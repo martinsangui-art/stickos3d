@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STICKOS 3D — Impresión 3D en Bahía Blanca · Envíos a todo el país</title>
+<meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido. Proyecto familiar en Bahía Blanca. Retiro local y envíos a todo el país.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   STICKOS 3D — Sistema de diseño
+   Concepto: todo se construye capa por capa.
+   ============================================================ */
+:root{
+  --bg:#121419;
+  --surface:#1A1E26;
+  --surface-2:#20252F;
+  --line:#2A303B;
+  --text:#EDEAE2;
+  --muted:#98A0AC;
+  --accent:#FF5A1F;
+  --accent-hi:#FF7A45;
+  --accent-soft:rgba(255,90,31,.12);
+  --ok:#4CC38A;
+  --radius:14px;
+  --font-display:'Unbounded',sans-serif;
+  --font-body:'Archivo',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --layers:repeating-linear-gradient(to bottom, transparent 0 5px, rgba(255,255,255,.035) 5px 6px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+/* ---------- Eyebrows estilo "capa" ---------- */
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:18px;
+}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
+
+/* ---------- Header ---------- */
+header{
+  position:sticky;top:0;z-index:60;
+  background:rgba(18,20,25,.82);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.02em}
+.logo em{font-style:normal;color:var(--accent)}
+.logo small{display:block;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
+.nav-links{display:flex;gap:28px;font-size:14.5px;font-weight:500;color:var(--muted)}
+.nav-links a{transition:color .18s}
+.nav-links a:hover{color:var(--text)}
+.cart-btn{
+  display:flex;align-items:center;gap:9px;
+  background:var(--surface-2);border:1px solid var(--line);
+  color:var(--text);border-radius:99px;padding:9px 18px;
+  font-size:14px;font-weight:600;transition:border-color .18s;
+}
+.cart-btn:hover{border-color:var(--accent)}
+.cart-count{
+  font-family:var(--font-mono);
+  background:var(--accent);color:#121419;
+  min-width:21px;height:21px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;
+}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;overflow:hidden;
+  padding:110px 0 90px;
+  background:
+    radial-gradient(700px 380px at 82% 10%, rgba(255,90,31,.14), transparent 65%),
+    var(--layers), var(--bg);
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(34px,5.6vw,64px);
+  line-height:1.12;
+  max-width:15ch;
+  margin-bottom:22px;
+}
+.hero h1 .capa{
+  display:block;
+  opacity:0;transform:translateY(14px);
+  animation:printLayer .55s ease forwards;
+}
+.hero h1 .capa:nth-child(2){animation-delay:.22s}
+.hero h1 .capa:nth-child(3){animation-delay:.44s;color:var(--accent)}
+@keyframes printLayer{to{opacity:1;transform:none}}
+.hero p{color:var(--muted);font-size:18px;max-width:52ch;margin-bottom:36px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  border-radius:10px;padding:14px 26px;
+  font-size:15px;font-weight:600;border:1px solid transparent;
+  transition:transform .15s, background .18s, border-color .18s;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);color:#121419}
+.btn-primary:hover{background:var(--accent-hi)}
+.btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
+.btn-ghost:hover{border-color:var(--accent)}
+.hero-specs{
+  display:flex;gap:34px;flex-wrap:wrap;
+  margin-top:56px;padding-top:26px;
+  border-top:1px solid var(--line);
+}
+.hero-specs div{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.hero-specs strong{display:block;color:var(--text);font-size:15px;letter-spacing:0;margin-bottom:3px}
+
+/* ---------- Marquee de materiales ---------- */
+.strip{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;white-space:nowrap;
+  background:var(--surface);
+  padding:13px 0;
+  font-family:var(--font-mono);font-size:12.5px;letter-spacing:.18em;color:var(--muted);
+}
+.strip-inner{display:inline-block;animation:slide 34s linear infinite}
+.strip span{margin:0 26px}
+.strip b{color:var(--accent);font-weight:400}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- Secciones ---------- */
+section{padding:96px 0}
+.sec-head{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2}
+.sec-head p{color:var(--muted);max-width:46ch;margin-top:10px}
+
+/* ---------- Filtros ---------- */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px}
+.chip{
+  font-family:var(--font-mono);font-size:12.5px;letter-spacing:.06em;
+  border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:99px;padding:8px 18px;transition:all .18s;
+}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#121419;font-weight:700}
+
+/* ---------- Grid de productos ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
+.card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .2s, border-color .2s;
+}
+.card:hover{transform:translateY(-4px);border-color:#3A4150}
+.tile{
+  aspect-ratio:4/3;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,var(--surface-2),#171B22);
+  overflow:hidden;
+}
+.tile::before{content:"";position:absolute;inset:0;background:var(--layers)}
+.tile::after{
+  content:"FOTO PRÓXIMAMENTE";
+  position:absolute;bottom:10px;right:12px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:#4A5160;
+}
+.tile span{
+  font-family:var(--font-display);font-weight:800;
+  font-size:64px;color:rgba(255,90,31,.22);
+  position:relative;user-select:none;
+}
+.card-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card-cat{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.card-body h3{font-size:17px;font-weight:600;line-height:1.35}
+.card-mat{font-size:13px;color:var(--muted)}
+.card-foot{margin-top:auto;padding-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.price{font-family:var(--font-mono);font-size:16.5px;font-weight:700;color:var(--text)}
+.add-btn{
+  background:var(--accent-soft);color:var(--accent);
+  border:1px solid transparent;border-radius:9px;
+  padding:9px 16px;font-size:13.5px;font-weight:700;
+  transition:all .18s;
+}
+.add-btn:hover{background:var(--accent);color:#121419}
+.buy-link{
+  display:block;text-align:center;
+  font-size:12.5px;font-weight:600;color:var(--muted);
+  padding:9px;border-top:1px solid var(--line);
+  transition:color .18s;
+}
+.buy-link:hover{color:var(--accent)}
+
+/* ---------- A pedido ---------- */
+.custom{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.custom ul{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:28px}
+.custom li{display:flex;gap:16px;color:var(--muted);font-size:15.5px}
+.custom li b{color:var(--text);font-weight:600}
+.li-mark{
+  font-family:var(--font-mono);font-size:11px;color:var(--accent);
+  border:1px solid var(--line);border-radius:8px;
+  min-width:52px;height:28px;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);flex-shrink:0;margin-top:2px;
+}
+form{display:flex;flex-direction:column;gap:16px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:7px}
+input,select,textarea{
+  font-family:var(--font-body);font-size:15px;color:var(--text);
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:9px;padding:12px 14px;width:100%;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:96px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-note{font-size:12.5px;color:var(--muted)}
+
+/* ---------- Cómo comprar ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.step{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:28px;
+}
+.step-n{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.15em;margin-bottom:14px}
+.step h3{font-size:18px;margin-bottom:10px}
+.step p{color:var(--muted);font-size:14.5px}
+.pay-row{
+  margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;
+}
+.pay-tag{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;
+  border:1px solid var(--line);border-radius:99px;padding:8px 18px;color:var(--muted);
+}
+.pay-tag b{color:var(--text);font-weight:700}
+
+/* ---------- Nosotros ---------- */
+.about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center}
+.about p{color:var(--muted);font-size:16.5px;margin-bottom:18px}
+.about p b{color:var(--text)}
+.about-visual{
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--layers),linear-gradient(160deg,var(--surface),#161A21);
+  padding:36px;font-family:var(--font-mono);font-size:13px;line-height:2.1;color:var(--muted);
+}
+.about-visual b{color:var(--accent);font-weight:400}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--surface)}
+.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:40px}
+.foot-grid h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px;text-transform:uppercase}
+.foot-grid a{display:block;font-size:14.5px;color:var(--text);margin-bottom:8px;opacity:.85}
+.foot-grid a:hover{color:var(--accent);opacity:1}
+.foot-base{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+
+/* ---------- Carrito (drawer) ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(10,12,16,.6);
+  opacity:0;pointer-events:none;transition:opacity .25s;z-index:70;
+}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;height:100dvh;width:min(420px,100vw);
+  background:var(--surface);border-left:1px solid var(--line);
+  transform:translateX(100%);transition:transform .28s ease;
+  z-index:80;display:flex;flex-direction:column;
+}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line)}
+.drawer-head h3{font-family:var(--font-display);font-size:16px;font-weight:600}
+.drawer-close{background:none;border:none;color:var(--muted);font-size:24px;line-height:1}
+.drawer-close:hover{color:var(--text)}
+.drawer-items{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:16px}
+.d-item{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.d-item h4{font-size:14.5px;font-weight:600;margin-bottom:4px}
+.d-item .price{font-size:13.5px}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{
+  width:26px;height:26px;border-radius:7px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+  font-size:15px;display:flex;align-items:center;justify-content:center;
+}
+.qty button:hover{border-color:var(--accent)}
+.qty span{font-family:var(--font-mono);font-size:14px;min-width:18px;text-align:center}
+.empty-cart{color:var(--muted);font-size:14.5px;text-align:center;margin-top:40px}
+.drawer-foot{border-top:1px solid var(--line);padding:20px 24px 26px}
+.total-row{display:flex;justify-content:space-between;font-size:15px;font-weight:600;margin-bottom:16px}
+.total-row .price{font-size:19px;color:var(--accent)}
+.drawer-foot .btn{width:100%;justify-content:center}
+.drawer-note{font-size:12px;color:var(--muted);margin-top:12px;text-align:center;line-height:1.5}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);
+  background:var(--surface-2);border:1px solid var(--accent);color:var(--text);
+  border-radius:10px;padding:12px 22px;font-size:14px;font-weight:600;
+  opacity:0;pointer-events:none;transition:all .25s;z-index:90;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- WhatsApp flotante ---------- */
+.wa-float{
+  position:fixed;bottom:24px;right:24px;z-index:65;
+  width:56px;height:56px;border-radius:99px;
+  background:#25D366;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 24px rgba(0,0,0,.4);transition:transform .18s;
+}
+.wa-float:hover{transform:scale(1.07)}
+.wa-float svg{width:28px;height:28px;fill:#fff}
+
+/* ---------- Responsive ---------- */
+@media(max-width:900px){
+  .custom-grid,.about-grid{grid-template-columns:1fr;gap:40px}
+  .steps{grid-template-columns:1fr}
+  .nav-links{display:none}
+  section{padding:72px 0}
+  .hero{padding:80px 0 64px}
+}
+@media(max-width:520px){
+  .form-row{grid-template-columns:1fr}
+  .hero-specs{gap:20px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .hero h1 .capa{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="wrap nav">
+    <a href="#" class="logo">STICKOS<em>3D</em><small>IMPRESIÓN 3D</small></a>
+    <nav class="nav-links">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#pedido">A pedido</a>
+      <a href="#comprar">Cómo comprar</a>
+      <a href="#nosotros">Nosotros</a>
+    </nav>
+    <button class="cart-btn" id="openCart" aria-label="Abrir carrito">
+      Carrito <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Bahía Blanca · Envíos a todo el país</div>
+    <h1>
+      <span class="capa">Ideas hechas</span>
+      <span class="capa">objeto,</span>
+      <span class="capa">capa por capa.</span>
+    </h1>
+    <p>Objetos útiles, deco y piezas a medida impresas en 3D. Un proyecto familiar con terminación cuidada, precios justos y respuesta rápida.</p>
+    <div class="hero-ctas">
+      <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
+      <a href="#pedido" class="btn btn-ghost">Pedir algo a medida</a>
+    </div>
+    <div class="hero-specs">
+      <div><strong>Diseños propios</strong>CATÁLOGO PERMANENTE</div>
+      <div><strong>Piezas a pedido</strong>TRAÉ TU IDEA O ARCHIVO</div>
+      <div><strong>Repuestos</strong>REPARÁ EN VEZ DE TIRAR</div>
+      <div><strong>Retiro o envío</strong>LOCAL + TODO EL PAÍS</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= STRIP ================= -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-inner" id="strip"></div>
+</div>
+
+<!-- ================= CATÁLOGO ================= -->
+<section id="catalogo">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Capa 01 — Catálogo</div>
+        <h2>Diseños listos para pedir</h2>
+        <p>Todo se imprime al momento del pedido: elegí color y te confirmamos el plazo por WhatsApp.</p>
+      </div>
+    </div>
+    <div class="filters" id="filters" role="tablist" aria-label="Filtrar por categoría"></div>
+    <div class="grid" id="productGrid"></div>
+  </div>
+</section>
+
+<!-- ================= A PEDIDO ================= -->
+<section class="custom" id="pedido">
+  <div class="wrap custom-grid">
+    <div>
+      <div class="eyebrow">Capa 02 — A pedido</div>
+      <h2 style="font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2">¿No está en el catálogo?<br>Lo imprimimos igual.</h2>
+      <ul>
+        <li><span class="li-mark">IDEA</span><span><b>Traé tu idea.</b> Contanos qué necesitás y te decimos si es viable, en qué material y cuánto sale.</span></li>
+        <li><span class="li-mark">STL</span><span><b>¿Ya tenés el archivo?</b> Mandanos el STL/3MF y te cotizamos la impresión directamente.</span></li>
+        <li><span class="li-mark">ROTO</span><span><b>Repuestos.</b> Perillas, enganches, soportes, piezas discontinuadas: una foto y las medidas suelen alcanzar.</span></li>
+        <li><span class="li-mark">LOTE</span><span><b>Cantidad.</b> Souvenirs, merchandising y series para eventos o negocios, con precio por volumen.</span></li>
+      </ul>
+    </div>
+    <form id="customForm">
+      <label>Tu nombre
+        <input type="text" id="cfName" placeholder="Nombre" required>
+      </label>
+      <label>¿Qué necesitás?
+        <textarea id="cfDesc" placeholder="Describí la pieza: qué es, para qué la usás, medidas aproximadas…" required></textarea>
+      </label>
+      <div class="form-row">
+        <label>Material preferido
+          <select id="cfMat">
+            <option>No sé, asesorame</option>
+            <option>PLA (uso general)</option>
+            <option>PETG (más resistente)</option>
+            <option>TPU (flexible)</option>
+          </select>
+        </label>
+        <label>Cantidad
+          <input type="number" id="cfQty" min="1" value="1">
+        </label>
+      </div>
+      <label>Color preferido
+        <input type="text" id="cfColor" placeholder="Ej: negro, blanco, naranja…">
+      </label>
+      <button type="submit" class="btn btn-primary" style="justify-content:center">Pedir cotización por WhatsApp</button>
+      <p class="form-note">Se abre WhatsApp con tu pedido ya redactado. Si tenés archivo o fotos, los adjuntás ahí mismo.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= CÓMO COMPRAR ================= -->
+<section id="comprar">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Capa 03 — Cómo comprar</div>
+        <h2>Simple, como tiene que ser</h2>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">PASO 01</div>
+        <h3>Armá tu pedido</h3>
+        <p>Sumá productos al carrito o completá el formulario de piezas a medida. Sin registrarte ni crear cuentas.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">PASO 02</div>
+        <h3>Confirmamos por WhatsApp</h3>
+        <p>Te llega el detalle, confirmamos colores, plazo de impresión y te pasamos el link de pago o datos de transferencia.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">PASO 03</div>
+        <h3>Retirás o te lo enviamos</h3>
+        <p>Retiro sin cargo en Bahía Blanca, o envío a todo el país por correo con seguimiento.</p>
+      </div>
+    </div>
+    <div class="pay-row">
+      <span class="pay-tag"><b>Mercado Pago</b> · link de pago</span>
+      <span class="pay-tag"><b>Transferencia</b> · CBU/alias</span>
+      <span class="pay-tag"><b>Efectivo</b> · al retirar</span>
+      <span class="pay-tag"><b>Envíos</b> · Correo Argentino / a convenir</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NOSOTROS ================= -->
+<section id="nosotros">
+  <div class="wrap about-grid">
+    <div class="about">
+      <div class="eyebrow">Capa 04 — Nosotros</div>
+      <h2 style="font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2;margin-bottom:22px">Un proyecto familiar,<br>en serio.</h2>
+      <p><b>STICKOS 3D nació en casa</b>, entre mates y rollos de filamento, con una idea simple: fabricar objetos útiles y bien terminados, sin la frialdad de una fábrica ni los precios de un importado.</p>
+      <p>Cada pieza que sale de nuestras impresoras la revisamos nosotros mismos. Si algo no nos convence para nuestra propia casa, no te lo vendemos.</p>
+      <p>Comprarnos es apoyar un emprendimiento familiar de Bahía Blanca. Y eso, para nosotros, vale tanto como la venta.</p>
+    </div>
+    <div class="about-visual" aria-hidden="true">
+      <b>&gt;</b> inicio ......... proyecto_familiar<br>
+      <b>&gt;</b> base ........... Bahía Blanca, AR<br>
+      <b>&gt;</b> materiales ..... PLA / PETG / TPU<br>
+      <b>&gt;</b> control ........ pieza por pieza<br>
+      <b>&gt;</b> filosofía ...... útil &gt; descartable<br>
+      <b>&gt;</b> estado ......... imprimiendo_
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo" style="margin-bottom:12px;display:inline-block">STICKOS<em>3D</em></a>
+        <p style="color:var(--muted);font-size:13.5px;max-width:32ch">Impresión 3D con espíritu familiar. Bahía Blanca, Buenos Aires.</p>
+      </div>
+      <div>
+        <h4>Tienda</h4>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#pedido">Piezas a pedido</a>
+        <a href="#comprar">Cómo comprar</a>
+      </div>
+      <div>
+        <h4>Contacto</h4>
+        <a href="#" id="footWa">WhatsApp</a>
+        <a href="#" id="footIg">Instagram</a>
+        <a href="#" id="footMail">Email</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© 2026 STICKOS 3D</span>
+      <span>HECHO CAPA POR CAPA EN BAHÍA BLANCA</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= CARRITO ================= -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Carrito de compras">
+  <div class="drawer-head">
+    <h3>Tu pedido</h3>
+    <button class="drawer-close" id="closeCart" aria-label="Cerrar carrito">×</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot">
+    <div class="total-row"><span>Total estimado</span><span class="price" id="cartTotal">$ 0</span></div>
+    <button class="btn btn-primary" id="checkoutWa">Enviar pedido por WhatsApp</button>
+    <p class="drawer-note">Te confirmamos stock y plazo, y te pasamos el link de Mercado Pago o los datos de transferencia. Sin vueltas.</p>
+  </div>
+</aside>
+
+<div class="toast" id="toast">Agregado al pedido ✓</div>
+
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
+  <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.6.8 5 2.3 7L4 29l7.2-2.2c1.9 1 4 1.5 4.8 1.5 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 22.2c-1.7 0-3.4-.5-4.9-1.3l-.4-.2-4.3 1.3 1.3-4.1-.3-.4C6 18.9 5.4 17 5.4 15 5.4 9.2 10.2 4.4 16 4.4S26.6 9.2 26.6 15 21.8 25.2 16 25.2zm5.8-7.6c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.4.5-.5.2-.2.2-.3.3-.5.1-.2.1-.4 0-.6-.1-.2-.7-1.7-1-2.4-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>
+</a>
+
+<script>
+/* ============================================================
+   CONFIGURACIÓN — editá esto con sus datos reales
+   ============================================================ */
+const CONFIG = {
+  whatsapp: "5492915164996",          // ← número con código de país, sin + ni espacios
+  instagram: "stickos3d",             // ← usuario de Instagram
+  email: "martinsangui@gmail.com"      // ← email de contacto
+};
+
+/* ============================================================
+   PRODUCTOS — para agregar uno, copiá un bloque {...} y editalo.
+   mpLink: pegá el link de pago de Mercado Pago del producto,
+   o dejalo en null para que se compre solo vía carrito/WhatsApp.
+   ============================================================ */
+const PRODUCTS = [
+  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:12500, mat:"PLA · varios colores", mpLink:null },
+  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:6800,  mat:"PLA · negro / blanco", mpLink:null },
+  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:9200,  mat:"PETG · apto exterior", mpLink:null },
+  { id:"p4",  name:"Soporte de auriculares",            cat:"Gadgets",  price:8900,  mat:"PLA · terminación mate", mpLink:null },
+  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:18500, mat:"PLA · incluye base", mpLink:null },
+  { id:"p6",  name:"Juego de encastre dinosaurio",      cat:"Juguetes", price:7400,  mat:"PLA · no tóxico", mpLink:null },
+  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:4200,  mat:"TPU · flexible", mpLink:null },
+  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:2900,  mat:"PLA · elegís color", mpLink:null },
+  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:8100,  mat:"PETG · resistente", mpLink:null },
+  { id:"p10", name:"Escultura low-poly personalizable", cat:"Deco",     price:11000, mat:"PLA · varios tamaños", mpLink:null },
+  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:5600,  mat:"PLA · flexible articulado", mpLink:null },
+  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:14800, mat:"PLA · a medida", mpLink:null }
+];
+
+/* ============================================================
+   Lógica del sitio (no hace falta tocar de acá para abajo)
+   ============================================================ */
+const fmt = n => "$ " + n.toLocaleString("es-AR");
+const wa  = msg => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+
+// Links de contacto
+document.getElementById("waFloat").href = wa("¡Hola STICKOS 3D! Quería hacer una consulta.");
+document.getElementById("footWa").href  = wa("¡Hola STICKOS 3D!");
+document.getElementById("footIg").href  = `https://instagram.com/${CONFIG.instagram}`;
+document.getElementById("footMail").href = `mailto:${CONFIG.email}`;
+
+// Strip de materiales
+const stripItems = "PLA <b>//</b> PETG <b>//</b> TPU <b>//</b> DISEÑOS PROPIOS <b>//</b> PIEZAS A PEDIDO <b>//</b> REPUESTOS <b>//</b> DECO <b>//</b> REGALOS <b>//</b> ";
+document.getElementById("strip").innerHTML = `<span>${stripItems.repeat(4)}</span>`;
+
+// Filtros
+const cats = ["Todos", ...new Set(PRODUCTS.map(p => p.cat))];
+const filtersEl = document.getElementById("filters");
+let activeCat = "Todos";
+cats.forEach(c => {
+  const b = document.createElement("button");
+  b.className = "chip" + (c === "Todos" ? " active" : "");
+  b.textContent = c;
+  b.onclick = () => {
+    activeCat = c;
+    document.querySelectorAll(".chip").forEach(x => x.classList.toggle("active", x === b));
+    renderProducts();
+  };
+  filtersEl.appendChild(b);
+});
+
+// Grid de productos
+const gridEl = document.getElementById("productGrid");
+function renderProducts(){
+  const list = activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat);
+  gridEl.innerHTML = list.map(p => `
+    <article class="card">
+      <div class="tile"><span>${p.name.charAt(0)}</span></div>
+      <div class="card-body">
+        <div class="card-cat">${p.cat}</div>
+        <h3>${p.name}</h3>
+        <div class="card-mat">${p.mat}</div>
+        <div class="card-foot">
+          <span class="price">${fmt(p.price)}</span>
+          <button class="add-btn" data-add="${p.id}">Agregar</button>
+        </div>
+      </div>
+      ${p.mpLink ? `<a class="buy-link" href="${p.mpLink}" target="_blank" rel="noopener">Comprar ya con Mercado Pago →</a>` : ""}
+    </article>
+  `).join("");
+}
+renderProducts();
+
+// Carrito (en memoria de la sesión)
+let cart = {};
+const drawer = document.getElementById("drawer");
+const overlay = document.getElementById("overlay");
+const toast = document.getElementById("toast");
+let toastTimer;
+
+function cartSize(){ return Object.values(cart).reduce((a,i)=>a+i.qty,0); }
+function cartTotal(){ return Object.values(cart).reduce((a,i)=>a+i.qty*i.price,0); }
+
+function renderCart(){
+  document.getElementById("cartCount").textContent = cartSize();
+  document.getElementById("cartTotal").textContent = fmt(cartTotal());
+  const box = document.getElementById("drawerItems");
+  const items = Object.values(cart);
+  if(!items.length){
+    box.innerHTML = `<p class="empty-cart">Tu pedido está vacío.<br>Sumá algo del catálogo 👇</p>`;
+    return;
+  }
+  box.innerHTML = items.map(i => `
+    <div class="d-item">
+      <div>
+        <h4>${i.name}</h4>
+        <span class="price">${fmt(i.price)} c/u</span>
+      </div>
+      <div class="qty">
+        <button data-dec="${i.id}" aria-label="Restar">−</button>
+        <span>${i.qty}</span>
+        <button data-inc="${i.id}" aria-label="Sumar">+</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function addToCart(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!cart[id]) cart[id] = { ...p, qty:0 };
+  cart[id].qty++;
+  renderCart();
+  clearTimeout(toastTimer);
+  toast.classList.add("show");
+  toastTimer = setTimeout(()=>toast.classList.remove("show"), 1800);
+}
+
+document.addEventListener("click", e => {
+  const add = e.target.closest("[data-add]");
+  const inc = e.target.closest("[data-inc]");
+  const dec = e.target.closest("[data-dec]");
+  if(add) addToCart(add.dataset.add);
+  if(inc){ cart[inc.dataset.inc].qty++; renderCart(); }
+  if(dec){
+    const it = cart[dec.dataset.dec];
+    it.qty--;
+    if(it.qty <= 0) delete cart[dec.dataset.dec];
+    renderCart();
+  }
+});
+
+function openCart(){ drawer.classList.add("open"); overlay.classList.add("open"); }
+function closeCart(){ drawer.classList.remove("open"); overlay.classList.remove("open"); }
+document.getElementById("openCart").onclick = openCart;
+document.getElementById("closeCart").onclick = closeCart;
+overlay.onclick = closeCart;
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeCart(); });
+
+// Checkout por WhatsApp
+document.getElementById("checkoutWa").onclick = () => {
+  const items = Object.values(cart);
+  if(!items.length){ alert("Tu pedido está vacío. Agregá algo del catálogo primero."); return; }
+  let msg = "¡Hola STICKOS 3D! Quiero hacer este pedido:\n\n";
+  items.forEach(i => { msg += `• ${i.name} x${i.qty} — ${fmt(i.price * i.qty)}\n`; });
+  msg += `\nTotal estimado: ${fmt(cartTotal())}\n\n¿Me confirman disponibilidad y forma de pago?`;
+  window.open(wa(msg), "_blank");
+};
+
+// Formulario a pedido
+document.getElementById("customForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name  = document.getElementById("cfName").value.trim();
+  const desc  = document.getElementById("cfDesc").value.trim();
+  const mat   = document.getElementById("cfMat").value;
+  const qty   = document.getElementById("cfQty").value;
+  const color = document.getElementById("cfColor").value.trim() || "a definir";
+  const msg = `¡Hola STICKOS 3D! Soy ${name} y quiero cotizar una pieza a medida:\n\n` +
+              `📦 Descripción: ${desc}\n🧵 Material: ${mat}\n🎨 Color: ${color}\n🔢 Cantidad: ${qty}\n\n` +
+              `Si necesitan fotos o el archivo, los mando por acá.`;
+  window.open(wa(msg), "_blank");
+});
+</script>
+</body>
+</html>
