@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STICKOS 3D — Impresión 3D en Bahía Blanca · Envíos a todo el país</title>
-<meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido. Proyecto familiar en Bahía Blanca. Retiro local y envíos a todo el país.">
+<meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido con cotización instantánea. Proyecto familiar en Bahía Blanca. Retiro local y envíos a todo el país.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   STICKOS 3D — Sistema de diseño
-   Concepto: todo se construye capa por capa.
+   STICKOS 3D — v2
+   Diferenciadores: color de filamento en vivo, cotizador
+   instantáneo, taller en vivo, garantía de reimpresión.
    ============================================================ */
 :root{
   --bg:#121419;
@@ -47,7 +48,6 @@ button{font-family:inherit;cursor:pointer}
 
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 
-/* ---------- Eyebrows estilo "capa" ---------- */
 .eyebrow{
   font-family:var(--font-mono);
   font-size:12px;
@@ -58,6 +58,7 @@ button{font-family:inherit;cursor:pointer}
   margin-bottom:18px;
 }
 .eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
+h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2}
 
 /* ---------- Header ---------- */
 header{
@@ -133,7 +134,7 @@ header{
 .hero-specs div{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
 .hero-specs strong{display:block;color:var(--text);font-size:15px;letter-spacing:0;margin-bottom:3px}
 
-/* ---------- Marquee de materiales ---------- */
+/* ---------- Strip ---------- */
 .strip{
   border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   overflow:hidden;white-space:nowrap;
@@ -146,10 +147,8 @@ header{
 .strip b{color:var(--accent);font-weight:400}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* ---------- Secciones ---------- */
 section{padding:96px 0}
 .sec-head{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
-.sec-head h2{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2}
 .sec-head p{color:var(--muted);max-width:46ch;margin-top:10px}
 
 /* ---------- Filtros ---------- */
@@ -183,15 +182,38 @@ section{padding:96px 0}
   position:absolute;bottom:10px;right:12px;
   font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:#4A5160;
 }
-.tile span{
-  font-family:var(--font-display);font-weight:800;
-  font-size:64px;color:rgba(255,90,31,.22);
-  position:relative;user-select:none;
+.tile .obj{
+  position:relative;
+  width:92px;height:92px;border-radius:18px;
+  background:var(--obj,#2A2A2E);
+  box-shadow:inset 0 -14px 22px rgba(0,0,0,.35), 0 10px 26px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .25s;
+}
+.tile .obj::before{
+  content:"";position:absolute;inset:0;border-radius:18px;
+  background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.14) 3px 4px);
+}
+.tile .obj span{
+  font-family:var(--font-display);font-weight:800;font-size:38px;
+  color:rgba(255,255,255,.55);mix-blend-mode:overlay;user-select:none;
 }
 .card-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
 .card-cat{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .card-body h3{font-size:17px;font-weight:600;line-height:1.35}
 .card-mat{font-size:13px;color:var(--muted)}
+
+/* Swatches de color */
+.swatches{display:flex;align-items:center;gap:8px;margin-top:4px}
+.swatch{
+  width:20px;height:20px;border-radius:99px;border:2px solid transparent;
+  outline:1px solid var(--line);cursor:pointer;padding:0;
+  transition:transform .15s, outline-color .15s;
+}
+.swatch:hover{transform:scale(1.15)}
+.swatch.active{outline:2px solid var(--accent);border-color:var(--bg)}
+.swatch-label{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em;margin-left:2px}
+
 .card-foot{margin-top:auto;padding-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .price{font-family:var(--font-mono);font-size:16.5px;font-weight:700;color:var(--text)}
 .add-btn{
@@ -209,9 +231,9 @@ section{padding:96px 0}
 }
 .buy-link:hover{color:var(--accent)}
 
-/* ---------- A pedido ---------- */
+/* ---------- A pedido + Cotizador ---------- */
 .custom{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.custom-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:start}
 .custom ul{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:28px}
 .custom li{display:flex;gap:16px;color:var(--muted);font-size:15.5px}
 .custom li b{color:var(--text);font-weight:600}
@@ -222,6 +244,7 @@ section{padding:96px 0}
   background:var(--bg);flex-shrink:0;margin-top:2px;
 }
 form{display:flex;flex-direction:column;gap:16px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+.form-title{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
 label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:7px}
 input,select,textarea{
   font-family:var(--font-body);font-size:15px;color:var(--text);
@@ -229,9 +252,19 @@ input,select,textarea{
   border-radius:9px;padding:12px 14px;width:100%;
 }
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
-textarea{resize:vertical;min-height:96px}
+textarea{resize:vertical;min-height:80px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .form-note{font-size:12.5px;color:var(--muted)}
+
+.quote-box{
+  border:1px dashed var(--line);border-radius:10px;
+  background:var(--surface);padding:18px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.quote-box .q-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.quote-value{font-family:var(--font-mono);font-size:clamp(20px,2.4vw,26px);font-weight:700;color:var(--accent)}
+.quote-box small{display:block;font-size:11.5px;color:var(--muted);max-width:24ch;line-height:1.45}
 
 /* ---------- Cómo comprar ---------- */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -242,25 +275,76 @@ textarea{resize:vertical;min-height:96px}
 .step-n{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.15em;margin-bottom:14px}
 .step h3{font-size:18px;margin-bottom:10px}
 .step p{color:var(--muted);font-size:14.5px}
-.pay-row{
-  margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;
-}
+.pay-row{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}
 .pay-tag{
   font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;
   border:1px solid var(--line);border-radius:99px;padding:8px 18px;color:var(--muted);
 }
 .pay-tag b{color:var(--text);font-weight:700}
 
-/* ---------- Nosotros ---------- */
-.about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center}
+/* ---------- Garantía / confianza ---------- */
+.trust{
+  margin-top:56px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+}
+.trust-card{
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px;background:linear-gradient(160deg,var(--surface),#161A21);
+  position:relative;overflow:hidden;
+}
+.trust-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.trust-card h3{font-size:16.5px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.trust-card p{color:var(--muted);font-size:14px}
+.trust-mark{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;
+  color:var(--accent);text-transform:uppercase;display:block;margin-bottom:12px;
+}
+
+/* ---------- Taller en vivo ---------- */
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
 .about p{color:var(--muted);font-size:16.5px;margin-bottom:18px}
 .about p b{color:var(--text)}
-.about-visual{
+.workshop{
   border:1px solid var(--line);border-radius:var(--radius);
   background:var(--layers),linear-gradient(160deg,var(--surface),#161A21);
-  padding:36px;font-family:var(--font-mono);font-size:13px;line-height:2.1;color:var(--muted);
+  padding:26px 28px;font-family:var(--font-mono);
 }
-.about-visual b{color:var(--accent);font-weight:400}
+.workshop-head{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;
+  margin-bottom:20px;
+}
+.live-dot{
+  display:inline-flex;align-items:center;gap:8px;color:var(--ok);
+}
+.live-dot::before{
+  content:"";width:8px;height:8px;border-radius:99px;background:var(--ok);
+  animation:pulse 1.6s ease infinite;
+}
+@keyframes pulse{50%{opacity:.35}}
+.job{margin-bottom:18px}
+.job:last-child{margin-bottom:0}
+.job-name{font-size:13px;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px}
+.job-name .pct{color:var(--accent)}
+.job-name .queued{color:var(--muted);font-size:11px;letter-spacing:.1em}
+.bar{
+  height:8px;border-radius:99px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden;
+}
+.bar i{
+  display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hi));
+  border-radius:99px;
+  background-size:200% 100%;
+  animation:flow 2.2s linear infinite;
+}
+@keyframes flow{to{background-position:-200% 0}}
+.workshop-foot{
+  margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:.04em;line-height:1.7;
+}
+.workshop-foot b{color:var(--accent);font-weight:400}
+.cursor{animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
 
 /* ---------- Footer ---------- */
 footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--surface)}
@@ -270,7 +354,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .foot-grid a:hover{color:var(--accent);opacity:1}
 .foot-base{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
 
-/* ---------- Carrito (drawer) ---------- */
+/* ---------- Carrito ---------- */
 .overlay{
   position:fixed;inset:0;background:rgba(10,12,16,.6);
   opacity:0;pointer-events:none;transition:opacity .25s;z-index:70;
@@ -289,7 +373,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .drawer-close:hover{color:var(--text)}
 .drawer-items{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:16px}
 .d-item{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:16px}
-.d-item h4{font-size:14.5px;font-weight:600;margin-bottom:4px}
+.d-item h4{font-size:14.5px;font-weight:600;margin-bottom:2px}
+.d-color{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:5px}
+.d-color i{width:11px;height:11px;border-radius:99px;display:inline-block;outline:1px solid var(--line)}
 .d-item .price{font-size:13.5px}
 .qty{display:flex;align-items:center;gap:10px}
 .qty button{
@@ -306,7 +392,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .drawer-foot .btn{width:100%;justify-content:center}
 .drawer-note{font-size:12px;color:var(--muted);margin-top:12px;text-align:center;line-height:1.5}
 
-/* ---------- Toast ---------- */
 .toast{
   position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);
   background:var(--surface-2);border:1px solid var(--accent);color:var(--text);
@@ -315,7 +400,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* ---------- WhatsApp flotante ---------- */
 .wa-float{
   position:fixed;bottom:24px;right:24px;z-index:65;
   width:56px;height:56px;border-radius:99px;
@@ -325,16 +409,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .wa-float:hover{transform:scale(1.07)}
 .wa-float svg{width:28px;height:28px;fill:#fff}
 
-/* ---------- Responsive ---------- */
 @media(max-width:900px){
   .custom-grid,.about-grid{grid-template-columns:1fr;gap:40px}
-  .steps{grid-template-columns:1fr}
+  .steps,.trust{grid-template-columns:1fr}
   .nav-links{display:none}
   section{padding:72px 0}
   .hero{padding:80px 0 64px}
 }
 @media(max-width:520px){
-  .form-row{grid-template-columns:1fr}
+  .form-row,.form-row-3{grid-template-columns:1fr}
   .hero-specs{gap:20px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -352,9 +435,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
     <a href="#" class="logo">STICKOS<em>3D</em><small>IMPRESIÓN 3D</small></a>
     <nav class="nav-links">
       <a href="#catalogo">Catálogo</a>
-      <a href="#pedido">A pedido</a>
+      <a href="#pedido">Cotizador</a>
       <a href="#comprar">Cómo comprar</a>
-      <a href="#nosotros">Nosotros</a>
+      <a href="#nosotros">El taller</a>
     </nav>
     <button class="cart-btn" id="openCart" aria-label="Abrir carrito">
       Carrito <span class="cart-count" id="cartCount">0</span>
@@ -371,15 +454,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       <span class="capa">objeto,</span>
       <span class="capa">capa por capa.</span>
     </h1>
-    <p>Objetos útiles, deco y piezas a medida impresas en 3D. Un proyecto familiar con terminación cuidada, precios justos y respuesta rápida.</p>
+    <p>Objetos útiles, deco y piezas a medida impresas en 3D. Elegí el color en pantalla, cotizá al instante y recibilo donde estés. Un proyecto familiar con garantía de reimpresión.</p>
     <div class="hero-ctas">
       <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
-      <a href="#pedido" class="btn btn-ghost">Pedir algo a medida</a>
+      <a href="#pedido" class="btn btn-ghost">Cotizar una pieza a medida</a>
     </div>
     <div class="hero-specs">
-      <div><strong>Diseños propios</strong>CATÁLOGO PERMANENTE</div>
-      <div><strong>Piezas a pedido</strong>TRAÉ TU IDEA O ARCHIVO</div>
-      <div><strong>Repuestos</strong>REPARÁ EN VEZ DE TIRAR</div>
+      <div><strong>Elegís el color</strong>EN PANTALLA, EN VIVO</div>
+      <div><strong>Cotización al instante</strong>SIN ESPERAR RESPUESTA</div>
+      <div><strong>Garantía STICKOS</strong>REIMPRESIÓN SIN CARGO</div>
       <div><strong>Retiro o envío</strong>LOCAL + TODO EL PAÍS</div>
     </div>
   </div>
@@ -396,8 +479,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
     <div class="sec-head">
       <div>
         <div class="eyebrow">Capa 01 — Catálogo</div>
-        <h2>Diseños listos para pedir</h2>
-        <p>Todo se imprime al momento del pedido: elegí color y te confirmamos el plazo por WhatsApp.</p>
+        <h2 class="sec-title">Diseños listos para pedir</h2>
+        <p>Tocá un color y mirá cómo queda. Cada pieza se imprime al momento del pedido, en el color que elijas.</p>
       </div>
     </div>
     <div class="filters" id="filters" role="tablist" aria-label="Filtrar por categoría"></div>
@@ -405,44 +488,65 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   </div>
 </section>
 
-<!-- ================= A PEDIDO ================= -->
+<!-- ================= COTIZADOR / A PEDIDO ================= -->
 <section class="custom" id="pedido">
   <div class="wrap custom-grid">
     <div>
-      <div class="eyebrow">Capa 02 — A pedido</div>
-      <h2 style="font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2">¿No está en el catálogo?<br>Lo imprimimos igual.</h2>
+      <div class="eyebrow">Capa 02 — Cotizador instantáneo</div>
+      <h2 class="sec-title">¿No está en el catálogo?<br>Cotizalo ahora, acá.</h2>
       <ul>
-        <li><span class="li-mark">IDEA</span><span><b>Traé tu idea.</b> Contanos qué necesitás y te decimos si es viable, en qué material y cuánto sale.</span></li>
-        <li><span class="li-mark">STL</span><span><b>¿Ya tenés el archivo?</b> Mandanos el STL/3MF y te cotizamos la impresión directamente.</span></li>
+        <li><span class="li-mark">YA</span><span><b>Precio estimado al instante.</b> Elegí tamaño, material y complejidad: el número aparece solo, sin esperar que nadie te responda.</span></li>
+        <li><span class="li-mark">STL</span><span><b>¿Ya tenés el archivo?</b> Mandanos el STL/3MF por WhatsApp y afinamos el precio exacto.</span></li>
         <li><span class="li-mark">ROTO</span><span><b>Repuestos.</b> Perillas, enganches, soportes, piezas discontinuadas: una foto y las medidas suelen alcanzar.</span></li>
-        <li><span class="li-mark">LOTE</span><span><b>Cantidad.</b> Souvenirs, merchandising y series para eventos o negocios, con precio por volumen.</span></li>
+        <li><span class="li-mark">LOTE</span><span><b>Cantidad.</b> Souvenirs, merchandising y series para eventos o negocios, con descuento por volumen.</span></li>
       </ul>
     </div>
     <form id="customForm">
-      <label>Tu nombre
-        <input type="text" id="cfName" placeholder="Nombre" required>
-      </label>
+      <span class="form-title">// Estimador de precio</span>
       <label>¿Qué necesitás?
         <textarea id="cfDesc" placeholder="Describí la pieza: qué es, para qué la usás, medidas aproximadas…" required></textarea>
       </label>
-      <div class="form-row">
-        <label>Material preferido
-          <select id="cfMat">
-            <option>No sé, asesorame</option>
-            <option>PLA (uso general)</option>
-            <option>PETG (más resistente)</option>
-            <option>TPU (flexible)</option>
+      <div class="form-row-3">
+        <label>Tamaño aproximado
+          <select id="cfSize">
+            <option value="S">Chico (hasta 5 cm)</option>
+            <option value="M" selected>Mediano (5–12 cm)</option>
+            <option value="L">Grande (12–20 cm)</option>
+            <option value="XL">Muy grande (+20 cm)</option>
           </select>
         </label>
+        <label>Material
+          <select id="cfMat">
+            <option value="PLA" selected>PLA (uso general)</option>
+            <option value="PETG">PETG (más resistente)</option>
+            <option value="TPU">TPU (flexible)</option>
+          </select>
+        </label>
+        <label>Complejidad
+          <select id="cfCx">
+            <option value="1">Simple</option>
+            <option value="1.3" selected>Media / no sé</option>
+            <option value="1.7">Alta (mucho detalle)</option>
+          </select>
+        </label>
+      </div>
+      <div class="form-row">
         <label>Cantidad
           <input type="number" id="cfQty" min="1" value="1">
         </label>
+        <label>Tu nombre
+          <input type="text" id="cfName" placeholder="Nombre" required>
+        </label>
       </div>
-      <label>Color preferido
-        <input type="text" id="cfColor" placeholder="Ej: negro, blanco, naranja…">
-      </label>
-      <button type="submit" class="btn btn-primary" style="justify-content:center">Pedir cotización por WhatsApp</button>
-      <p class="form-note">Se abre WhatsApp con tu pedido ya redactado. Si tenés archivo o fotos, los adjuntás ahí mismo.</p>
+      <div class="quote-box">
+        <div>
+          <div class="q-label">Estimado en el acto</div>
+          <div class="quote-value" id="quoteValue">$ 6.800 – $ 10.000</div>
+        </div>
+        <small>Orientativo. El precio final se confirma al ver la pieza o el archivo.</small>
+      </div>
+      <button type="submit" class="btn btn-primary" style="justify-content:center">Confirmar cotización por WhatsApp</button>
+      <p class="form-note">Se abre WhatsApp con tu pedido y el estimado ya redactados. Si tenés archivo o fotos, los adjuntás ahí.</p>
     </form>
   </div>
 </section>
@@ -453,19 +557,19 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
     <div class="sec-head">
       <div>
         <div class="eyebrow">Capa 03 — Cómo comprar</div>
-        <h2>Simple, como tiene que ser</h2>
+        <h2 class="sec-title">Simple, como tiene que ser</h2>
       </div>
     </div>
     <div class="steps">
       <div class="step">
         <div class="step-n">PASO 01</div>
         <h3>Armá tu pedido</h3>
-        <p>Sumá productos al carrito o completá el formulario de piezas a medida. Sin registrarte ni crear cuentas.</p>
+        <p>Sumá productos al carrito con el color elegido, o cotizá tu pieza a medida. Sin registrarte ni crear cuentas.</p>
       </div>
       <div class="step">
         <div class="step-n">PASO 02</div>
         <h3>Confirmamos por WhatsApp</h3>
-        <p>Te llega el detalle, confirmamos colores, plazo de impresión y te pasamos el link de pago o datos de transferencia.</p>
+        <p>Te llega el detalle completo, confirmamos plazo de impresión y te pasamos el link de pago o datos de transferencia.</p>
       </div>
       <div class="step">
         <div class="step-n">PASO 03</div>
@@ -479,26 +583,49 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       <span class="pay-tag"><b>Efectivo</b> · al retirar</span>
       <span class="pay-tag"><b>Envíos</b> · Correo Argentino / a convenir</span>
     </div>
+
+    <!-- Garantía y confianza -->
+    <div class="trust">
+      <div class="trust-card">
+        <span class="trust-mark">Garantía STICKOS</span>
+        <h3>Reimpresión sin cargo</h3>
+        <p>Si una pieza falla por un defecto de impresión, la volvemos a imprimir gratis. Sin letra chica: nos avisás, la reimprimimos.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-mark">Respuesta real</span>
+        <h3>Te contestamos en el día</h3>
+        <p>Atendemos nosotros, no un bot. Consultas, cotizaciones y seguimiento de pedidos, siempre con una persona del otro lado.</p>
+      </div>
+      <div class="trust-card">
+        <span class="trust-mark">Control artesanal</span>
+        <h3>Pieza por pieza</h3>
+        <p>Revisamos cada impresión antes de entregarla. Si no la pondríamos en nuestra propia casa, no te la vendemos.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ================= NOSOTROS ================= -->
+<!-- ================= EL TALLER / NOSOTROS ================= -->
 <section id="nosotros">
   <div class="wrap about-grid">
     <div class="about">
-      <div class="eyebrow">Capa 04 — Nosotros</div>
-      <h2 style="font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2;margin-bottom:22px">Un proyecto familiar,<br>en serio.</h2>
+      <div class="eyebrow">Capa 04 — El taller</div>
+      <h2 class="sec-title" style="margin-bottom:22px">Un proyecto familiar,<br>en serio.</h2>
       <p><b>STICKOS 3D nació en casa</b>, entre mates y rollos de filamento, con una idea simple: fabricar objetos útiles y bien terminados, sin la frialdad de una fábrica ni los precios de un importado.</p>
-      <p>Cada pieza que sale de nuestras impresoras la revisamos nosotros mismos. Si algo no nos convence para nuestra propia casa, no te lo vendemos.</p>
+      <p>A la derecha ves nuestra cola de impresión real: qué está en la impresora ahora y qué sigue. La actualizamos a mano, como todo lo que hacemos.</p>
       <p>Comprarnos es apoyar un emprendimiento familiar de Bahía Blanca. Y eso, para nosotros, vale tanto como la venta.</p>
     </div>
-    <div class="about-visual" aria-hidden="true">
-      <b>&gt;</b> inicio ......... proyecto_familiar<br>
-      <b>&gt;</b> base ........... Bahía Blanca, AR<br>
-      <b>&gt;</b> materiales ..... PLA / PETG / TPU<br>
-      <b>&gt;</b> control ........ pieza por pieza<br>
-      <b>&gt;</b> filosofía ...... útil &gt; descartable<br>
-      <b>&gt;</b> estado ......... imprimiendo_
+    <div class="workshop" aria-label="Cola de impresión del taller">
+      <div class="workshop-head">
+        <span>Cola de impresión</span>
+        <span class="live-dot">EN EL TALLER</span>
+      </div>
+      <div id="printQueue"></div>
+      <div class="workshop-foot">
+        <b>&gt;</b> materiales: PLA / PETG / TPU<br>
+        <b>&gt;</b> control de calidad: pieza por pieza<br>
+        <b>&gt;</b> estado: imprimiendo<span class="cursor">_</span>
+      </div>
     </div>
   </div>
 </section>
@@ -514,7 +641,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       <div>
         <h4>Tienda</h4>
         <a href="#catalogo">Catálogo</a>
-        <a href="#pedido">Piezas a pedido</a>
+        <a href="#pedido">Cotizador instantáneo</a>
         <a href="#comprar">Cómo comprar</a>
       </div>
       <div>
@@ -558,14 +685,46 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
    ============================================================ */
 const CONFIG = {
   whatsapp: "5492915164996",          // ← número con código de país, sin + ni espacios
-  instagram: "stickos3d",             // ← usuario de Instagram
-  email: "martinsangui@gmail.com"      // ← email de contacto
+  instagram: "stickos3d",
+  email: "martinsangui@gmail.com"
 };
 
 /* ============================================================
-   PRODUCTOS — para agregar uno, copiá un bloque {...} y editalo.
-   mpLink: pegá el link de pago de Mercado Pago del producto,
-   o dejalo en null para que se compre solo vía carrito/WhatsApp.
+   COLORES DE FILAMENTO DISPONIBLES
+   Agregá o sacá según el stock real de rollos que tengan.
+   ============================================================ */
+const COLORS = [
+  { name:"Negro",   hex:"#2A2A2E" },
+  { name:"Blanco",  hex:"#E8E6E0" },
+  { name:"Naranja", hex:"#FF5A1F" },
+  { name:"Azul",    hex:"#3E6FD4" },
+  { name:"Verde",   hex:"#5FBF8A" },
+  { name:"Gris",    hex:"#8A8F98" }
+];
+
+/* ============================================================
+   COLA DE IMPRESIÓN — "El taller, en vivo"
+   Actualizá esto cuando cambien de trabajo. progress: 0 = en cola.
+   ============================================================ */
+const PRINT_QUEUE = [
+  { name:"Lámpara de luna — pedido #041", progress:64 },
+  { name:"Soportes de auriculares x3",     progress:0 },
+  { name:"Repuesto: perilla de estufa",    progress:0 }
+];
+
+/* ============================================================
+   COTIZADOR — precios base por tamaño y multiplicadores.
+   Calibrá estos números con sus costos reales.
+   ============================================================ */
+const QUOTE = {
+  size: { S:3500, M:8000, L:16000, XL:28000 },
+  mat:  { PLA:1, PETG:1.25, TPU:1.5 },
+  rangeLow:0.85, rangeHigh:1.25
+};
+
+/* ============================================================
+   PRODUCTOS — copiá un bloque {...} para agregar uno nuevo.
+   mpLink: link de pago de Mercado Pago, o null.
    ============================================================ */
 const PRODUCTS = [
   { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:12500, mat:"PLA · varios colores", mpLink:null },
@@ -583,19 +742,18 @@ const PRODUCTS = [
 ];
 
 /* ============================================================
-   Lógica del sitio (no hace falta tocar de acá para abajo)
+   Lógica (no hace falta tocar de acá para abajo)
    ============================================================ */
-const fmt = n => "$ " + n.toLocaleString("es-AR");
+const fmt = n => "$ " + Math.round(n).toLocaleString("es-AR");
 const wa  = msg => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
 
-// Links de contacto
 document.getElementById("waFloat").href = wa("¡Hola STICKOS 3D! Quería hacer una consulta.");
 document.getElementById("footWa").href  = wa("¡Hola STICKOS 3D!");
 document.getElementById("footIg").href  = `https://instagram.com/${CONFIG.instagram}`;
 document.getElementById("footMail").href = `mailto:${CONFIG.email}`;
 
-// Strip de materiales
-const stripItems = "PLA <b>//</b> PETG <b>//</b> TPU <b>//</b> DISEÑOS PROPIOS <b>//</b> PIEZAS A PEDIDO <b>//</b> REPUESTOS <b>//</b> DECO <b>//</b> REGALOS <b>//</b> ";
+// Strip
+const stripItems = "ELEGÍS EL COLOR <b>//</b> COTIZACIÓN INSTANTÁNEA <b>//</b> GARANTÍA DE REIMPRESIÓN <b>//</b> PLA · PETG · TPU <b>//</b> PIEZAS A PEDIDO <b>//</b> REPUESTOS <b>//</b> ";
 document.getElementById("strip").innerHTML = `<span>${stripItems.repeat(4)}</span>`;
 
 // Filtros
@@ -614,29 +772,59 @@ cats.forEach(c => {
   filtersEl.appendChild(b);
 });
 
+// Estado de color seleccionado por producto
+const selectedColor = {};
+PRODUCTS.forEach(p => selectedColor[p.id] = COLORS[0]);
+
 // Grid de productos
 const gridEl = document.getElementById("productGrid");
 function renderProducts(){
   const list = activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat);
-  gridEl.innerHTML = list.map(p => `
-    <article class="card">
-      <div class="tile"><span>${p.name.charAt(0)}</span></div>
+  gridEl.innerHTML = list.map(p => {
+    const sel = selectedColor[p.id];
+    return `
+    <article class="card" data-card="${p.id}">
+      <div class="tile">
+        <div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>
+      </div>
       <div class="card-body">
-        <div class="card-cat">${p.cat}</div>
+        <div class="card-cat">${p.cat} · ${p.mat}</div>
         <h3>${p.name}</h3>
-        <div class="card-mat">${p.mat}</div>
+        <div class="swatches" role="group" aria-label="Elegir color">
+          ${COLORS.map(c => `
+            <button class="swatch ${c.name===sel.name?"active":""}"
+              style="background:${c.hex}"
+              data-color="${c.name}" data-pid="${p.id}"
+              title="${c.name}" aria-label="Color ${c.name}"></button>
+          `).join("")}
+          <span class="swatch-label">${sel.name}</span>
+        </div>
         <div class="card-foot">
           <span class="price">${fmt(p.price)}</span>
           <button class="add-btn" data-add="${p.id}">Agregar</button>
         </div>
       </div>
       ${p.mpLink ? `<a class="buy-link" href="${p.mpLink}" target="_blank" rel="noopener">Comprar ya con Mercado Pago →</a>` : ""}
-    </article>
-  `).join("");
+    </article>`;
+  }).join("");
 }
 renderProducts();
 
-// Carrito (en memoria de la sesión)
+// Cola de impresión
+const queueEl = document.getElementById("printQueue");
+queueEl.innerHTML = PRINT_QUEUE.map(j => `
+  <div class="job">
+    <div class="job-name">
+      <span>${j.name}</span>
+      ${j.progress > 0
+        ? `<span class="pct">${j.progress}%</span>`
+        : `<span class="queued">EN COLA</span>`}
+    </div>
+    ${j.progress > 0 ? `<div class="bar"><i style="width:${j.progress}%"></i></div>` : ""}
+  </div>
+`).join("");
+
+// Carrito (en memoria de la sesión) — clave: producto + color
 let cart = {};
 const drawer = document.getElementById("drawer");
 const overlay = document.getElementById("overlay");
@@ -650,21 +838,22 @@ function renderCart(){
   document.getElementById("cartCount").textContent = cartSize();
   document.getElementById("cartTotal").textContent = fmt(cartTotal());
   const box = document.getElementById("drawerItems");
-  const items = Object.values(cart);
+  const items = Object.entries(cart);
   if(!items.length){
     box.innerHTML = `<p class="empty-cart">Tu pedido está vacío.<br>Sumá algo del catálogo 👇</p>`;
     return;
   }
-  box.innerHTML = items.map(i => `
+  box.innerHTML = items.map(([key,i]) => `
     <div class="d-item">
       <div>
         <h4>${i.name}</h4>
+        <div class="d-color"><i style="background:${i.colorHex}"></i>${i.color}</div>
         <span class="price">${fmt(i.price)} c/u</span>
       </div>
       <div class="qty">
-        <button data-dec="${i.id}" aria-label="Restar">−</button>
+        <button data-dec="${key}" aria-label="Restar">−</button>
         <span>${i.qty}</span>
-        <button data-inc="${i.id}" aria-label="Sumar">+</button>
+        <button data-inc="${key}" aria-label="Sumar">+</button>
       </div>
     </div>
   `).join("");
@@ -672,18 +861,30 @@ function renderCart(){
 
 function addToCart(id){
   const p = PRODUCTS.find(x => x.id === id);
-  if(!cart[id]) cart[id] = { ...p, qty:0 };
-  cart[id].qty++;
+  const c = selectedColor[id];
+  const key = `${id}|${c.name}`;
+  if(!cart[key]) cart[key] = { name:p.name, price:p.price, color:c.name, colorHex:c.hex, qty:0 };
+  cart[key].qty++;
   renderCart();
   clearTimeout(toastTimer);
+  toast.textContent = `${p.name} (${c.name}) agregado ✓`;
   toast.classList.add("show");
-  toastTimer = setTimeout(()=>toast.classList.remove("show"), 1800);
+  toastTimer = setTimeout(()=>toast.classList.remove("show"), 1900);
 }
 
 document.addEventListener("click", e => {
+  const sw  = e.target.closest("[data-color]");
   const add = e.target.closest("[data-add]");
   const inc = e.target.closest("[data-inc]");
   const dec = e.target.closest("[data-dec]");
+  if(sw){
+    const pid = sw.dataset.pid;
+    selectedColor[pid] = COLORS.find(c => c.name === sw.dataset.color);
+    const card = document.querySelector(`[data-card="${pid}"]`);
+    card.querySelector(".obj").style.setProperty("--obj", selectedColor[pid].hex);
+    card.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s === sw));
+    card.querySelector(".swatch-label").textContent = selectedColor[pid].name;
+  }
   if(add) addToCart(add.dataset.add);
   if(inc){ cart[inc.dataset.inc].qty++; renderCart(); }
   if(dec){
@@ -701,27 +902,44 @@ document.getElementById("closeCart").onclick = closeCart;
 overlay.onclick = closeCart;
 document.addEventListener("keydown", e => { if(e.key === "Escape") closeCart(); });
 
-// Checkout por WhatsApp
+// Checkout por WhatsApp (incluye colores)
 document.getElementById("checkoutWa").onclick = () => {
   const items = Object.values(cart);
   if(!items.length){ alert("Tu pedido está vacío. Agregá algo del catálogo primero."); return; }
   let msg = "¡Hola STICKOS 3D! Quiero hacer este pedido:\n\n";
-  items.forEach(i => { msg += `• ${i.name} x${i.qty} — ${fmt(i.price * i.qty)}\n`; });
+  items.forEach(i => { msg += `• ${i.name} — color ${i.color} — x${i.qty} — ${fmt(i.price * i.qty)}\n`; });
   msg += `\nTotal estimado: ${fmt(cartTotal())}\n\n¿Me confirman disponibilidad y forma de pago?`;
   window.open(wa(msg), "_blank");
 };
 
-// Formulario a pedido
+// Cotizador instantáneo
+const qEls = ["cfSize","cfMat","cfCx","cfQty"].map(id => document.getElementById(id));
+function calcQuote(){
+  const size = document.getElementById("cfSize").value;
+  const mat  = document.getElementById("cfMat").value;
+  const cx   = parseFloat(document.getElementById("cfCx").value);
+  const qty  = Math.max(1, parseInt(document.getElementById("cfQty").value) || 1);
+  const base = QUOTE.size[size] * QUOTE.mat[mat] * cx * qty;
+  const low  = Math.round(base * QUOTE.rangeLow  / 100) * 100;
+  const high = Math.round(base * QUOTE.rangeHigh / 100) * 100;
+  document.getElementById("quoteValue").textContent = `${fmt(low)} – ${fmt(high)}`;
+  return { low, high, size, mat, qty };
+}
+qEls.forEach(el => el.addEventListener("input", calcQuote));
+calcQuote();
+
 document.getElementById("customForm").addEventListener("submit", e => {
   e.preventDefault();
-  const name  = document.getElementById("cfName").value.trim();
-  const desc  = document.getElementById("cfDesc").value.trim();
-  const mat   = document.getElementById("cfMat").value;
-  const qty   = document.getElementById("cfQty").value;
-  const color = document.getElementById("cfColor").value.trim() || "a definir";
-  const msg = `¡Hola STICKOS 3D! Soy ${name} y quiero cotizar una pieza a medida:\n\n` +
-              `📦 Descripción: ${desc}\n🧵 Material: ${mat}\n🎨 Color: ${color}\n🔢 Cantidad: ${qty}\n\n` +
-              `Si necesitan fotos o el archivo, los mando por acá.`;
+  const q = calcQuote();
+  const name = document.getElementById("cfName").value.trim();
+  const desc = document.getElementById("cfDesc").value.trim();
+  const sizeLabel = document.getElementById("cfSize").selectedOptions[0].text;
+  const cxLabel = document.getElementById("cfCx").selectedOptions[0].text;
+  const msg = `¡Hola STICKOS 3D! Soy ${name} y usé el cotizador de la web:\n\n` +
+              `📦 Pieza: ${desc}\n📐 Tamaño: ${sizeLabel}\n🧵 Material: ${q.mat}\n` +
+              `⚙️ Complejidad: ${cxLabel}\n🔢 Cantidad: ${q.qty}\n\n` +
+              `💰 Estimado web: ${fmt(q.low)} – ${fmt(q.high)}\n\n` +
+              `¿Me confirman el precio final? Si necesitan fotos o el archivo, los mando por acá.`;
   window.open(wa(msg), "_blank");
 });
 </script>
