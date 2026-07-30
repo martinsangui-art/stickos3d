@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STICKOS 3D — Impresión 3D en Bahía Blanca · Envíos a todo el país</title>
 <meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido con cotización instantánea. Proyecto familiar en Bahía Blanca. Retiro local y envíos a todo el país.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30' fill='none' stroke='%23FF5A1F' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    STICKOS 3D — v2
@@ -15,21 +16,35 @@
    instantáneo, taller en vivo, garantía de reimpresión.
    ============================================================ */
 :root{
-  --bg:#121419;
-  --surface:#1A1E26;
-  --surface-2:#20252F;
-  --line:#2A303B;
-  --text:#EDEAE2;
-  --muted:#98A0AC;
-  --accent:#FF5A1F;
-  --accent-hi:#FF7A45;
+  /* ---- STICKOS 3D — tokens de marca (Toolpath Identity) ---- */
+  --ink:#14120F;
+  --ink-2:#1D1A15;
+  --paper:#F4EFE4;
+  --paper-2:#EAE3D3;
+  --signal-orange:#FF5A1F;
+  --signal-orange-hi:#FF7440;
+  --layer-teal:#0AAFA0;
+  --warm-grey:#8C8579;
+  --soft-grey:#C9C2B4;
+
+  /* ---- alias funcionales (repuntan a los tokens de marca de arriba —
+     ajustá la paleta desde ahí, no acá) ---- */
+  --bg:var(--ink);
+  --surface:var(--ink-2);
+  --surface-2:#241F17;
+  --line:rgba(201,194,180,.16);
+  --text:var(--paper);
+  --muted:var(--warm-grey);
+  --accent:var(--signal-orange);
+  --accent-hi:var(--signal-orange-hi);
   --accent-soft:rgba(255,90,31,.12);
-  --ok:#4CC38A;
-  --radius:14px;
-  --font-display:'Unbounded',sans-serif;
-  --font-body:'Archivo',sans-serif;
-  --font-mono:'JetBrains Mono',monospace;
-  --layers:repeating-linear-gradient(to bottom, transparent 0 5px, rgba(255,255,255,.035) 5px 6px);
+  --ok:var(--layer-teal);
+  --radius:4px;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --layers:repeating-linear-gradient(to bottom, transparent 0 6px, rgba(244,239,228,.05) 6px 7px);
+  --dots:radial-gradient(var(--soft-grey) 1px, transparent 1px);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -48,6 +63,37 @@ button{font-family:inherit;cursor:pointer}
 
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 
+/* ============================================================
+   Motivos de marca — reutilizados en todas las secciones:
+   1) hachurado de capas → var(--layers)
+   2) trayectoria punteada → .toolpath / .eyebrow::before
+   3) badges tipo máquina → .badge
+   4) marcas de calibración → .tick
+   5) grid de puntos → .dot-grid / var(--dots)
+   ============================================================ */
+.toolpath{
+  height:1px;
+  background-image:repeating-linear-gradient(to right, var(--warm-grey) 0 6px, transparent 6px 12px);
+  opacity:.6;
+}
+.dot-grid{background-image:var(--dots);background-size:20px 20px}
+
+.tick{position:absolute;width:13px;height:13px;opacity:.5;pointer-events:none;z-index:2}
+.tick::before,.tick::after{content:"";position:absolute;background:var(--paper)}
+.tick::before{width:100%;height:1px;top:50%;left:0;transform:translateY(-50%)}
+.tick::after{height:100%;width:1px;left:50%;top:0;transform:translateX(-50%)}
+.tick.tl{top:10px;left:10px} .tick.tr{top:10px;right:10px} .tick.bl{bottom:10px;left:10px} .tick.br{bottom:10px;right:10px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 10px;border-radius:100px;border:1px solid currentColor;line-height:1;
+}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge.b-orange{color:var(--signal-orange)}
+.badge.b-teal{color:var(--layer-teal)}
+.badge.b-grey{color:var(--warm-grey);border-color:var(--soft-grey)}
+
 .eyebrow{
   font-family:var(--font-mono);
   font-size:12px;
@@ -57,18 +103,19 @@ button{font-family:inherit;cursor:pointer}
   display:flex;align-items:center;gap:12px;
   margin-bottom:18px;
 }
-.eyebrow::before{content:"";width:34px;height:1px;background:var(--accent)}
+.eyebrow::before{content:"";width:34px;height:1px;background-image:repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 9px)}
 h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2}
 
 /* ---------- Header ---------- */
 header{
   position:sticky;top:0;z-index:60;
-  background:rgba(18,20,25,.82);
+  background:rgba(20,18,15,.82);
   backdrop-filter:blur(12px);
   border-bottom:1px solid var(--line);
 }
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
-.logo{font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.02em}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.02em}
+.logo svg{width:22px;height:22px;flex-shrink:0}
 .logo em{font-style:normal;color:var(--accent)}
 .logo small{display:block;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
 .nav-links{display:flex;gap:28px;font-size:14.5px;font-weight:500;color:var(--muted)}
@@ -83,7 +130,7 @@ header{
 .cart-btn:hover{border-color:var(--accent)}
 .cart-count{
   font-family:var(--font-mono);
-  background:var(--accent);color:#121419;
+  background:var(--accent);color:var(--ink);
   min-width:21px;height:21px;border-radius:99px;
   display:inline-flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:700;
@@ -122,7 +169,7 @@ header{
   transition:transform .15s, background .18s, border-color .18s;
 }
 .btn:active{transform:scale(.98)}
-.btn-primary{background:var(--accent);color:#121419}
+.btn-primary{background:var(--accent);color:var(--ink)}
 .btn-primary:hover{background:var(--accent-hi)}
 .btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
 .btn-ghost:hover{border-color:var(--accent)}
@@ -159,7 +206,7 @@ section{padding:96px 0}
   border-radius:99px;padding:8px 18px;transition:all .18s;
 }
 .chip:hover{border-color:var(--accent);color:var(--text)}
-.chip.active{background:var(--accent);border-color:var(--accent);color:#121419;font-weight:700}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700}
 
 /* ---------- Grid de productos ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
@@ -169,19 +216,21 @@ section{padding:96px 0}
   display:flex;flex-direction:column;
   transition:transform .2s, border-color .2s;
 }
-.card:hover{transform:translateY(-4px);border-color:#3A4150}
+.card:hover{transform:translateY(-4px);border-color:rgba(201,194,180,.4)}
+.card-top{height:3px;background:var(--filament, var(--soft-grey));transition:background .2s}
 .tile{
   aspect-ratio:4/3;position:relative;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(160deg,var(--surface-2),#171B22);
+  background:linear-gradient(160deg,var(--surface-2),#171310);
   overflow:hidden;
 }
 .tile::before{content:"";position:absolute;inset:0;background:var(--layers)}
 .tile::after{
   content:"FOTO PRÓXIMAMENTE";
   position:absolute;bottom:10px;right:12px;
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:#4A5160;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--warm-grey);opacity:.6;
 }
+.card-status{position:absolute;top:12px;left:12px;z-index:2}
 .tile .obj{
   position:relative;
   width:92px;height:92px;border-radius:18px;
@@ -222,7 +271,7 @@ section{padding:96px 0}
   padding:9px 16px;font-size:13.5px;font-weight:700;
   transition:all .18s;
 }
-.add-btn:hover{background:var(--accent);color:#121419}
+.add-btn:hover{background:var(--accent);color:var(--ink)}
 .buy-link{
   display:block;text-align:center;
   font-size:12.5px;font-weight:600;color:var(--muted);
@@ -289,7 +338,7 @@ textarea{resize:vertical;min-height:80px}
 }
 .trust-card{
   border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px;background:linear-gradient(160deg,var(--surface),#161A21);
+  padding:26px;background:linear-gradient(160deg,var(--surface),#18140D);
   position:relative;overflow:hidden;
 }
 .trust-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
@@ -306,7 +355,7 @@ textarea{resize:vertical;min-height:80px}
 .about p b{color:var(--text)}
 .workshop{
   border:1px solid var(--line);border-radius:var(--radius);
-  background:var(--layers),linear-gradient(160deg,var(--surface),#161A21);
+  background:var(--layers),linear-gradient(160deg,var(--surface),#18140D);
   padding:26px 28px;font-family:var(--font-mono);
 }
 .workshop-head{
@@ -324,9 +373,7 @@ textarea{resize:vertical;min-height:80px}
 @keyframes pulse{50%{opacity:.35}}
 .job{margin-bottom:18px}
 .job:last-child{margin-bottom:0}
-.job-name{font-size:13px;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;gap:12px}
-.job-name .pct{color:var(--accent)}
-.job-name .queued{color:var(--muted);font-size:11px;letter-spacing:.1em}
+.job-name{font-size:13px;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .bar{
   height:8px;border-radius:99px;background:var(--surface-2);
   border:1px solid var(--line);overflow:hidden;
@@ -356,7 +403,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 
 /* ---------- Carrito ---------- */
 .overlay{
-  position:fixed;inset:0;background:rgba(10,12,16,.6);
+  position:fixed;inset:0;background:rgba(20,18,15,.6);
   opacity:0;pointer-events:none;transition:opacity .25s;z-index:70;
 }
 .overlay.open{opacity:1;pointer-events:auto}
@@ -432,15 +479,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 <!-- ================= HEADER ================= -->
 <header>
   <div class="wrap nav">
-    <a href="#" class="logo">STICKOS<em>3D</em><small>IMPRESIÓN 3D</small></a>
+    <a href="#" class="logo"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round"/></svg>STICKOS<em>3D</em><small>IMPRESIÓN 3D</small></a>
     <nav class="nav-links">
       <a href="#catalogo">Catálogo</a>
       <a href="#pedido">Cotizador</a>
       <a href="#comprar">Cómo comprar</a>
       <a href="#nosotros">El taller</a>
     </nav>
-    <button class="cart-btn" id="openCart" aria-label="Abrir carrito">
-      Carrito <span class="cart-count" id="cartCount">0</span>
+    <button class="cart-btn" id="openCart" aria-label="Abrir cola de impresión">
+      Cola <span class="cart-count" id="cartCount">0</span>
     </button>
   </div>
 </header>
@@ -635,7 +682,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <a href="#" class="logo" style="margin-bottom:12px;display:inline-block">STICKOS<em>3D</em></a>
+        <a href="#" class="logo" style="margin-bottom:12px;display:inline-flex"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round"/></svg>STICKOS<em>3D</em></a>
         <p style="color:var(--muted);font-size:13.5px;max-width:32ch">Impresión 3D con espíritu familiar. Bahía Blanca, Buenos Aires.</p>
       </div>
       <div>
@@ -660,20 +707,20 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 
 <!-- ================= CARRITO ================= -->
 <div class="overlay" id="overlay"></div>
-<aside class="drawer" id="drawer" aria-label="Carrito de compras">
+<aside class="drawer" id="drawer" aria-label="Cola de impresión">
   <div class="drawer-head">
-    <h3>Tu pedido</h3>
-    <button class="drawer-close" id="closeCart" aria-label="Cerrar carrito">×</button>
+    <h3>Tu cola de impresión</h3>
+    <button class="drawer-close" id="closeCart" aria-label="Cerrar cola de impresión">×</button>
   </div>
   <div class="drawer-items" id="drawerItems"></div>
   <div class="drawer-foot">
     <div class="total-row"><span>Total estimado</span><span class="price" id="cartTotal">$ 0</span></div>
-    <button class="btn btn-primary" id="checkoutWa">Enviar pedido por WhatsApp</button>
+    <button class="btn btn-primary" id="checkoutWa">Confirmar cola por WhatsApp</button>
     <p class="drawer-note">Te confirmamos stock y plazo, y te pasamos el link de Mercado Pago o los datos de transferencia. Sin vueltas.</p>
   </div>
 </aside>
 
-<div class="toast" id="toast">Agregado al pedido ✓</div>
+<div class="toast" id="toast">En la cola ✓</div>
 
 <a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
   <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.6.8 5 2.3 7L4 29l7.2-2.2c1.9 1 4 1.5 4.8 1.5 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 22.2c-1.7 0-3.4-.5-4.9-1.3l-.4-.2-4.3 1.3 1.3-4.1-.3-.4C6 18.9 5.4 17 5.4 15 5.4 9.2 10.2 4.4 16 4.4S26.6 9.2 26.6 15 21.8 25.2 16 25.2zm5.8-7.6c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.4.5-.5.2-.2.2-.3.3-.5.1-.2.1-.4 0-.6-.1-.2-.7-1.7-1-2.4-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>
@@ -726,20 +773,28 @@ const QUOTE = {
    PRODUCTOS — copiá un bloque {...} para agregar uno nuevo.
    mpLink: link de pago de Mercado Pago, o null.
    ============================================================ */
+// status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 const PRODUCTS = [
-  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:12500, mat:"PLA · varios colores", mpLink:null },
-  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:6800,  mat:"PLA · negro / blanco", mpLink:null },
-  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:9200,  mat:"PETG · apto exterior", mpLink:null },
-  { id:"p4",  name:"Soporte de auriculares",            cat:"Gadgets",  price:8900,  mat:"PLA · terminación mate", mpLink:null },
-  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:18500, mat:"PLA · incluye base", mpLink:null },
-  { id:"p6",  name:"Juego de encastre dinosaurio",      cat:"Juguetes", price:7400,  mat:"PLA · no tóxico", mpLink:null },
-  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:4200,  mat:"TPU · flexible", mpLink:null },
-  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:2900,  mat:"PLA · elegís color", mpLink:null },
-  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:8100,  mat:"PETG · resistente", mpLink:null },
-  { id:"p10", name:"Escultura low-poly personalizable", cat:"Deco",     price:11000, mat:"PLA · varios tamaños", mpLink:null },
-  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:5600,  mat:"PLA · flexible articulado", mpLink:null },
-  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:14800, mat:"PLA · a medida", mpLink:null }
+  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:12500, mat:"PLA · varios colores", mpLink:null, status:"listo" },
+  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:6800,  mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
+  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:9200,  mat:"PETG · apto exterior", mpLink:null, status:"listo" },
+  { id:"p4",  name:"Soporte de auriculares",            cat:"Gadgets",  price:8900,  mat:"PLA · terminación mate", mpLink:null, status:"extruyendo" },
+  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:18500, mat:"PLA · incluye base", mpLink:null, status:"pedido" },
+  { id:"p6",  name:"Juego de encastre dinosaurio",      cat:"Juguetes", price:7400,  mat:"PLA · no tóxico", mpLink:null, status:"listo" },
+  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:4200,  mat:"TPU · flexible", mpLink:null, status:"listo" },
+  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:2900,  mat:"PLA · elegís color", mpLink:null, status:"extruyendo" },
+  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:8100,  mat:"PETG · resistente", mpLink:null, status:"listo" },
+  { id:"p10", name:"Escultura low-poly personalizable", cat:"Deco",     price:11000, mat:"PLA · varios tamaños", mpLink:null, status:"pedido" },
+  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:5600,  mat:"PLA · flexible articulado", mpLink:null, status:"listo" },
+  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:14800, mat:"PLA · a medida", mpLink:null, status:"pedido" }
 ];
+
+// Vocabulario de estado — reutilizado del badge tipo máquina de la cola de impresión.
+const STOCK_STATUS = {
+  extruyendo: { label:"Extruyendo ahora",        cls:"b-orange" },
+  listo:      { label:"Listo para retirar",      cls:"b-teal" },
+  pedido:     { label:"Bajo pedido — 3 a 5 días", cls:"b-grey" }
+};
 
 /* ============================================================
    Lógica (no hace falta tocar de acá para abajo)
@@ -782,10 +837,14 @@ function renderProducts(){
   const list = activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat);
   gridEl.innerHTML = list.map(p => {
     const sel = selectedColor[p.id];
+    const st = STOCK_STATUS[p.status];
     return `
-    <article class="card" data-card="${p.id}">
+    <article class="card" data-card="${p.id}" style="--filament:${sel.hex}">
+      <div class="card-top"></div>
       <div class="tile">
+        <div class="tick tl"></div><div class="tick tr"></div><div class="tick bl"></div><div class="tick br"></div>
         <div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>
+        <div class="card-status"><span class="badge ${st.cls}"><span class="dot"></span>${st.label}</span></div>
       </div>
       <div class="card-body">
         <div class="card-cat">${p.cat} · ${p.mat}</div>
@@ -801,7 +860,7 @@ function renderProducts(){
         </div>
         <div class="card-foot">
           <span class="price">${fmt(p.price)}</span>
-          <button class="add-btn" data-add="${p.id}">Agregar</button>
+          <button class="add-btn" data-add="${p.id}">A la cola</button>
         </div>
       </div>
       ${p.mpLink ? `<a class="buy-link" href="${p.mpLink}" target="_blank" rel="noopener">Comprar ya con Mercado Pago →</a>` : ""}
@@ -817,8 +876,8 @@ queueEl.innerHTML = PRINT_QUEUE.map(j => `
     <div class="job-name">
       <span>${j.name}</span>
       ${j.progress > 0
-        ? `<span class="pct">${j.progress}%</span>`
-        : `<span class="queued">EN COLA</span>`}
+        ? `<span class="badge b-orange"><span class="dot"></span>${j.progress}% listo</span>`
+        : `<span class="badge b-grey"><span class="dot"></span>En cola</span>`}
     </div>
     ${j.progress > 0 ? `<div class="bar"><i style="width:${j.progress}%"></i></div>` : ""}
   </div>
@@ -840,7 +899,7 @@ function renderCart(){
   const box = document.getElementById("drawerItems");
   const items = Object.entries(cart);
   if(!items.length){
-    box.innerHTML = `<p class="empty-cart">Tu pedido está vacío.<br>Sumá algo del catálogo 👇</p>`;
+    box.innerHTML = `<p class="empty-cart">Tu cola está vacía.<br>Sumá algo del catálogo 👇</p>`;
     return;
   }
   box.innerHTML = items.map(([key,i]) => `
@@ -867,7 +926,7 @@ function addToCart(id){
   cart[key].qty++;
   renderCart();
   clearTimeout(toastTimer);
-  toast.textContent = `${p.name} (${c.name}) agregado ✓`;
+  toast.textContent = `${p.name} (${c.name}) en cola ✓`;
   toast.classList.add("show");
   toastTimer = setTimeout(()=>toast.classList.remove("show"), 1900);
 }
@@ -881,6 +940,7 @@ document.addEventListener("click", e => {
     const pid = sw.dataset.pid;
     selectedColor[pid] = COLORS.find(c => c.name === sw.dataset.color);
     const card = document.querySelector(`[data-card="${pid}"]`);
+    card.style.setProperty("--filament", selectedColor[pid].hex);
     card.querySelector(".obj").style.setProperty("--obj", selectedColor[pid].hex);
     card.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s === sw));
     card.querySelector(".swatch-label").textContent = selectedColor[pid].name;
@@ -905,8 +965,8 @@ document.addEventListener("keydown", e => { if(e.key === "Escape") closeCart(); 
 // Checkout por WhatsApp (incluye colores)
 document.getElementById("checkoutWa").onclick = () => {
   const items = Object.values(cart);
-  if(!items.length){ alert("Tu pedido está vacío. Agregá algo del catálogo primero."); return; }
-  let msg = "¡Hola STICKOS 3D! Quiero hacer este pedido:\n\n";
+  if(!items.length){ alert("Tu cola está vacía. Agregá algo del catálogo primero."); return; }
+  let msg = "¡Hola STICKOS 3D! Quiero mandar esto a la cola de impresión:\n\n";
   items.forEach(i => { msg += `• ${i.name} — color ${i.color} — x${i.qty} — ${fmt(i.price * i.qty)}\n`; });
   msg += `\nTotal estimado: ${fmt(cartTotal())}\n\n¿Me confirman disponibilidad y forma de pago?`;
   window.open(wa(msg), "_blank");
