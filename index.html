@@ -118,22 +118,55 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 .trust .trust-card:nth-child(2){transition-delay:.08s}
 .trust .trust-card:nth-child(3){transition-delay:.16s}
 
-/* Preloader — el isotipo se traza como un toolpath antes de mostrar el sitio */
+/* ============================================================
+   PRELOADER — un cabezal FDM imprime el logo capa por capa.
+   El logo se revela en 6 pasos discretos (steps) de abajo hacia
+   arriba, el cabezal barre en horizontal a la velocidad de una
+   capa y sube con cada una. Duración total ~1.7s, y solo la
+   primera carga de la sesión (después el JS lo saltea).
+   ============================================================ */
 .preloader{
   position:fixed;inset:0;z-index:200;
   background:var(--ink);
-  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;
-  transition:opacity .5s ease, visibility .5s ease;
-  animation:autohide 0s linear 2.4s forwards; /* red de seguridad si el JS no llega a ocultarlo */
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
+  transition:opacity .45s ease, visibility .45s ease;
+  animation:autohide 0s linear 3.2s forwards; /* red de seguridad si el JS no llega a ocultarlo */
 }
 @keyframes autohide{to{opacity:0;visibility:hidden;pointer-events:none}}
 .preloader.done{opacity:0;visibility:hidden;pointer-events:none}
-.preloader .wm{font-size:30px;color:var(--paper)}
-.preloader .print{display:inline-block;animation:printUp 1.05s cubic-bezier(.4,0,.2,1) forwards;clip-path:inset(100% 0 0 0)}
-@keyframes printUp{to{clip-path:inset(0 0 0 0)}}
+
+.rig{position:relative;display:inline-block;padding-top:34px}
+/* El pórtico (riel + cabezal) sube con cada capa, como el eje Z real */
+.rig .gantry{
+  position:absolute;left:0;right:0;top:100%;z-index:2;
+  animation:gantryRise 1.62s steps(6,end) forwards;
+}
+.rig .rail{
+  position:absolute;top:0;left:-30px;right:-30px;height:2px;
+  background:repeating-linear-gradient(to right,var(--warm-grey) 0 7px,transparent 7px 14px);
+  opacity:.45;
+}
+.rig .bed{position:relative}
+.rig .wm{font-size:clamp(30px,7vw,46px);color:var(--paper)}
+.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 1.62s steps(6,end) forwards}
+@keyframes layerUp{to{clip-path:inset(0 0 0 0)}}
+
+.rig .head{
+  position:absolute;top:0;left:0;width:19px;height:24px;
+  transform:translate(-50%,-100%);
+  animation:headSweep .27s linear infinite alternate;
+}
+@keyframes headSweep{from{left:3%}to{left:97%}}
+@keyframes gantryRise{from{top:100%}to{top:0%}}
+.rig .head svg{width:100%;height:100%;display:block}
+.rig .head::after{ /* filamento saliendo de la boquilla */
+  content:"";position:absolute;left:50%;bottom:-4px;width:2px;height:5px;
+  background:var(--accent);transform:translateX(-50%);border-radius:1px;
+}
+
 .preloader .plabel{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
-.preloader .pbar{width:150px;height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
-.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 1.3s ease forwards}
+.preloader .pbar{width:170px;height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 1.62s linear forwards}
 @keyframes pfill{to{width:100%}}
 
 /* Barrido de capa sobre la foto de producto al pasar el mouse */
@@ -151,6 +184,33 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 .add-btn.pulse{animation:addPulse .55s ease}
 
 .nav-actions{display:flex;align-items:center;gap:10px}
+
+/* ---------- Menú mobile ---------- */
+.menu-btn{
+  display:none;align-items:center;justify-content:center;
+  width:42px;height:42px;border-radius:99px;flex-shrink:0;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+}
+.menu-btn svg{width:18px;height:18px}
+.menu-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.mobile-nav{
+  display:none;flex-direction:column;
+  border-top:1px solid var(--line);
+  /* padding-top/bottom por separado: el shorthand pisaría el padding lateral de .wrap */
+  padding-top:6px;padding-bottom:12px;
+}
+.mobile-nav a{
+  display:flex;align-items:center;min-height:48px;
+  padding:0 4px;font-size:16px;font-weight:500;color:var(--text);
+  border-bottom:1px solid var(--line);
+}
+.mobile-nav a:last-child{border-bottom:none}
+.mobile-nav a::before{
+  content:"";width:14px;height:1px;margin-right:12px;flex-shrink:0;
+  background-image:repeating-linear-gradient(to right,var(--accent) 0 4px,transparent 4px 7px);
+}
+.mobile-nav:not([hidden]){display:flex}
+
 .sound-btn{
   display:flex;align-items:center;justify-content:center;
   width:38px;height:38px;border-radius:99px;flex-shrink:0;
@@ -189,6 +249,7 @@ header{
 .wm em{font-style:normal;color:var(--accent)}
 .wm .wm-b{display:block;clip-path:inset(52% 0 0 0)}
 .wm .wm-t{position:absolute;left:0;top:0;clip-path:inset(0 0 48% 0);transform:translateX(.108em)}
+header .logo .wm{font-size:27px}
 .nav-links{display:flex;gap:28px;font-size:14.5px;font-weight:500;color:var(--muted)}
 .nav-links a{transition:color .18s}
 .nav-links a:hover{color:var(--text)}
@@ -298,8 +359,10 @@ section{padding:96px 0}
 .tile::before{content:"";position:absolute;inset:0;background:var(--layers)}
 .tile::after{
   content:"FOTO PRÓXIMAMENTE";
-  position:absolute;bottom:10px;right:12px;
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--warm-grey);opacity:.6;
+  /* centrado entre las dos marcas de calibración de abajo, para no pisarlas */
+  position:absolute;bottom:11px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;white-space:nowrap;
+  color:var(--warm-grey);opacity:.6;
 }
 .card-status{position:absolute;top:12px;left:12px;z-index:2}
 .tile .obj{
@@ -367,9 +430,11 @@ form{display:flex;flex-direction:column;gap:16px;background:var(--bg);border:1px
 .form-title{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
 label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:7px}
 input,select,textarea{
-  font-family:var(--font-body);font-size:15px;color:var(--text);
+  font-family:var(--font-body);color:var(--text);
+  /* 16px es el mínimo que evita que iOS Safari haga zoom al enfocar un campo */
+  font-size:16px;
   background:var(--surface-2);border:1px solid var(--line);
-  border-radius:9px;padding:12px 14px;width:100%;
+  border-radius:9px;padding:13px 14px;width:100%;
 }
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 textarea{resize:vertical;min-height:80px}
@@ -532,15 +597,26 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   .custom-grid,.about-grid{grid-template-columns:1fr;gap:40px}
   .steps,.trust{grid-template-columns:1fr}
   .nav-links{display:none}
+  .menu-btn{display:flex}
   section{padding:72px 0}
   .hero{padding:80px 0 64px}
+  /* Objetivos táctiles: mínimo 44px en todo lo que se toca */
+  .swatch{width:28px;height:28px}
+  .qty button{width:40px;height:40px;font-size:18px}
+  .chip{padding:13px 19px;font-size:13.5px}
+  .add-btn{padding:13px 20px;font-size:14.5px}
+  .drawer-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+  .buy-link{padding:15px 9px}
+  .btn{padding:16px 26px}
 }
 @media(max-width:520px){
   .form-row,.form-row-3{grid-template-columns:1fr}
   .hero-specs{gap:20px}
   .logo small{display:none}
   .nav-actions{gap:6px}
-  .sound-btn{width:34px;height:34px}
+  header .logo .wm{font-size:23px}
+  .sound-btn{width:38px;height:38px}
+  .menu-btn{width:38px;height:38px}
   .cart-btn{padding:9px 14px}
 }
 @media(prefers-reduced-motion:reduce){
@@ -556,8 +632,18 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 
 <!-- ================= PRELOADER ================= -->
 <div class="preloader" id="preloader" aria-hidden="true">
-  <span class="print"><span class="wm"><span class="wm-b">STICKOS<em>3D</em></span><span class="wm-t">STICKOS<em>3D</em></span></span></span>
-  <div class="plabel">Iniciando impresión…</div>
+  <div class="rig">
+    <div class="gantry">
+      <div class="rail"></div>
+      <div class="head">
+        <svg viewBox="0 0 19 24" fill="none"><path d="M2 1h15v9l-4.5 6.5V23h-6v-6.5L2 10z" fill="#FF5A1F"/><rect x="5" y="3.5" width="9" height="1.6" fill="#14120F" opacity=".45"/></svg>
+      </div>
+    </div>
+    <div class="bed">
+      <span class="lay"><span class="wm"><span class="wm-b">STICKOS<em>3D</em></span><span class="wm-t">STICKOS<em>3D</em></span></span></span>
+    </div>
+  </div>
+  <div class="plabel">Imprimiendo…</div>
   <div class="pbar"><i></i></div>
 </div>
 
@@ -575,6 +661,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       <a href="#nosotros">El taller</a>
     </nav>
     <div class="nav-actions">
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileNav" aria-label="Abrir menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </button>
       <button class="sound-btn" id="soundToggle" type="button" aria-pressed="false" aria-label="Sonido del taller" title="Sonido del taller">
         <svg id="soundIconOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><line x1="16" y1="9" x2="21" y2="15"/><line x1="21" y1="9" x2="16" y2="15"/></svg>
         <svg id="soundIconOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a9 9 0 0 1 0 12"/></svg>
@@ -584,6 +673,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       </button>
     </div>
   </div>
+  <nav class="mobile-nav wrap" id="mobileNav" hidden>
+    <a href="#catalogo">Catálogo</a>
+    <a href="#pedido">Cotizador</a>
+    <a href="#comprar">Cómo comprar</a>
+    <a href="#nosotros">El taller</a>
+  </nav>
 </header>
 
 <!-- ================= HERO ================= -->
@@ -1127,12 +1222,37 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 
 const preloaderEl = document.getElementById("preloader");
 function hidePreloader(){ preloaderEl.classList.add("done"); }
-if(prefersReducedMotion){
+
+/* La animación de impresión dura 1.62s. Se muestra completa solo en la
+   primera carga de la sesión: si el visitante navega y vuelve, se saltea
+   para no hacerle esperar de nuevo. */
+const BOOT_KEY = "stickos_booted";
+let alreadyBooted = false;
+try { alreadyBooted = sessionStorage.getItem(BOOT_KEY) === "1"; sessionStorage.setItem(BOOT_KEY, "1"); }
+catch(e){ /* modo privado sin sessionStorage: se muestra siempre */ }
+
+if(prefersReducedMotion || alreadyBooted){
   hidePreloader();
 } else {
-  window.addEventListener("load", () => setTimeout(hidePreloader, 850));
-  setTimeout(hidePreloader, 2200); // red de seguridad si "load" tarda
+  const PRINT_MS = 1750;              // 1.62s de animación + un respiro
+  const t0 = performance.now();
+  const finish = () => setTimeout(hidePreloader, Math.max(0, PRINT_MS - (performance.now() - t0)));
+  if(document.readyState === "complete") finish();
+  else window.addEventListener("load", finish);
+  setTimeout(hidePreloader, 3000);    // red de seguridad si "load" nunca llega
 }
+
+/* ---------- Menú mobile ---------- */
+const menuBtn = document.getElementById("menuBtn");
+const mobileNav = document.getElementById("mobileNav");
+function setMenu(open){
+  mobileNav.hidden = !open;
+  menuBtn.setAttribute("aria-expanded", String(open));
+  menuBtn.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+}
+menuBtn.addEventListener("click", () => setMenu(mobileNav.hidden));
+mobileNav.addEventListener("click", e => { if(e.target.closest("a")) setMenu(false); });
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !mobileNav.hidden) setMenu(false); });
 
 function observeReveal(nodeList){
   if(prefersReducedMotion || !("IntersectionObserver" in window)){
@@ -1214,6 +1334,35 @@ function stopAmbient(){
   ambientNodes = null;
 }
 
+/* Sonido del cabezal durante el preloader: seis pasadas de motor paso a paso,
+   una por capa, sincronizadas con la animación. Ojo: los navegadores bloquean
+   el audio hasta que hay un gesto del usuario, así que en la PRIMERA visita
+   esto no suena aunque el sonido esté activado. Suena al recargar/volver
+   dentro de la misma sesión, después de cualquier click. */
+function playPrinterBoot(){
+  if(!soundOn) return;
+  let ctx;
+  try { ctx = ensureAudioCtx(); } catch(e){ return; }
+  if(ctx.state !== "running") return;   // bloqueado por autoplay: se saltea, sin romper nada
+  const LAYER = 0.27, LAYERS = 6;
+  for(let i = 0; i < LAYERS; i++){
+    const t = ctx.currentTime + i * LAYER;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sawtooth";
+    // el motor sube de tono con cada capa, como cuando el eje Z va subiendo
+    osc.frequency.setValueAtTime(180 + i * 14, t);
+    osc.frequency.linearRampToValueAtTime(320 + i * 14, t + LAYER * 0.75);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.linearRampToValueAtTime(0.035, t + 0.03);
+    gain.gain.setValueAtTime(0.035, t + LAYER * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + LAYER * 0.92);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + LAYER);
+  }
+}
+
 const soundBtn = document.getElementById("soundToggle");
 const soundIconOff = document.getElementById("soundIconOff");
 const soundIconOn = document.getElementById("soundIconOn");
@@ -1241,6 +1390,9 @@ if(soundOn){
   };
   document.addEventListener("click", resumeOnFirstGesture, { once:true });
 }
+
+// Sonido del cabezal, solo cuando el preloader se está mostrando de verdad.
+if(soundOn && !prefersReducedMotion && !alreadyBooted) playPrinterBoot();
 </script>
 </body>
 </html>
