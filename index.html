@@ -130,31 +130,34 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
   background:var(--ink);
   display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
   transition:opacity .45s ease, visibility .45s ease;
-  animation:autohide 0s linear 3.2s forwards; /* red de seguridad si el JS no llega a ocultarlo */
+  animation:autohide 0s linear 4.4s forwards; /* red de seguridad si el JS no llega a ocultarlo */
 }
 @keyframes autohide{to{opacity:0;visibility:hidden;pointer-events:none}}
 .preloader.done{opacity:0;visibility:hidden;pointer-events:none}
 
-.rig{position:relative;display:inline-block;padding-top:34px}
-/* El pórtico (riel + cabezal) sube con cada capa, como el eje Z real */
+.rig{position:relative;display:inline-block;padding-top:38px}
+/* La cama es la referencia del pórtico: así el cabezal recorre exactamente
+   el alto del logo y siempre queda apoyado sobre la pieza, nunca flotando. */
+.rig .bed{position:relative}
+.rig .wm{font-size:clamp(40px,9.5vw,66px);color:var(--paper)}
+.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 2.6s steps(6,end) forwards}
+@keyframes layerUp{to{clip-path:inset(0 0 0 0)}}
+
+/* El pórtico (riel + cabezal) sube una capa por vez, como el eje Z real */
 .rig .gantry{
   position:absolute;left:0;right:0;top:100%;z-index:2;
-  animation:gantryRise 1.62s steps(6,end) forwards;
+  animation:gantryRise 2.6s steps(6,end) forwards;
 }
 .rig .rail{
-  position:absolute;top:0;left:-30px;right:-30px;height:2px;
+  position:absolute;top:0;left:-34px;right:-34px;height:2px;
   background:repeating-linear-gradient(to right,var(--warm-grey) 0 7px,transparent 7px 14px);
   opacity:.45;
 }
-.rig .bed{position:relative}
-.rig .wm{font-size:clamp(30px,7vw,46px);color:var(--paper)}
-.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 1.62s steps(6,end) forwards}
-@keyframes layerUp{to{clip-path:inset(0 0 0 0)}}
-
 .rig .head{
-  position:absolute;top:0;left:0;width:19px;height:24px;
+  position:absolute;top:0;left:0;width:21px;height:26px;
+  /* -100% deja la punta de la boquilla justo sobre la capa que se está imprimiendo */
   transform:translate(-50%,-100%);
-  animation:headSweep .27s linear infinite alternate;
+  animation:headSweep .433s linear infinite alternate;
 }
 @keyframes headSweep{from{left:3%}to{left:97%}}
 @keyframes gantryRise{from{top:100%}to{top:0%}}
@@ -166,7 +169,9 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 
 .preloader .plabel{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
 .preloader .pbar{width:170px;height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
-.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 1.62s linear forwards}
+/* La barra avanza en los mismos 6 pasos que las capas: cada tramo es una capa
+   impresa, así termina exactamente con la última pasada del cabezal. */
+.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 2.6s steps(6,end) forwards}
 @keyframes pfill{to{width:100%}}
 
 /* Barrido de capa sobre la foto de producto al pasar el mouse */
@@ -633,14 +638,14 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 <!-- ================= PRELOADER ================= -->
 <div class="preloader" id="preloader" aria-hidden="true">
   <div class="rig">
-    <div class="gantry">
-      <div class="rail"></div>
-      <div class="head">
-        <svg viewBox="0 0 19 24" fill="none"><path d="M2 1h15v9l-4.5 6.5V23h-6v-6.5L2 10z" fill="#FF5A1F"/><rect x="5" y="3.5" width="9" height="1.6" fill="#14120F" opacity=".45"/></svg>
-      </div>
-    </div>
     <div class="bed">
       <span class="lay"><span class="wm"><span class="wm-b">STICKOS<em>3D</em></span><span class="wm-t">STICKOS<em>3D</em></span></span></span>
+      <div class="gantry">
+        <div class="rail"></div>
+        <div class="head">
+          <svg viewBox="0 0 19 24" fill="none"><path d="M2 1h15v9l-4.5 6.5V23h-6v-6.5L2 10z" fill="#FF5A1F"/><rect x="5" y="3.5" width="9" height="1.6" fill="#14120F" opacity=".45"/></svg>
+        </div>
+      </div>
     </div>
   </div>
   <div class="plabel">Imprimiendo…</div>
@@ -1234,12 +1239,12 @@ catch(e){ /* modo privado sin sessionStorage: se muestra siempre */ }
 if(prefersReducedMotion || alreadyBooted){
   hidePreloader();
 } else {
-  const PRINT_MS = 1750;              // 1.62s de animación + un respiro
+  const PRINT_MS = 2750;              // 2.6s de animación + un respiro
   const t0 = performance.now();
   const finish = () => setTimeout(hidePreloader, Math.max(0, PRINT_MS - (performance.now() - t0)));
   if(document.readyState === "complete") finish();
   else window.addEventListener("load", finish);
-  setTimeout(hidePreloader, 3000);    // red de seguridad si "load" nunca llega
+  setTimeout(hidePreloader, 4200);    // red de seguridad si "load" nunca llega
 }
 
 /* ---------- Menú mobile ---------- */
@@ -1344,7 +1349,7 @@ function playPrinterBoot(){
   let ctx;
   try { ctx = ensureAudioCtx(); } catch(e){ return; }
   if(ctx.state !== "running") return;   // bloqueado por autoplay: se saltea, sin romper nada
-  const LAYER = 0.27, LAYERS = 6;
+  const LAYER = 0.433, LAYERS = 6;   // igual que la animación: 6 capas de .433s
   for(let i = 0; i < LAYERS; i++){
     const t = ctx.currentTime + i * LAYER;
     const osc = ctx.createOscillator();
