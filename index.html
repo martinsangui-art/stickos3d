@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STICKOS 3D — Impresión 3D en Bahía Blanca · Envíos a todo el país</title>
 <meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido con cotización instantánea. Proyecto familiar en Bahía Blanca. Retiro local y envíos a todo el país.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30' fill='none' stroke='%23FF5A1F' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cg id='s' fill='%23FF5A1F'%3E%3Crect x='5' y='5' width='21' height='5'/%3E%3Crect x='5' y='10' width='5' height='6'/%3E%3Crect x='5' y='14' width='21' height='5'/%3E%3Crect x='21' y='19' width='5' height='5'/%3E%3Crect x='5' y='22' width='21' height='5'/%3E%3C/g%3E%3CclipPath id='t'%3E%3Crect x='0' y='0' width='32' height='16.5'/%3E%3C/clipPath%3E%3CclipPath id='b'%3E%3Crect x='0' y='16.5' width='32' height='15.5'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg transform='translate(3,0)'%3E%3Cg clip-path='url(%23t)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/g%3E%3Cg clip-path='url(%23b)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    STICKOS 3D — v2
@@ -128,9 +128,9 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 }
 @keyframes autohide{to{opacity:0;visibility:hidden;pointer-events:none}}
 .preloader.done{opacity:0;visibility:hidden;pointer-events:none}
-.preloader svg{width:56px;height:56px;overflow:visible}
-.preloader svg path{stroke-dasharray:120;stroke-dashoffset:120;animation:draw 1.1s ease forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
+.preloader .wm{font-size:30px;color:var(--paper)}
+.preloader .print{display:inline-block;animation:printUp 1.05s cubic-bezier(.4,0,.2,1) forwards;clip-path:inset(100% 0 0 0)}
+@keyframes printUp{to{clip-path:inset(0 0 0 0)}}
 .preloader .plabel{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
 .preloader .pbar{width:150px;height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
 .preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 1.3s ease forwards}
@@ -172,10 +172,23 @@ header{
   border-bottom:1px solid var(--line);
 }
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
-.logo{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:800;font-size:18px;letter-spacing:.02em}
-.logo svg{width:22px;height:22px;flex-shrink:0}
-.logo em{font-style:normal;color:var(--accent)}
+.logo{display:flex;align-items:center;gap:11px}
 .logo small{display:block;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
+
+/* ============================================================
+   WORDMARK — "layer shift": la mitad de arriba sale corrida una
+   capa, como cuando la impresora pierde pasos. Son dos copias
+   del mismo texto recortadas a la altura del corte; la de arriba
+   se desplaza .108em, así el corrimiento escala con el cuerpo.
+   ============================================================ */
+.wm{
+  position:relative;display:inline-block;
+  font-family:var(--font-display);font-weight:700;
+  font-size:18px;letter-spacing:-.01em;line-height:1;white-space:nowrap;
+}
+.wm em{font-style:normal;color:var(--accent)}
+.wm .wm-b{display:block;clip-path:inset(52% 0 0 0)}
+.wm .wm-t{position:absolute;left:0;top:0;clip-path:inset(0 0 48% 0);transform:translateX(.108em)}
 .nav-links{display:flex;gap:28px;font-size:14.5px;font-weight:500;color:var(--muted)}
 .nav-links a{transition:color .18s}
 .nav-links a:hover{color:var(--text)}
@@ -204,7 +217,7 @@ header{
 }
 .hero h1{
   font-family:var(--font-display);
-  font-weight:800;
+  font-weight:700;
   font-size:clamp(34px,5.6vw,64px);
   line-height:1.12;
   max-width:15ch;
@@ -302,7 +315,7 @@ section{padding:96px 0}
   background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.14) 3px 4px);
 }
 .tile .obj span{
-  font-family:var(--font-display);font-weight:800;font-size:38px;
+  font-family:var(--font-display);font-weight:700;font-size:38px;
   color:rgba(255,255,255,.55);mix-blend-mode:overlay;user-select:none;
 }
 .card-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -543,7 +556,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 
 <!-- ================= PRELOADER ================= -->
 <div class="preloader" id="preloader" aria-hidden="true">
-  <svg viewBox="0 0 40 40" fill="none"><path d="M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round"/></svg>
+  <span class="print"><span class="wm"><span class="wm-b">STICKOS<em>3D</em></span><span class="wm-t">STICKOS<em>3D</em></span></span></span>
   <div class="plabel">Iniciando impresión…</div>
   <div class="pbar"><i></i></div>
 </div>
@@ -551,7 +564,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 <!-- ================= HEADER ================= -->
 <header>
   <div class="wrap nav">
-    <a href="#" class="logo"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round"/></svg>STICKOS<em>3D</em><small>IMPRESIÓN 3D</small></a>
+    <a href="#" class="logo" aria-label="STICKOS 3D — inicio">
+      <span class="wm"><span class="wm-b">STICKOS<em>3D</em></span><span class="wm-t" aria-hidden="true">STICKOS<em>3D</em></span></span>
+      <small>IMPRESIÓN 3D</small>
+    </a>
     <nav class="nav-links">
       <a href="#catalogo">Catálogo</a>
       <a href="#pedido">Cotizador</a>
@@ -760,7 +776,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   <div class="wrap">
     <div class="foot-grid">
       <div>
-        <a href="#" class="logo" style="margin-bottom:12px;display:inline-flex"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M8 10 C8 10 30 8 30 16 C30 22 12 20 12 26 C12 33 32 30 32 30" stroke="#FF5A1F" stroke-width="4" stroke-linecap="round"/></svg>STICKOS<em>3D</em></a>
+        <a href="#" class="logo" style="margin-bottom:12px;display:inline-flex" aria-label="STICKOS 3D">
+          <span class="wm" style="font-size:21px"><span class="wm-b">STICKOS<em>3D</em></span><span class="wm-t" aria-hidden="true">STICKOS<em>3D</em></span></span>
+        </a>
         <p style="color:var(--muted);font-size:13.5px;max-width:32ch">Impresión 3D con espíritu familiar. Bahía Blanca, Buenos Aires.</p>
       </div>
       <div>
