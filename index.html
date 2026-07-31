@@ -130,7 +130,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
   background:var(--ink);
   display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
   transition:opacity .45s ease, visibility .45s ease;
-  animation:autohide 0s linear 4.4s forwards; /* red de seguridad si el JS no llega a ocultarlo */
+  animation:autohide 0s linear 6.2s forwards; /* red de seguridad si el JS no llega a ocultarlo */
 }
 @keyframes autohide{to{opacity:0;visibility:hidden;pointer-events:none}}
 .preloader.done{opacity:0;visibility:hidden;pointer-events:none}
@@ -139,14 +139,14 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 /* La cama es la referencia del pórtico: así el cabezal recorre exactamente
    el alto del logo y siempre queda apoyado sobre la pieza, nunca flotando. */
 .rig .bed{position:relative}
-.rig .wm{font-size:clamp(40px,9.5vw,66px);color:var(--paper)}
-.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 2.6s steps(6,end) forwards}
+.rig .wm{font-size:clamp(46px,12vw,100px);color:var(--paper)}
+.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 3.4s steps(6,end) forwards}
 @keyframes layerUp{to{clip-path:inset(0 0 0 0)}}
 
 /* El pórtico (riel + cabezal) sube una capa por vez, como el eje Z real */
 .rig .gantry{
   position:absolute;left:0;right:0;top:100%;z-index:2;
-  animation:gantryRise 2.6s steps(6,end) forwards;
+  animation:gantryRise 3.4s steps(6,end) forwards;
 }
 .rig .rail{
   position:absolute;top:0;left:-34px;right:-34px;height:2px;
@@ -154,10 +154,11 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
   opacity:.45;
 }
 .rig .head{
-  position:absolute;top:0;left:0;width:21px;height:26px;
+  /* acompaña el tamaño del logo para que no quede una boquilla diminuta */
+  position:absolute;top:0;left:0;width:clamp(21px,3vw,32px);aspect-ratio:19/24;
   /* -100% deja la punta de la boquilla justo sobre la capa que se está imprimiendo */
   transform:translate(-50%,-100%);
-  animation:headSweep .433s linear infinite alternate;
+  animation:headSweep .567s linear infinite alternate;
 }
 @keyframes headSweep{from{left:3%}to{left:97%}}
 @keyframes gantryRise{from{top:100%}to{top:0%}}
@@ -168,10 +169,10 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 }
 
 .preloader .plabel{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
-.preloader .pbar{width:170px;height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.preloader .pbar{width:min(230px,52vw);height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
 /* La barra avanza en los mismos 6 pasos que las capas: cada tramo es una capa
    impresa, así termina exactamente con la última pasada del cabezal. */
-.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 2.6s steps(6,end) forwards}
+.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 3.4s steps(6,end) forwards}
 @keyframes pfill{to{width:100%}}
 
 /* Barrido de capa sobre la foto de producto al pasar el mouse */
@@ -1228,23 +1229,19 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const preloaderEl = document.getElementById("preloader");
 function hidePreloader(){ preloaderEl.classList.add("done"); }
 
-/* La animación de impresión dura 1.62s. Se muestra completa solo en la
-   primera carga de la sesión: si el visitante navega y vuelve, se saltea
-   para no hacerle esperar de nuevo. */
-const BOOT_KEY = "stickos_booted";
-let alreadyBooted = false;
-try { alreadyBooted = sessionStorage.getItem(BOOT_KEY) === "1"; sessionStorage.setItem(BOOT_KEY, "1"); }
-catch(e){ /* modo privado sin sessionStorage: se muestra siempre */ }
-
-if(prefersReducedMotion || alreadyBooted){
+/* La animación se muestra en TODAS las cargas, también al refrescar.
+   Duración: 3.4s de impresión + 1.4s con la pieza terminada en pantalla,
+   para que se llegue a ver el logo completo antes del fundido.
+   Para acortarla en el futuro, tocar PRINT_MS acá y los 3.4s del CSS. */
+if(prefersReducedMotion){
   hidePreloader();
 } else {
-  const PRINT_MS = 2750;              // 2.6s de animación + un respiro
+  const PRINT_MS = 4800;              // 3.4s de animación + 1.4s de pausa final
   const t0 = performance.now();
   const finish = () => setTimeout(hidePreloader, Math.max(0, PRINT_MS - (performance.now() - t0)));
   if(document.readyState === "complete") finish();
   else window.addEventListener("load", finish);
-  setTimeout(hidePreloader, 4200);    // red de seguridad si "load" nunca llega
+  setTimeout(hidePreloader, 6000);    // red de seguridad si "load" nunca llega
 }
 
 /* ---------- Menú mobile ---------- */
@@ -1349,7 +1346,7 @@ function playPrinterBoot(){
   let ctx;
   try { ctx = ensureAudioCtx(); } catch(e){ return; }
   if(ctx.state !== "running") return;   // bloqueado por autoplay: se saltea, sin romper nada
-  const LAYER = 0.433, LAYERS = 6;   // igual que la animación: 6 capas de .433s
+  const LAYER = 0.567, LAYERS = 6;   // igual que la animación: 6 capas de .567s
   for(let i = 0; i < LAYERS; i++){
     const t = ctx.currentTime + i * LAYER;
     const osc = ctx.createOscillator();
@@ -1397,7 +1394,7 @@ if(soundOn){
 }
 
 // Sonido del cabezal, solo cuando el preloader se está mostrando de verdad.
-if(soundOn && !prefersReducedMotion && !alreadyBooted) playPrinterBoot();
+if(soundOn && !prefersReducedMotion) playPrinterBoot();
 </script>
 </body>
 </html>
