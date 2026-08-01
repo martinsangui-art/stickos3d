@@ -573,9 +573,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .foot-grid a{display:block;font-size:14.5px;color:var(--text);margin-bottom:8px;opacity:.85}
 .foot-grid a:hover{color:var(--accent);opacity:1}
 .foot-base{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
-/* El número va como texto, no como link: en desktop se copia o se marca,
-   que es justo lo que un href de WhatsApp no te deja hacer. */
-.foot-phone{display:block;font-family:var(--font-mono);font-size:13.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.04em}
+/* El mail va como texto, no como link: así se puede copiar o seleccionar sin
+   que el navegador dispare el cliente de correo. */
+.foot-mail{display:block;font-family:var(--font-mono);font-size:13.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.04em;word-break:break-all}
 
 /* ---------- Contacto ----------
    Reusa el <form> global, así los campos son idénticos a los del cotizador
@@ -1044,7 +1044,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       </div>
       <div>
         <h4>Contacto</h4>
-        <span class="foot-phone" id="footPhone"></span>
+        <span class="foot-mail" id="footEmail"></span>
         <a href="#" id="footWa" target="_blank" rel="noopener">WhatsApp — abrir app</a>
         <a href="#" id="footWaWeb" target="_blank" rel="noopener">WhatsApp Web</a>
         <a href="#" id="footMail">Escribinos por mail</a>
@@ -1158,14 +1158,6 @@ const wa  = msg => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(m
    app instalada; web.whatsapp.com es la salida para el que está en la compu. */
 const waWeb = msg => `https://web.whatsapp.com/send?phone=${CONFIG.whatsapp}&text=${encodeURIComponent(msg)}`;
 
-/* El número visible se deriva de CONFIG para que no queden dos fuentes de
-   verdad. Formato AR: 549 + área (3) + abonado (7). Si el número no encaja
-   con ese molde, se muestra tal cual con el + adelante. */
-function phoneLabel(raw){
-  const m = /^549(\d{3})(\d{3})(\d{4})$/.exec(raw);
-  return m ? `+54 9 ${m[1]} ${m[2]}-${m[3]}` : "+" + raw;
-}
-
 const mailBody = [
   "Hola STICKOS 3D:",
   "",
@@ -1180,7 +1172,9 @@ const mailBody = [
 document.getElementById("waFloat").href = wa("¡Hola STICKOS 3D! Quería hacer una consulta.");
 document.getElementById("footWa").href  = wa("¡Hola STICKOS 3D!");
 document.getElementById("footWaWeb").href = waWeb("¡Hola STICKOS 3D!");
-document.getElementById("footPhone").textContent = phoneLabel(CONFIG.whatsapp);
+// El mail se muestra como texto (se copia o se selecciona); el link de abajo
+// abre el cliente de correo con el asunto y el cuerpo ya armados.
+document.getElementById("footEmail").textContent = CONFIG.email;
 document.getElementById("socialIg").href = `https://instagram.com/${CONFIG.instagram}`;
 document.getElementById("footMail").href =
   `mailto:${CONFIG.email}?subject=${encodeURIComponent("Consulta desde la web — STICKOS 3D")}&body=${encodeURIComponent(mailBody)}`;
