@@ -577,16 +577,47 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 /* El número va como texto, no como link: en desktop se copia o se marca,
    que es justo lo que un href de WhatsApp no te deja hacer. */
 .foot-phone{display:block;font-family:var(--font-mono);font-size:13.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.04em}
-.follow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:22px 0}
-.follow-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.follow-link{
-  display:inline-flex;align-items:center;gap:9px;
-  border:1px solid var(--line);border-radius:99px;padding:9px 16px;
-  font-family:var(--font-mono);font-size:13.5px;color:var(--text);
-  transition:border-color .18s, color .18s;
+
+/* ---------- Contacto ----------
+   Reusa el <form> global, así los campos son idénticos a los del cotizador
+   sin duplicar una sola regla. */
+.contact{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:start}
+.contact-copy{color:var(--muted);font-size:16.5px;margin-top:4px}
+.contact-list{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:28px}
+.contact-list li{display:flex;gap:16px;color:var(--muted);font-size:15.5px}
+.contact-list li b{color:var(--text);font-weight:600}
+.hp{display:none!important}
+.form-note.ok{color:var(--ok)}
+.form-note.err{color:var(--accent)}
+
+/* ---------- Redes ----------
+   Única sección clara del sitio: el corte de Ink a Paper es lo que le da
+   presencia sin agregar decoración. Usa el grid de puntos del manual de
+   marca, que está pensado justo para las secciones claras. */
+.social{
+  background:var(--dots), var(--paper);
+  background-size:22px 22px;
+  border-top:1px solid rgba(20,18,15,.14);
+  text-align:center;
 }
-.follow-link:hover{border-color:var(--accent);color:var(--accent)}
-.follow-link svg{width:17px;height:17px;fill:currentColor;flex-shrink:0}
+.social .eyebrow{justify-content:center}
+.social .sec-title{color:var(--ink);margin-bottom:14px}
+.social-copy{color:var(--warm-grey);max-width:52ch;margin:0 auto 36px;font-size:16.5px}
+.social-handle{
+  display:inline-flex;align-items:center;gap:.32em;
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(30px,6vw,58px);line-height:1;letter-spacing:-.02em;
+  color:var(--ink);
+  border:2px solid var(--ink);border-radius:99px;
+  padding:.3em .6em .34em;
+  transition:background .2s, border-color .2s, color .2s, transform .15s;
+}
+/* Sin fill acá: el ícono es de trazo y define su propio fill/stroke por
+   atributo. Una regla CSS de fill pisaría esos atributos y lo rellenaría. */
+.social-handle svg{width:.82em;height:.82em;flex-shrink:0}
+.social-handle:hover{background:var(--signal-orange);border-color:var(--signal-orange);color:var(--paper)}
+.social-handle:active{transform:scale(.98)}
 
 /* ---------- Carrito ---------- */
 .overlay{
@@ -645,7 +676,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .wa-float svg{width:28px;height:28px;fill:#fff}
 
 @media(max-width:900px){
-  .custom-grid,.about-grid{grid-template-columns:1fr;gap:40px}
+  .custom-grid,.about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
   .steps,.trust{grid-template-columns:1fr}
   .nav-links{display:none}
   .menu-btn{display:flex}
@@ -687,7 +718,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   /* Fuera todo lo interactivo, lo decorativo y lo que no se puede tocar en papel */
   .preloader,header,.strip,.wa-float,.drawer,.overlay,.toast,footer,
   .hero-ctas,.hero-specs,.filters,.swatches,.card-top,.tile,.sweep,
-  .add-btn,.mp-btn,.buy-link,form,.quote-box,.workshop,.pay-row{display:none!important}
+  .add-btn,.mp-btn,.buy-link,form,.quote-box,.workshop,.pay-row,.social,.contact{display:none!important}
   /* Catálogo y secciones en una sola columna */
   .grid,.steps,.trust,.custom-grid,.about-grid{grid-template-columns:1fr!important;gap:12px!important}
   .card{border:1px solid #bbb;break-inside:avoid;page-break-inside:avoid}
@@ -948,6 +979,54 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   </div>
 </section>
 
+<!-- ================= CONTACTO ================= -->
+<section class="contact" id="contacto">
+  <div class="wrap contact-grid">
+    <div class="reveal">
+      <div class="eyebrow">Capa 05 — Contacto</div>
+      <h2 class="sec-title">¿Preferís escribirnos?</h2>
+      <p class="contact-copy">WhatsApp es lo más rápido, pero si estás en la compu o preferís dejarlo por escrito, mandanos el mensaje desde acá. Te contestamos al mail que nos dejes.</p>
+      <ul class="contact-list">
+        <li><span class="li-mark">1</span><span><b>Contanos qué necesitás.</b> Si es una pieza a medida, sumá medidas aproximadas y para qué la vas a usar.</span></li>
+        <li><span class="li-mark">2</span><span><b>Te respondemos por mail.</b> Con precio estimado o las preguntas que falten para cerrarlo.</span></li>
+        <li><span class="li-mark">WA</span><span><b>¿Tenés apuro?</b> El botón verde de WhatsApp sigue estando abajo a la derecha.</span></li>
+      </ul>
+    </div>
+    <form id="contactForm" class="reveal" action="https://api.web3forms.com/submit" method="POST">
+      <span class="form-title">// Mensaje directo</span>
+      <input type="hidden" name="access_key" value="ebf443e0-4ca3-42e9-9cb2-c34c5792bda3">
+      <input type="hidden" name="subject" value="Nuevo mensaje desde stickos3d.com.ar">
+      <input type="hidden" name="from_name" value="Web STICKOS 3D">
+      <!-- Honeypot de Web3Forms: los bots la completan, las personas no la ven. -->
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+      <label>Tu nombre
+        <input type="text" name="name" placeholder="Nombre y apellido" required>
+      </label>
+      <label>Tu mail
+        <input type="email" name="email" placeholder="nombre@mail.com" required>
+      </label>
+      <label>Mensaje
+        <textarea name="message" placeholder="Contanos qué necesitás…" required></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary" id="contactSubmit" style="justify-content:center">Enviar mensaje</button>
+      <p class="form-note" id="contactStatus" role="status" aria-live="polite">No compartimos tu mail con nadie. Solo lo usamos para responderte.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= REDES ================= -->
+<section class="social" id="redes">
+  <div class="wrap reveal">
+    <div class="eyebrow">Capa 06 — Redes</div>
+    <h2 class="sec-title">Seguinos en redes</h2>
+    <p class="social-copy">Ahí van saliendo las piezas terminadas, los colores nuevos de filamento y los trabajos a medida que todavía no están en el catálogo.</p>
+    <a class="social-handle" id="socialIg" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/></svg>
+      <span>@stickos3d</span>
+    </a>
+  </div>
+</section>
+
 <!-- ================= FOOTER ================= -->
 <footer>
   <div class="wrap">
@@ -971,13 +1050,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
         <a href="#" id="footWaWeb" target="_blank" rel="noopener">WhatsApp Web</a>
         <a href="#" id="footMail">Escribinos por mail</a>
       </div>
-    </div>
-    <div class="follow">
-      <span class="follow-label">Seguinos en redes</span>
-      <a class="follow-link" id="followIg" href="#" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill-rule="evenodd"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 5.68a4.16 4.16 0 1 0 0 8.32 4.16 4.16 0 0 0 0-8.32zm0 6.86a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4zm5.3-7.03a.97.97 0 1 1-1.94 0 .97.97 0 0 1 1.94 0z"/></svg>
-        @stickos3d
-      </a>
     </div>
     <div class="foot-base">
       <span>© 2026 STICKOS 3D</span>
@@ -1014,7 +1086,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 const CONFIG = {
   whatsapp: "5492915164996",          // ← número con código de país, sin + ni espacios
   instagram: "stickos3d",
-  email: "martinsangui@gmail.com"
+  email: "hola@stickos3d.com.ar"    // ← mismo destino que el formulario de contacto
 };
 
 /* ============================================================
@@ -1110,7 +1182,7 @@ document.getElementById("waFloat").href = wa("¡Hola STICKOS 3D! Quería hacer u
 document.getElementById("footWa").href  = wa("¡Hola STICKOS 3D!");
 document.getElementById("footWaWeb").href = waWeb("¡Hola STICKOS 3D!");
 document.getElementById("footPhone").textContent = phoneLabel(CONFIG.whatsapp);
-document.getElementById("followIg").href = `https://instagram.com/${CONFIG.instagram}`;
+document.getElementById("socialIg").href = `https://instagram.com/${CONFIG.instagram}`;
 document.getElementById("footMail").href =
   `mailto:${CONFIG.email}?subject=${encodeURIComponent("Consulta desde la web — STICKOS 3D")}&body=${encodeURIComponent(mailBody)}`;
 
@@ -1331,6 +1403,46 @@ document.getElementById("customForm").addEventListener("submit", e => {
               `💰 Estimado web: ${fmt(q.low)} – ${fmt(q.high)}\n\n` +
               `¿Me confirman el precio final? Si necesitan fotos o el archivo, los mando por acá.`;
   window.open(wa(msg), "_blank");
+});
+
+/* ============================================================
+   FORMULARIO DE CONTACTO — Web3Forms.
+   Se manda por fetch en vez de dejar que el form navegue: así el
+   visitante ve la confirmación acá mismo, sin recargar. Recargar no es
+   gratis en esta web — el carrito vive en memoria y se perdería.
+   La access_key es pública por diseño de Web3Forms (va en el HTML del
+   cliente); lo que la protege es el dominio configurado en su panel.
+   ============================================================ */
+const contactForm = document.getElementById("contactForm");
+const contactStatus = document.getElementById("contactStatus");
+const contactSubmit = document.getElementById("contactSubmit");
+
+contactForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  const label = contactSubmit.textContent;
+  contactSubmit.disabled = true;
+  contactSubmit.textContent = "Enviando…";
+  contactStatus.className = "form-note";
+  contactStatus.textContent = "Enviando tu mensaje…";
+  try{
+    const res = await fetch(contactForm.action, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(Object.fromEntries(new FormData(contactForm)))
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || !data.success) throw new Error(data.message || "error");
+    contactForm.reset();
+    contactStatus.className = "form-note ok";
+    contactStatus.textContent = "Listo, te respondemos a la brevedad.";
+    playBlip(660);
+  } catch(err){
+    contactStatus.className = "form-note err";
+    contactStatus.textContent = "No pudimos enviarlo. Probá de nuevo, o escribinos por WhatsApp acá abajo.";
+  } finally {
+    contactSubmit.disabled = false;
+    contactSubmit.textContent = label;
+  }
 });
 
 /* ============================================================
