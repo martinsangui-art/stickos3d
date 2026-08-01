@@ -991,13 +991,13 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
         <li><span class="li-mark">WA</span><span><b>¿Tenés apuro?</b> El botón verde de WhatsApp sigue estando abajo a la derecha.</span></li>
       </ul>
     </div>
-    <form id="contactForm" class="reveal" action="https://api.web3forms.com/submit" method="POST">
+    <form id="contactForm" class="reveal" action="https://formspree.io/f/xvzejwvl" method="POST">
       <span class="form-title">// Mensaje directo</span>
-      <input type="hidden" name="access_key" value="ebf443e0-4ca3-42e9-9cb2-c34c5792bda3">
-      <input type="hidden" name="subject" value="Nuevo mensaje desde stickos3d.com.ar">
-      <input type="hidden" name="from_name" value="Web STICKOS 3D">
-      <!-- Honeypot de Web3Forms: los bots la completan, las personas no la ven. -->
-      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+      <!-- _subject define el asunto del mail; el campo "email" de abajo lo toma
+           Formspree como responder-a, así se le contesta al cliente directo. -->
+      <input type="hidden" name="_subject" value="Nuevo mensaje desde stickos3d.com.ar">
+      <!-- Honeypot de Formspree: los bots la completan, las personas no la ven. -->
+      <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off">
       <label>Tu nombre
         <input type="text" name="name" placeholder="Nombre y apellido" required>
       </label>
@@ -1405,12 +1405,15 @@ document.getElementById("customForm").addEventListener("submit", e => {
 });
 
 /* ============================================================
-   FORMULARIO DE CONTACTO — Web3Forms.
+   FORMULARIO DE CONTACTO — Formspree.
    Se manda por fetch en vez de dejar que el form navegue: así el
    visitante ve la confirmación acá mismo, sin recargar. Recargar no es
    gratis en esta web — el carrito vive en memoria y se perdería.
-   La access_key es pública por diseño de Web3Forms (va en el HTML del
-   cliente); lo que la protege es el dominio configurado en su panel.
+   El ID del endpoint es público (va en el HTML del cliente); lo que lo
+   protege es el dominio autorizado en el panel de Formspree.
+   Ojo con el chequeo de éxito: Formspree responde {"ok":true}, no
+   {"success":true} como Web3Forms. Confundir esos dos campos hace que
+   cada envío se muestre como error aunque haya salido bien.
    ============================================================ */
 const contactForm = document.getElementById("contactForm");
 const contactStatus = document.getElementById("contactStatus");
@@ -1430,7 +1433,7 @@ contactForm.addEventListener("submit", async e => {
       body: JSON.stringify(Object.fromEntries(new FormData(contactForm)))
     });
     const data = await res.json().catch(() => ({}));
-    if(!res.ok || !data.success) throw new Error(data.message || "error");
+    if(!res.ok || !data.ok) throw new Error(data.error || "error");
     contactForm.reset();
     contactStatus.className = "form-note ok";
     contactStatus.textContent = "Listo, te respondemos a la brevedad.";
