@@ -1078,6 +1078,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.6.8 5 2.3 7L4 29l7.2-2.2c1.9 1 4 1.5 4.8 1.5 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 22.2c-1.7 0-3.4-.5-4.9-1.3l-.4-.2-4.3 1.3 1.3-4.1-.3-.4C6 18.9 5.4 17 5.4 15 5.4 9.2 10.2 4.4 16 4.4S26.6 9.2 26.6 15 21.8 25.2 16 25.2zm5.8-7.6c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.4.5-.5.2-.2.2-.3.3-.5.1-.2.1-.4 0-.6-.1-.2-.7-1.7-1-2.4-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>
 </a>
 
+<!-- SDK de EmailJS — solo para la autorespuesta al visitante. Va sin defer y
+     antes del script principal para que ya esté definido cuando se inicializa.
+     Si el CDN no carga, el formulario sigue funcionando igual: la autorespuesta
+     se saltea sola. -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <script>
 /* ============================================================
    CONFIGURACIÓN — editá esto con sus datos reales
@@ -1413,6 +1419,28 @@ const contactForm = document.getElementById("contactForm");
 const contactStatus = document.getElementById("contactStatus");
 const contactSubmit = document.getElementById("contactSubmit");
 
+/* ---- Autorespuesta al visitante (EmailJS) ----
+   La public key va en el HTML por diseño; lo que la protege es el dominio
+   autorizado en el panel de EmailJS.
+   Es un extra, no parte del flujo: cuando esto corre, el mensaje YA entró por
+   Formspree. Por eso si falla no se le avisa nada al visitante ni se toca el
+   estado del formulario — solo queda un warning en consola. */
+const EMAILJS = { service:"service_q92zkyv", template:"ts06l8u", publicKey:"g76VDrZbQEF22XBq6" };
+if(typeof emailjs !== "undefined") emailjs.init({ publicKey: EMAILJS.publicKey });
+
+function sendAutoReply(p){
+  if(typeof emailjs === "undefined"){
+    console.warn("[autorespuesta] el SDK de EmailJS no cargó; se omite.");
+    return;
+  }
+  // Se mandan varios alias del mail porque el destinatario del template puede
+  // estar mapeado a {{email}}, {{to_email}} o {{reply_to}} según cómo se armó.
+  emailjs.send(EMAILJS.service, EMAILJS.template, {
+    name: p.name, email: p.email, message: p.message,
+    to_email: p.email, reply_to: p.email
+  }).catch(err => console.warn("[autorespuesta] no se pudo enviar:", err));
+}
+
 contactForm.addEventListener("submit", async e => {
   e.preventDefault();
   const label = contactSubmit.textContent;
@@ -1421,10 +1449,13 @@ contactForm.addEventListener("submit", async e => {
   contactStatus.className = "form-note";
   contactStatus.textContent = "Enviando tu mensaje…";
   try{
+    // Se captura antes del reset(): después de limpiar el form los valores ya
+    // no están, y la autorespuesta los necesita.
+    const payload = Object.fromEntries(new FormData(contactForm));
     const res = await fetch(contactForm.action, {
       method:"POST",
       headers:{ "Content-Type":"application/json", "Accept":"application/json" },
-      body: JSON.stringify(Object.fromEntries(new FormData(contactForm)))
+      body: JSON.stringify(payload)
     });
     const data = await res.json().catch(() => ({}));
     if(!res.ok || !data.ok) throw new Error(data.error || "error");
@@ -1432,6 +1463,7 @@ contactForm.addEventListener("submit", async e => {
     contactStatus.className = "form-note ok";
     contactStatus.textContent = "Listo, te respondemos a la brevedad.";
     playBlip(660);
+    sendAutoReply(payload);   // sin await: no debe demorar ni arrastrar el flujo
   } catch(err){
     contactStatus.className = "form-note err";
     contactStatus.textContent = "No pudimos enviarlo. Probá de nuevo, o escribinos por WhatsApp acá abajo.";
