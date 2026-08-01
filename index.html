@@ -6,7 +6,11 @@
 <title>STICKOS 3D — Impresión 3D en Bahía Blanca · Envíos a todo el país</title>
 <meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido con cotización instantánea. Retiro en Bahía Blanca y envíos a todo el país.">
 <link rel="canonical" href="https://stickos3d.com.ar/">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cg id='s' fill='%23FF5A1F'%3E%3Crect x='5' y='5' width='21' height='5'/%3E%3Crect x='5' y='10' width='5' height='6'/%3E%3Crect x='5' y='14' width='21' height='5'/%3E%3Crect x='21' y='19' width='5' height='5'/%3E%3Crect x='5' y='22' width='21' height='5'/%3E%3C/g%3E%3CclipPath id='t'%3E%3Crect x='0' y='0' width='32' height='16.5'/%3E%3C/clipPath%3E%3CclipPath id='b'%3E%3Crect x='0' y='16.5' width='32' height='15.5'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg transform='translate(3,0)'%3E%3Cg clip-path='url(%23t)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/g%3E%3Cg clip-path='url(%23b)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/svg%3E">
+<!-- Favicon: la "S" de bloques con el layer shift (mismo gesto que el wordmark),
+     montada en una pastilla Ink. La pastilla es lo que la despega de las pestañas
+     claras; el isotipo de trazo continuo del manual se probó acá y a 16px se leía
+     como un "2", así que para favicon manda esta versión. -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cg id='s' fill='%23FF5A1F'%3E%3Crect x='5' y='5' width='21' height='5'/%3E%3Crect x='5' y='10' width='5' height='6'/%3E%3Crect x='5' y='14' width='21' height='5'/%3E%3Crect x='21' y='19' width='5' height='5'/%3E%3Crect x='5' y='22' width='21' height='5'/%3E%3C/g%3E%3CclipPath id='t'%3E%3Crect x='0' y='0' width='32' height='16.5'/%3E%3C/clipPath%3E%3CclipPath id='b'%3E%3Crect x='0' y='16.5' width='32' height='15.5'/%3E%3C/clipPath%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='%2314120F'/%3E%3Cg transform='translate(16,16)%20scale(.82)%20translate(-16,-16)'%3E%3Cg transform='translate(3,0)'%3E%3Cg clip-path='url(%23t)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/g%3E%3Cg clip-path='url(%23b)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -570,6 +574,19 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .foot-grid a{display:block;font-size:14.5px;color:var(--text);margin-bottom:8px;opacity:.85}
 .foot-grid a:hover{color:var(--accent);opacity:1}
 .foot-base{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+/* El número va como texto, no como link: en desktop se copia o se marca,
+   que es justo lo que un href de WhatsApp no te deja hacer. */
+.foot-phone{display:block;font-family:var(--font-mono);font-size:13.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.04em}
+.follow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:22px 0}
+.follow-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.follow-link{
+  display:inline-flex;align-items:center;gap:9px;
+  border:1px solid var(--line);border-radius:99px;padding:9px 16px;
+  font-family:var(--font-mono);font-size:13.5px;color:var(--text);
+  transition:border-color .18s, color .18s;
+}
+.follow-link:hover{border-color:var(--accent);color:var(--accent)}
+.follow-link svg{width:17px;height:17px;fill:currentColor;flex-shrink:0}
 
 /* ---------- Carrito ---------- */
 .overlay{
@@ -889,14 +906,14 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
     <!-- Garantía y confianza -->
     <div class="trust">
       <div class="trust-card reveal">
-        <span class="trust-mark">Control de calidad</span>
-        <h3>Revisión antes de salir</h3>
-        <p>Cada pieza se revisa antes de despacharla. Sin excepciones.</p>
+        <span class="trust-mark">Diseño propio</span>
+        <h3>¿No existe? Lo diseñamos</h3>
+        <p>Traés la idea, no hace falta archivo ni planos. Lo dibujamos nosotros y recién ahí se imprime.</p>
       </div>
       <div class="trust-card reveal">
         <span class="trust-mark">Garantía STICKOS</span>
-        <h3>Cobertura en el envío</h3>
-        <p>Si llega rota o dañada en el camino, la reimprimimos sin cargo. Sin hacer preguntas.</p>
+        <h3>Si llega dañada, la rehacemos</h3>
+        <p>Mandanos una foto dentro de las 48hs de recibido el paquete y la reimprimimos sin cargo.</p>
       </div>
       <div class="trust-card reveal">
         <span class="trust-mark">Sin vueltas</span>
@@ -949,10 +966,18 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
       </div>
       <div>
         <h4>Contacto</h4>
-        <a href="#" id="footWa">WhatsApp</a>
-        <a href="#" id="footIg">Instagram</a>
-        <a href="#" id="footMail">Email</a>
+        <span class="foot-phone" id="footPhone"></span>
+        <a href="#" id="footWa" target="_blank" rel="noopener">WhatsApp — abrir app</a>
+        <a href="#" id="footWaWeb" target="_blank" rel="noopener">WhatsApp Web</a>
+        <a href="#" id="footMail">Escribinos por mail</a>
       </div>
+    </div>
+    <div class="follow">
+      <span class="follow-label">Seguinos en redes</span>
+      <a class="follow-link" id="followIg" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill-rule="evenodd"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 5.68a4.16 4.16 0 1 0 0 8.32 4.16 4.16 0 0 0 0-8.32zm0 6.86a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4zm5.3-7.03a.97.97 0 1 1-1.94 0 .97.97 0 0 1 1.94 0z"/></svg>
+        @stickos3d
+      </a>
     </div>
     <div class="foot-base">
       <span>© 2026 STICKOS 3D</span>
@@ -1058,10 +1083,36 @@ const STOCK_STATUS = {
 const fmt = n => "$ " + Math.round(n).toLocaleString("es-AR");
 const wa  = msg => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
 
+/* wa.me resuelve bien en celular pero en escritorio suele rebotar contra la
+   app instalada; web.whatsapp.com es la salida para el que está en la compu. */
+const waWeb = msg => `https://web.whatsapp.com/send?phone=${CONFIG.whatsapp}&text=${encodeURIComponent(msg)}`;
+
+/* El número visible se deriva de CONFIG para que no queden dos fuentes de
+   verdad. Formato AR: 549 + área (3) + abonado (7). Si el número no encaja
+   con ese molde, se muestra tal cual con el + adelante. */
+function phoneLabel(raw){
+  const m = /^549(\d{3})(\d{3})(\d{4})$/.exec(raw);
+  return m ? `+54 9 ${m[1]} ${m[2]}-${m[3]}` : "+" + raw;
+}
+
+const mailBody = [
+  "Hola STICKOS 3D:",
+  "",
+  "Quería consultar por…",
+  "",
+  "(Contame qué necesitás: tipo de pieza, medidas aproximadas y cantidad.)",
+  "",
+  "Nombre:",
+  "Teléfono:"
+].join("\n");
+
 document.getElementById("waFloat").href = wa("¡Hola STICKOS 3D! Quería hacer una consulta.");
 document.getElementById("footWa").href  = wa("¡Hola STICKOS 3D!");
-document.getElementById("footIg").href  = `https://instagram.com/${CONFIG.instagram}`;
-document.getElementById("footMail").href = `mailto:${CONFIG.email}`;
+document.getElementById("footWaWeb").href = waWeb("¡Hola STICKOS 3D!");
+document.getElementById("footPhone").textContent = phoneLabel(CONFIG.whatsapp);
+document.getElementById("followIg").href = `https://instagram.com/${CONFIG.instagram}`;
+document.getElementById("footMail").href =
+  `mailto:${CONFIG.email}?subject=${encodeURIComponent("Consulta desde la web — STICKOS 3D")}&body=${encodeURIComponent(mailBody)}`;
 
 // Strip
 const stripItems = "ELEGÍS EL COLOR <b>//</b> COTIZACIÓN INSTANTÁNEA <b>//</b> GARANTÍA DE REIMPRESIÓN <b>//</b> PLA · PETG · TPU <b>//</b> PIEZAS A MEDIDA <b>//</b> STOCK ELEGIDO <b>//</b> ";
