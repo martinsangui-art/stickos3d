@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>STICKOS 3D — Impresión 3D en Bahía Blanca · Envíos a todo el país</title>
 <meta name="description" content="STICKOS 3D: objetos impresos en 3D, diseños propios y piezas a pedido con cotización instantánea. Retiro en Bahía Blanca y envíos a todo el país.">
+<link rel="canonical" href="https://stickos3d.com.ar/">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cg id='s' fill='%23FF5A1F'%3E%3Crect x='5' y='5' width='21' height='5'/%3E%3Crect x='5' y='10' width='5' height='6'/%3E%3Crect x='5' y='14' width='21' height='5'/%3E%3Crect x='21' y='19' width='5' height='5'/%3E%3Crect x='5' y='22' width='21' height='5'/%3E%3C/g%3E%3CclipPath id='t'%3E%3Crect x='0' y='0' width='32' height='16.5'/%3E%3C/clipPath%3E%3CclipPath id='b'%3E%3Crect x='0' y='16.5' width='32' height='15.5'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg transform='translate(3,0)'%3E%3Cg clip-path='url(%23t)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/g%3E%3Cg clip-path='url(%23b)'%3E%3Cuse href='%23s'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,6 +61,16 @@ img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+/* Scrollbar con los colores de marca — el borde del thumb es del color
+   del track, así el naranja queda como una guía fina y no como una barra
+   maciza. Firefox usa scrollbar-color; el resto, ::-webkit-scrollbar. */
+html{scrollbar-color:var(--signal-orange) var(--ink);scrollbar-width:thin}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--signal-orange);border-radius:99px;border:3px solid var(--ink)}
+::-webkit-scrollbar-thumb:hover{background:var(--signal-orange-hi)}
+::-webkit-scrollbar-corner{background:var(--ink)}
 
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 
@@ -176,13 +187,18 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 .preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 2.9s steps(6,end) forwards}
 @keyframes pfill{to{width:100%}}
 
-/* Barrido de capa sobre la foto de producto al pasar el mouse */
+/* Hover de producto: la pieza se "imprime" de abajo hacia arriba.
+   El panel arranca justo debajo del tile (101% para esconder también la
+   línea del cabezal) y sube hasta cubrirlo, con el filo naranja al frente
+   y el relleno desvaneciéndose atrás, como una pasada de material. */
 .tile .sweep{
   position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:linear-gradient(100deg, transparent 42%, rgba(244,239,228,.09) 50%, transparent 58%);
-  transform:translateX(-130%);
+  transform:translateY(101%);
+  border-top:2px solid var(--accent);
+  background:linear-gradient(to bottom, rgba(255,90,31,.16), rgba(255,90,31,.05) 45%, transparent);
+  transition:transform .32s cubic-bezier(.2,.75,.3,1);
 }
-.card:hover .tile .sweep{transition:transform 1s ease;transform:translateX(130%)}
+.card:hover .tile .sweep{transform:translateY(0)}
 
 /* Feedback táctil */
 @keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.4)}100%{transform:scale(1)}}
@@ -413,6 +429,17 @@ section{padding:96px 0}
   transition:all .18s;
 }
 .add-btn:hover{background:var(--accent);color:var(--ink)}
+/* Los dos caminos de compra conviven en el pie de la tarjeta: Mercado Pago
+   (directo, sólido) y la cola por WhatsApp (blando). Envuelve en flex para
+   que en tarjetas angostas bajen juntos en vez de romper el renglón. */
+.foot-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.mp-btn{
+  background:var(--accent);color:var(--ink);
+  border:1px solid var(--accent);border-radius:9px;
+  padding:9px 16px;font-size:13.5px;font-weight:700;white-space:nowrap;
+  transition:background .18s, border-color .18s;
+}
+.mp-btn:hover{background:var(--accent-hi);border-color:var(--accent-hi)}
 .buy-link{
   display:block;text-align:center;
   font-size:12.5px;font-weight:600;color:var(--muted);
@@ -611,7 +638,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   .swatch{width:28px;height:28px}
   .qty button{width:40px;height:40px;font-size:18px}
   .chip{padding:13px 19px;font-size:13.5px}
-  .add-btn{padding:13px 20px;font-size:14.5px}
+  .add-btn,.mp-btn{padding:13px 20px;font-size:14.5px}
   .drawer-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
   .buy-link{padding:15px 9px}
   .btn{padding:16px 26px}
@@ -625,6 +652,38 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   .sound-btn{width:38px;height:38px}
   .menu-btn{width:38px;height:38px}
   .cart-btn{padding:9px 14px}
+}
+/* ============================================================
+   IMPRESIÓN EN PAPEL (@media print) — el catálogo tiene que poder
+   imprimirse como lista de precios. Se redefinen los tokens en vez
+   de pisar regla por regla: así el modo oscuro no se arrastra a la
+   hoja y todo lo que usa var(--…) queda en tinta negra sobre blanco.
+   ============================================================ */
+@media print{
+  :root{
+    --bg:#fff;--surface:#fff;--surface-2:#fff;
+    --text:#000;--muted:#333;--line:#bbb;
+    --accent:#000;--accent-hi:#000;--accent-soft:transparent;--ok:#000;
+    --layers:none;--dots:none;
+  }
+  body{background:#fff;color:#000}
+  /* Fuera todo lo interactivo, lo decorativo y lo que no se puede tocar en papel */
+  .preloader,header,.strip,.wa-float,.drawer,.overlay,.toast,footer,
+  .hero-ctas,.hero-specs,.filters,.swatches,.card-top,.tile,.sweep,
+  .add-btn,.mp-btn,.buy-link,form,.quote-box,.workshop,.pay-row{display:none!important}
+  /* Catálogo y secciones en una sola columna */
+  .grid,.steps,.trust,.custom-grid,.about-grid{grid-template-columns:1fr!important;gap:12px!important}
+  .card{border:1px solid #bbb;break-inside:avoid;page-break-inside:avoid}
+  .card-body{padding:10px 12px;gap:4px}
+  .card-foot{padding-top:6px}
+  .price{color:#000;font-weight:700}
+  section{padding:18px 0}
+  .hero{padding:18px 0;background:none}
+  a{color:#000;text-decoration:none}
+  /* El scroll-reveal deja los elementos en opacity:0 hasta que entran en
+     viewport; al imprimir hay que forzarlos visibles o salen páginas vacías. */
+  .reveal{opacity:1!important;transform:none!important}
+  @page{margin:14mm}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -1061,10 +1120,12 @@ function renderProducts(){
         </div>
         <div class="card-foot">
           <span class="price">${fmt(p.price)}</span>
-          <button class="add-btn" data-add="${p.id}">A la cola</button>
+          <div class="foot-btns">
+            ${p.mpLink ? `<a class="mp-btn" href="${p.mpLink}" target="_blank" rel="noopener">Comprar ahora</a>` : ""}
+            <button class="add-btn" data-add="${p.id}">A la cola</button>
+          </div>
         </div>
       </div>
-      ${p.mpLink ? `<a class="buy-link" href="${p.mpLink}" target="_blank" rel="noopener">Comprar ya con Mercado Pago →</a>` : ""}
     </article>`;
   }).join("");
   firstProductRender = false;
@@ -1401,6 +1462,16 @@ if(soundOn){
 
 // Sonido del cabezal, solo cuando el preloader se está mostrando de verdad.
 if(soundOn && !prefersReducedMotion) playPrinterBoot();
+
+/* ============================================================
+   BANNER DE CONSOLA — para el que abre DevTools y se pone a mirar.
+   El número sale de CONFIG, así que se actualiza solo si cambia.
+   ============================================================ */
+console.log(
+  "%cSTICKOS 3D%c\n¿Mirando el código? Armamos webs a medida también.\nEscribinos: https://wa.me/" + CONFIG.whatsapp + "\n",
+  "background:#14120F;color:#FF5A1F;font:700 22px/1.8 'Space Grotesk',Helvetica,sans-serif;padding:12px 20px 4px;letter-spacing:-.5px",
+  "background:#14120F;color:#F4EFE4;font:400 12px/1.8 'IBM Plex Mono',Menlo,monospace;padding:0 20px 12px"
+);
 </script>
 </body>
 </html>
