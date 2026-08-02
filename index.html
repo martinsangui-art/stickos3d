@@ -1129,22 +1129,26 @@ const QUOTE = {
 
 /* ============================================================
    PRODUCTOS — copiá un bloque {...} para agregar uno nuevo.
+   price se calculó como: (g / 1000) × 33000 (costo filamento/kg) × 4 (markup),
+   redondeado a la centena. g = gramos estimados; ACTUALIZAR cuando se lamine
+   el STL definitivo (varios productos todavía tienen g estimado a ojo, no
+   medido: p4, p6, p10 no tienen diseño de referencia real).
    mpLink: link de pago de Mercado Pago, o null.
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 const PRODUCTS = [
-  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:12500, mat:"PLA · varios colores", mpLink:null, status:"listo" },
-  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:6800,  mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
-  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:9200,  mat:"PETG · apto exterior", mpLink:null, status:"listo" },
-  { id:"p4",  name:"Soporte de auriculares",            cat:"Gadgets",  price:8900,  mat:"PLA · terminación mate", mpLink:null, status:"extruyendo" },
-  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:18500, mat:"PLA · incluye base", mpLink:null, status:"pedido" },
-  { id:"p6",  name:"Juego de encastre dinosaurio",      cat:"Juguetes", price:7400,  mat:"PLA · no tóxico", mpLink:null, status:"listo" },
-  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:4200,  mat:"TPU · flexible", mpLink:null, status:"listo" },
-  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:2900,  mat:"PLA · elegís color", mpLink:null, status:"extruyendo" },
-  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:8100,  mat:"PETG · resistente", mpLink:null, status:"listo" },
-  { id:"p10", name:"Escultura low-poly personalizable", cat:"Deco",     price:11000, mat:"PLA · varios tamaños", mpLink:null, status:"pedido" },
-  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:5600,  mat:"PLA · flexible articulado", mpLink:null, status:"listo" },
-  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:14800, mat:"PLA · a medida", mpLink:null, status:"pedido" }
+  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:23800, g:180, mat:"PLA · varios colores", mpLink:null, status:"listo" },
+  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:7900,  g:60,  mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
+  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:19800, g:150, mat:"PETG · apto exterior", mpLink:null, status:"listo" },
+  { id:"p4",  name:"Soporte de auriculares",            cat:"Gadgets",  price:19800, g:150, mat:"PLA · terminación mate", mpLink:null, status:"extruyendo" },
+  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:11900, g:90,  mat:"PLA · incluye base", mpLink:null, status:"pedido" },
+  { id:"p6",  name:"Juego de encastre dinosaurio",      cat:"Juguetes", price:13200, g:100, mat:"PLA · no tóxico", mpLink:null, status:"listo" },
+  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:4000,  g:30,  mat:"TPU · flexible", mpLink:null, status:"listo" },
+  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:1300,  g:10,  mat:"PLA · elegís color", mpLink:null, status:"extruyendo" },
+  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:15800, g:120, mat:"PETG · resistente", mpLink:null, status:"listo" },
+  { id:"p10", name:"Escultura low-poly personalizable", cat:"Deco",     price:19800, g:150, mat:"PLA · varios tamaños", mpLink:null, status:"pedido" },
+  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:10600, g:80,  mat:"PLA · flexible articulado", mpLink:null, status:"listo" },
+  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:10600, g:80,  mat:"PLA · a medida", mpLink:null, status:"pedido" }
 ];
 
 // Vocabulario de estado — reutilizado del badge tipo máquina de la cola de impresión.
