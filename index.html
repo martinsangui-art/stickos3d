@@ -891,6 +891,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
         <div>
           <div class="q-label">Estimado en el acto</div>
           <div class="quote-value" id="quoteValue">$ 6.800 – $ 10.000</div>
+          <p class="form-note" id="quoteNote" style="margin-top:6px"></p>
         </div>
         <small>Orientativo. El precio final se confirma al ver la pieza o el archivo.</small>
       </div>
@@ -1388,16 +1389,29 @@ document.getElementById("checkoutWa").onclick = () => {
 
 // Cotizador instantáneo
 const qEls = ["cfSize","cfMat","cfCx","cfQty"].map(id => document.getElementById(id));
+/* El XL no cotiza solo: en piezas grandes una suba de filamento pega fuerte en
+   pesos absolutos, así que ese caso se ajusta a mano. S/M/L siguen dando precio
+   instantáneo, que es el diferenciador de la marca. */
 function calcQuote(){
   const size = document.getElementById("cfSize").value;
   const mat  = document.getElementById("cfMat").value;
   const cx   = parseFloat(document.getElementById("cfCx").value);
   const qty  = Math.max(1, parseInt(document.getElementById("cfQty").value) || 1);
+  const valueEl = document.getElementById("quoteValue");
+  const noteEl  = document.getElementById("quoteNote");
+
+  if (size === "XL") {
+    valueEl.textContent = "Te cotizamos por mail";
+    if (noteEl) noteEl.textContent = "Piezas grandes: preferimos ajustar el precio a mano para darte el mejor número. Escribinos desde el formulario de abajo.";
+    return { low:null, high:null, size, mat, qty, needsContact:true };
+  }
+
   const base = QUOTE.size[size] * QUOTE.mat[mat] * cx * qty;
   const low  = Math.round(base * QUOTE.rangeLow  / 100) * 100;
   const high = Math.round(base * QUOTE.rangeHigh / 100) * 100;
-  document.getElementById("quoteValue").textContent = `${fmt(low)} – ${fmt(high)}`;
-  return { low, high, size, mat, qty };
+  valueEl.textContent = `${fmt(low)} – ${fmt(high)}`;
+  if (noteEl) noteEl.textContent = "Precio de referencia, sujeto a modificación sin previo aviso.";
+  return { low, high, size, mat, qty, needsContact:false };
 }
 qEls.forEach(el => el.addEventListener("input", calcQuote));
 calcQuote();
@@ -1405,6 +1419,10 @@ calcQuote();
 document.getElementById("customForm").addEventListener("submit", e => {
   e.preventDefault();
   const q = calcQuote();
+  if (q.needsContact) {
+    document.getElementById("contacto").scrollIntoView({behavior:"smooth"});
+    return;
+  }
   const name = document.getElementById("cfName").value.trim();
   const desc = document.getElementById("cfDesc").value.trim();
   const sizeLabel = document.getElementById("cfSize").selectedOptions[0].text;
