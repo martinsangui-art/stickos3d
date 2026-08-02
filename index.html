@@ -327,6 +327,9 @@ header .logo .wm{font-size:27px}
   transition:transform .15s, background .18s, border-color .18s;
 }
 .btn:active{transform:scale(.98)}
+.btn:hover{transform:translateY(-3px)}
+.btn-primary:hover{background:var(--accent-hi);box-shadow:0 10px 24px rgba(255,90,31,.35)}
+.btn-ghost:hover{border-color:var(--accent);transform:translateY(-3px)}
 .btn-primary{background:var(--accent);color:var(--ink)}
 .btn-primary:hover{background:var(--accent-hi)}
 .btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
@@ -807,6 +810,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
     <div class="hero-ctas">
       <a href="#catalogo" class="btn btn-primary">Ver catálogo</a>
       <a href="#pedido" class="btn btn-ghost">Cotizar una pieza a medida</a>
+      <a href="#contacto" class="btn btn-ghost">Contactanos</a>
     </div>
     <div class="hero-specs">
       <div><strong>Elegís el color</strong>EN PANTALLA, EN VIVO</div>
@@ -866,7 +870,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
         </label>
         <label>Material
           <select id="cfMat">
-            <option value="PLA" selected>PLA (uso general)</option>
+            <option value="PLA" selected>PLA común (uso general)</option>
+            <option value="PLA_MATE">PLA Mate (acabado sin brillo)</option>
+            <option value="PLA_SILK">PLA Silk (brillo satinado)</option>
             <option value="PETG">PETG (más resistente)</option>
             <option value="TPU">TPU (flexible)</option>
           </select>
@@ -1127,7 +1133,7 @@ const PRINT_QUEUE = [
    ============================================================ */
 const QUOTE = {
   size: { S:4000, M:15800, L:37000, XL:79200 },
-  mat:  { PLA:1, PETG:1.25, TPU:1.5 },
+  mat:  { PLA:1, PLA_MATE:1.35, PLA_SILK:1.74, PETG:1.25, TPU:1.5 },
   rangeLow:0.85, rangeHigh:1.25
 };
 
@@ -1426,9 +1432,12 @@ document.getElementById("customForm").addEventListener("submit", e => {
   const name = document.getElementById("cfName").value.trim();
   const desc = document.getElementById("cfDesc").value.trim();
   const sizeLabel = document.getElementById("cfSize").selectedOptions[0].text;
+  // La etiqueta, no el value: los materiales nuevos tienen guion bajo
+  // (PLA_SILK) y quedaría feo en el mensaje de WhatsApp.
+  const matLabel = document.getElementById("cfMat").selectedOptions[0].text;
   const cxLabel = document.getElementById("cfCx").selectedOptions[0].text;
   const msg = `¡Hola STICKOS 3D! Soy ${name} y usé el cotizador de la web:\n\n` +
-              `📦 Pieza: ${desc}\n📐 Tamaño: ${sizeLabel}\n🧵 Material: ${q.mat}\n` +
+              `📦 Pieza: ${desc}\n📐 Tamaño: ${sizeLabel}\n🧵 Material: ${matLabel}\n` +
               `⚙️ Complejidad: ${cxLabel}\n🔢 Cantidad: ${q.qty}\n\n` +
               `💰 Estimado web: ${fmt(q.low)} – ${fmt(q.high)}\n\n` +
               `¿Me confirman el precio final? Si necesitan fotos o el archivo, los mando por acá.`;
