@@ -1119,10 +1119,13 @@ const PRINT_QUEUE = [
 
 /* ============================================================
    COTIZADOR — precios base por tamaño y multiplicadores.
-   Calibrá estos números con sus costos reales.
+   size usa la MISMA fórmula que el catálogo (gramos × 33 × 4), con los
+   gramos típicos de cada tamaño: S≈30g, M≈120g, L≈280g, XL≈600g. Si cambia
+   el precio del filamento, hay que mover estos cuatro y los de PRODUCTS
+   juntos, o el cotizador y el catálogo empiezan a contradecirse.
    ============================================================ */
 const QUOTE = {
-  size: { S:3500, M:8000, L:16000, XL:28000 },
+  size: { S:4000, M:15800, L:37000, XL:79200 },
   mat:  { PLA:1, PETG:1.25, TPU:1.5 },
   rangeLow:0.85, rangeHigh:1.25
 };
@@ -1133,6 +1136,12 @@ const QUOTE = {
    redondeado a la centena. g = gramos estimados; ACTUALIZAR cuando se lamine
    el STL definitivo (varios productos todavía tienen g estimado a ojo, no
    medido: p4, p6, p10 no tienen diseño de referencia real).
+
+   DOS EXCEPCIONES a la fórmula, no las "corrijas" recalculando desde g:
+   · p5 (lámpara): suma ~$1.000 de LED + pila CR2032 antes del ×4 → $15.900.
+   · p8 (llavero): 10 g darían $1.300, pero hay un piso de $3.500 por producto
+     (abajo de eso la venta no paga el rato de personalizar y empaquetar).
+
    mpLink: link de pago de Mercado Pago, o null.
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
@@ -1141,10 +1150,10 @@ const PRODUCTS = [
   { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:7900,  g:60,  mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
   { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:19800, g:150, mat:"PETG · apto exterior", mpLink:null, status:"listo" },
   { id:"p4",  name:"Soporte de auriculares",            cat:"Gadgets",  price:19800, g:150, mat:"PLA · terminación mate", mpLink:null, status:"extruyendo" },
-  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:11900, g:90,  mat:"PLA · incluye base", mpLink:null, status:"pedido" },
+  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:15900, g:90,  mat:"PLA · incluye base", mpLink:null, status:"pedido" },
   { id:"p6",  name:"Juego de encastre dinosaurio",      cat:"Juguetes", price:13200, g:100, mat:"PLA · no tóxico", mpLink:null, status:"listo" },
   { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:4000,  g:30,  mat:"TPU · flexible", mpLink:null, status:"listo" },
-  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:1300,  g:10,  mat:"PLA · elegís color", mpLink:null, status:"extruyendo" },
+  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:3500,  g:10,  mat:"PLA · elegís color", mpLink:null, status:"extruyendo" },
   { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:15800, g:120, mat:"PETG · resistente", mpLink:null, status:"listo" },
   { id:"p10", name:"Escultura low-poly personalizable", cat:"Deco",     price:19800, g:150, mat:"PLA · varios tamaños", mpLink:null, status:"pedido" },
   { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:10600, g:80,  mat:"PLA · flexible articulado", mpLink:null, status:"listo" },
