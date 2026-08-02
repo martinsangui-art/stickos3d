@@ -1437,7 +1437,7 @@ function sendAutoReply(p){
   // estar mapeado a {{email}}, {{to_email}} o {{reply_to}} según cómo se armó.
   emailjs.send(EMAILJS.service, EMAILJS.template, {
     name: p.name, email: p.email, message: p.message,
-    to_email: p.email, reply_to: p.email
+    to_email: p.email, reply_to: p.email, to_name: p.name
   }).catch(err => console.warn("[autorespuesta] no se pudo enviar:", err));
 }
 
