@@ -238,8 +238,9 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 }
 .mobile-nav a{
   display:flex;align-items:center;min-height:48px;
-  padding:0 4px;font-size:16px;font-weight:500;color:var(--text);
+  padding:0 4px;font-size:15px;font-weight:500;color:var(--text);
   border-bottom:1px solid var(--line);
+  font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;
 }
 .mobile-nav a:last-child{border-bottom:none}
 .mobile-nav a::before{
@@ -287,9 +288,12 @@ header{
 .wm .wm-b{display:block;clip-path:inset(52% 0 0 0)}
 .wm .wm-t{position:absolute;left:0;top:0;clip-path:inset(0 0 48% 0);transform:translateX(.108em)}
 header .logo .wm{font-size:27px}
-.nav-links{display:flex;gap:28px;font-size:14.5px;font-weight:500;color:var(--muted)}
+/* El nav habla el mismo idioma tipográfico que los eyebrows, los badges y los
+   precios: mono, tracked, mayúsculas. Antes usaba la fuente de cuerpo, que es
+   lo más genérico del sitio. */
+.nav-links{display:flex;gap:26px;font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .nav-links a{transition:color .18s}
-.nav-links a:hover{color:var(--text)}
+.nav-links a:hover{color:var(--accent)}
 .cart-btn{
   display:flex;align-items:center;gap:9px;
   background:var(--surface-2);border:1px solid var(--line);
@@ -1663,30 +1667,44 @@ function playBlip(freq){
   osc.stop(ctx.currentTime + 0.13);
 }
 
+/* Hum de taller con dos senoidales graves apenas desafinadas, no ruido blanco.
+   El ruido blanco tiene energía en todo el espectro y el oído es muy sensible
+   al siseo agudo: cansa aunque el volumen sea bajísimo. Dos tonos graves con
+   un lowpass encima se escuchan de fondo sin molestar. */
 function startAmbient(){
   if(ambientNodes) return;
   const ctx = ensureAudioCtx();
-  const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
-  noise.loop = true;
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.value = 220;
-  filter.Q.value = 0.7;
+
+  const osc1 = ctx.createOscillator();
+  osc1.type = "sine";
+  osc1.frequency.value = 58;          // zumbido grave tipo motor
+
+  const osc2 = ctx.createOscillator();
+  osc2.type = "sine";
+  osc2.frequency.value = 61;          // desafinado a propósito: el batido de 3 Hz da textura
+
+  const lowpass = ctx.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 300;      // corta cualquier aspereza que quede arriba
+
   const gain = ctx.createGain();
-  gain.gain.value = 0.018;
-  noise.connect(filter).connect(gain).connect(ctx.destination);
-  noise.start();
-  ambientNodes = { noise, gain };
+  gain.gain.value = 0;                // arranca en silencio y sube solo, sin golpe
+
+  osc1.connect(lowpass);
+  osc2.connect(lowpass);
+  lowpass.connect(gain).connect(ctx.destination);
+
+  osc1.start();
+  osc2.start();
+  gain.gain.setTargetAtTime(0.035, ctx.currentTime, 0.4);
+  ambientNodes = { osc1, osc2, gain };
 }
 function stopAmbient(){
   if(!ambientNodes) return;
   ambientNodes.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
   const nodes = ambientNodes;
-  setTimeout(() => nodes.noise.stop(), 400);
+  // Los dos osciladores se frenan recién cuando el fade terminó.
+  setTimeout(() => { nodes.osc1.stop(); nodes.osc2.stop(); }, 400);
   ambientNodes = null;
 }
 
