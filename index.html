@@ -1192,7 +1192,10 @@ const QUOTE = {
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 const PRODUCTS = [
   { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:23800, g:180, mat:"PLA · varios colores", mpLink:null, status:"listo" },
-  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:7900,  g:60,  mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
+  // p2: único con datos reales de laminado (Creality Print, 120,52 g de
+  // Soleyin, $2.772 de material, 4h31m). El precio sale de comparar contra
+  // talleres artesanales en MercadoLibre, no del ×4 del resto del catálogo.
+  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:15800, g:121, mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
   { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:19800, g:150, mat:"PETG · apto exterior", mpLink:null, status:"listo" },
   { id:"p4",  name:"Portarretrato personalizado",       cat:"Regalos",  price:5500,  g:60,  mat:"PLA · texto grabado", mpLink:null, status:"extruyendo" },
   { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:15900, g:90,  mat:"PLA · incluye base", mpLink:null, status:"pedido" },
