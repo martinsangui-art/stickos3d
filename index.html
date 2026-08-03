@@ -845,6 +845,10 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
   </nav>
 </header>
 
+<!-- Loop ambiente del taller. preload="none": no se descarga hasta que alguien
+     activa el sonido, así no pesa en la carga inicial. -->
+<audio id="workshopAudio" src="assets/workshop-loop.mp3" loop preload="none"></audio>
+
 <!-- ================= HERO ================= -->
 <div class="hero">
   <div class="wrap">
@@ -1643,8 +1647,8 @@ window.addEventListener("scroll", () => {
    ============================================================ */
 const SOUND_KEY = "stickos_sound_on";
 let soundOn = localStorage.getItem(SOUND_KEY) === "1";
+// audioCtx sigue en uso para playBlip() y el sonido del preloader.
 let audioCtx = null;
-let ambientNodes = null;
 
 function ensureAudioCtx(){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1667,46 +1671,41 @@ function playBlip(freq){
   osc.stop(ctx.currentTime + 0.13);
 }
 
-/* Hum de taller con dos senoidales graves apenas desafinadas, no ruido blanco.
-   El ruido blanco tiene energía en todo el espectro y el oído es muy sensible
-   al siseo agudo: cansa aunque el volumen sea bajísimo. Dos tonos graves con
-   un lowpass encima se escuchan de fondo sin molestar. */
+/* Ambiente: un loop real del taller, no sonido generado. El <audio> lleva
+   preload="none", así que los 2,7 MB no se bajan con la página — recién cuando
+   alguien activa el sonido. Los blips de interacción siguen por Web Audio. */
+const workshopAudio = document.getElementById("workshopAudio");
+let fadeInterval = null;
+
+/* Fade a mano con setInterval: HTMLMediaElement.volume no es automatizable
+   como los AudioParam de Web Audio, no acepta rampas. */
+function fadeAudio(target, duration = 800){
+  if(fadeInterval) clearInterval(fadeInterval);
+  const steps = 20;
+  const stepTime = duration / steps;
+  const startVol = workshopAudio.volume;
+  const diff = target - startVol;
+  let i = 0;
+  fadeInterval = setInterval(() => {
+    i++;
+    workshopAudio.volume = Math.max(0, Math.min(1, startVol + diff * (i / steps)));
+    if(i >= steps){
+      clearInterval(fadeInterval);
+      fadeInterval = null;
+      // Pausar recién al final del fade, si no se corta de golpe.
+      if(target === 0) workshopAudio.pause();
+    }
+  }, stepTime);
+}
+
 function startAmbient(){
-  if(ambientNodes) return;
-  const ctx = ensureAudioCtx();
-
-  const osc1 = ctx.createOscillator();
-  osc1.type = "sine";
-  osc1.frequency.value = 58;          // zumbido grave tipo motor
-
-  const osc2 = ctx.createOscillator();
-  osc2.type = "sine";
-  osc2.frequency.value = 61;          // desafinado a propósito: el batido de 3 Hz da textura
-
-  const lowpass = ctx.createBiquadFilter();
-  lowpass.type = "lowpass";
-  lowpass.frequency.value = 300;      // corta cualquier aspereza que quede arriba
-
-  const gain = ctx.createGain();
-  gain.gain.value = 0;                // arranca en silencio y sube solo, sin golpe
-
-  osc1.connect(lowpass);
-  osc2.connect(lowpass);
-  lowpass.connect(gain).connect(ctx.destination);
-
-  osc1.start();
-  osc2.start();
-  gain.gain.setTargetAtTime(0.035, ctx.currentTime, 0.4);
-  ambientNodes = { osc1, osc2, gain };
+  workshopAudio.volume = 0;
+  // El catch se traga el rechazo por política de autoplay: si el navegador lo
+  // bloquea, no pasa nada y arranca con el primer gesto del usuario.
+  workshopAudio.play().catch(() => {});
+  fadeAudio(0.28);
 }
-function stopAmbient(){
-  if(!ambientNodes) return;
-  ambientNodes.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
-  const nodes = ambientNodes;
-  // Los dos osciladores se frenan recién cuando el fade terminó.
-  setTimeout(() => { nodes.osc1.stop(); nodes.osc2.stop(); }, 400);
-  ambientNodes = null;
-}
+function stopAmbient(){ fadeAudio(0); }
 
 /* Sonido del cabezal durante el preloader: seis pasadas de motor paso a paso,
    una por capa, sincronizadas con la animación. Ojo: los navegadores bloquean
