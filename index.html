@@ -1237,7 +1237,7 @@ const PRODUCTS = [
   // p2: único con laminado real (Creality Print, 120,52 g de Soleyin, $2.772
   // de material, 4h31m). El precio sale de comparar contra talleres
   // artesanales en MercadoLibre, no de la fórmula: no lo recalcules.
-  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:15800, g:121, mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
+  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:15800, g:121, mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo", imgs:["assets/products/soporte-celular-1.jpg","assets/products/soporte-celular-2.jpg","assets/products/soporte-celular-3.jpg"] },
   { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:24800, g:188, mat:"PETG · apto exterior", mpLink:null, status:"listo" },            // [estimado +25%]
   { id:"p4",  name:"Portarretrato personalizado",       cat:"Regalos",  price:7900,  g:60,  mat:"PLA · texto grabado", mpLink:null, status:"extruyendo" },
   // p5: suma ~$1.000 de LED + pila CR2032 antes del markup. Si lo recalculás
@@ -1324,7 +1324,20 @@ PRODUCTS.forEach(p => selectedColor[p.id] = COLORS[0]);
 const gridEl = document.getElementById("productGrid");
 let firstProductRender = true;
 function renderProducts(){
-  const list = activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat);
+  // .slice() antes del filtro/sort: cuando activeCat === "Todos" el ternario
+  // de abajo devolvía la referencia real a PRODUCTS (no una copia), y
+  // sort() muta in-place — sin el slice() cada render reordenaría el array
+  // global de productos para siempre, no solo la lista mostrada.
+  const list = (activeCat === "Todos" ? PRODUCTS.slice() : PRODUCTS.filter(p => p.cat === activeCat))
+    // Con foto real primero — evita tener que reordenar PRODUCTS a mano cada
+    // vez que se suma una foto. sort() de JS es estable: entre los que
+    // empatan (con foto entre sí, sin foto entre sí) se mantiene el orden
+    // original del array.
+    .sort((a, b) => {
+      const aHasPhoto = a.imgs && a.imgs.length ? 1 : 0;
+      const bHasPhoto = b.imgs && b.imgs.length ? 1 : 0;
+      return bHasPhoto - aHasPhoto;
+    });
   gridEl.innerHTML = list.map((p, i) => {
     const sel = selectedColor[p.id];
     const st = STOCK_STATUS[p.status];
