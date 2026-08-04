@@ -406,6 +406,29 @@ section{padding:96px 0}
 .tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .tile.has-photo::after{display:none}
 .tile.has-photo .card-status{z-index:3}
+/* Slider de fotos (hasta 4 por producto) — track con flexbox que se
+   desplaza en X; flechas ocultas hasta hover, siempre visibles en touch. */
+.tile-slider{position:absolute;inset:0;overflow:hidden;border-radius:inherit}
+.tile-slider-track{display:flex;height:100%;transition:transform .32s ease}
+/* .tile-photo base es position:absolute (mecanismo de foto única); adentro
+   del track hay que devolverla a flujo normal o el flex de arriba no puede
+   ubicarlas una al lado de la otra y las 3 quedan apiladas en el mismo lugar */
+.tile-slider-track .tile-photo{position:static;flex:0 0 100%;width:100%;height:100%;object-fit:cover}
+.tile-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;border:none;
+  background:rgba(20,18,15,.55);color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;line-height:1;cursor:pointer;z-index:4;
+  opacity:0;transition:opacity .18s;
+}
+.tile-slider:hover .tile-nav{opacity:1}
+.tile-nav.prev{left:8px}
+.tile-nav.next{right:8px}
+.tile-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:4}
+.tile-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45)}
+.tile-dot.active{background:var(--accent)}
+@media(hover:none){.tile-nav{opacity:1}}
 .tile::after{
   content:"FOTO PRÓXIMAMENTE";
   /* centrado entre las dos marcas de calibración de abajo, para no pisarlas */
@@ -1232,7 +1255,7 @@ const PRODUCTS = [
   { id:"p13", name:"Soporte elevador con guarda-auriculares", cat:"Regalos", price:16100, g:122, mat:"PLA · una sola pieza", mpLink:null, status:"pedido" },
   // p14: laminado real, 13 g y $300 → $23.077/kg, otra confirmación del costo
   // base. La fórmula daría $1.700: acá manda el piso de $3.500.
-  { id:"p14", name:"Anillo lector sujeta páginas", cat:"Regalos", price:3500, g:13, mat:"PLA · diseño a elección", mpLink:null, status:"pedido" }   // piso
+  { id:"p14", name:"Ala Nocturna — anillo lector sujeta páginas", cat:"Regalos", price:3500, g:13, mat:"PLA · negro", mpLink:null, status:"pedido", imgs:["assets/products/ala-nocturna-1.jpg","assets/products/ala-nocturna-2.jpg","assets/products/ala-nocturna-3.jpg"] }   // piso
 ];
 
 // Vocabulario de estado — reutilizado del badge tipo máquina de la cola de impresión.
@@ -1310,11 +1333,20 @@ function renderProducts(){
     return `
     <article class="${cardClass}" data-card="${p.id}" style="${cardStyle}">
       <div class="card-top"></div>
-      <div class="tile ${p.img ? "has-photo" : ""}">
+      <div class="tile ${(p.imgs && p.imgs.length) ? "has-photo" : ""}" data-idx="0">
         <div class="tick tl"></div><div class="tick tr"></div><div class="tick bl"></div><div class="tick br"></div>
-        ${p.img
-          ? `<img class="tile-photo" src="${p.img}" alt="${p.name}" loading="lazy">`
-          : `<div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>`}
+        ${(p.imgs && p.imgs.length) ? `
+          <div class="tile-slider">
+            <div class="tile-slider-track">
+              ${p.imgs.slice(0,4).map(src => `<img class="tile-photo" src="${src}" alt="${p.name}" loading="lazy">`).join("")}
+            </div>
+            ${p.imgs.length > 1 ? `
+              <button type="button" class="tile-nav prev" aria-label="Foto anterior" onclick="slidePhoto(event,'${p.id}',-1)">‹</button>
+              <button type="button" class="tile-nav next" aria-label="Foto siguiente" onclick="slidePhoto(event,'${p.id}',1)">›</button>
+              <div class="tile-dots">${p.imgs.slice(0,4).map((_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("")}</div>
+            ` : ""}
+          </div>
+        ` : `<div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>`}
         <div class="card-status"><span class="badge ${st.cls}"><span class="dot"></span>${st.label}</span></div>
         <div class="sweep"></div>
       </div>
@@ -1445,6 +1477,43 @@ document.addEventListener("click", e => {
     renderCart();
   }
 });
+
+// Slider de fotos por producto (hasta 4 por producto vía p.imgs)
+function slidePhoto(e, id, dir){
+  e.stopPropagation();
+  e.preventDefault();
+  const tileSlider = e.currentTarget.closest(".tile-slider");
+  if(!tileSlider) return;
+  const track = tileSlider.querySelector(".tile-slider-track");
+  const dots = tileSlider.querySelectorAll(".tile-dot");
+  const tile = tileSlider.closest(".tile");
+  let idx = parseInt(tile.dataset.idx || "0", 10);
+  const total = dots.length;
+  idx = (idx + dir + total) % total;
+  tile.dataset.idx = idx;
+  track.style.transform = `translateX(-${idx * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+}
+// Swipe táctil delegado en document (no en querySelectorAll de un
+// DOMContentLoaded puntual): el grid se re-arma entero con innerHTML cada
+// vez que se cambia de filtro de categoría, así que atar el swipe una sola
+// vez a los elementos de esa primera tanda lo dejaría roto en cualquier
+// tile que aparezca después. Con delegación no hace falta re-atarlo nunca.
+let tileTouchStartX = 0;
+let tileTouchSlider = null;
+document.addEventListener("touchstart", e => {
+  tileTouchSlider = e.target.closest(".tile-slider");
+  if(tileTouchSlider) tileTouchStartX = e.touches[0].clientX;
+}, { passive:true });
+document.addEventListener("touchend", e => {
+  if(!tileTouchSlider) return;
+  const dx = e.changedTouches[0].clientX - tileTouchStartX;
+  if(Math.abs(dx) >= 40){
+    const btn = tileTouchSlider.querySelector(dx < 0 ? ".tile-nav.next" : ".tile-nav.prev");
+    if(btn) btn.click();
+  }
+  tileTouchSlider = null;
+}, { passive:true });
 
 function openCart(){ drawer.classList.add("open"); overlay.classList.add("open"); }
 function closeCart(){ drawer.classList.remove("open"); overlay.classList.remove("open"); }
