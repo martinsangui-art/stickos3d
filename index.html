@@ -1757,15 +1757,19 @@ window.addEventListener("scroll", () => {
 }, { passive:true });
 
 /* ============================================================
-   SONIDO DEL TALLER — opt-in, apagado por defecto.
-   Generado con Web Audio (sin archivos externos): blips en
-   interacciones + hum ambiente muy suave. Los navegadores
-   bloquean el autoplay con audio, así que solo arranca con
-   un gesto del usuario (el toggle, o el primer click si ya
-   lo tenía activado de una visita anterior).
+   SONIDO DEL TALLER — activado por defecto en la primera visita,
+   salvo que la persona ya lo haya apagado a mano antes (se respeta
+   esa elección). Blips de interacción por Web Audio + loop real del
+   taller de fondo. Los navegadores bloquean el autoplay con audio,
+   así que solo arranca con un gesto real de la persona: el toggle,
+   o cualquier primer click/touch/tecla en la página.
    ============================================================ */
 const SOUND_KEY = "stickos_sound_on";
-let soundOn = localStorage.getItem(SOUND_KEY) === "1";
+// Sin preferencia guardada (primera visita) arranca activado. Si alguien lo
+// apagó a mano en una visita anterior (quedó guardado "0"), se respeta esa
+// elección — el default nuevo no pisa una decisión explícita.
+const storedSoundPref = localStorage.getItem(SOUND_KEY);
+let soundOn = storedSoundPref === null ? true : storedSoundPref === "1";
 // audioCtx sigue en uso para playBlip() y el sonido del preloader.
 let audioCtx = null;
 
@@ -1874,14 +1878,30 @@ soundBtn.addEventListener("click", () => {
   else { stopAmbient(); }
 });
 
-// Si venía activado de una visita anterior, esperamos el primer gesto del usuario para arrancarlo (política de autoplay del navegador).
-if(soundOn){
-  const resumeOnFirstGesture = () => {
+// Si el sonido está activado (por default en la primera visita, o porque
+// venía así de una visita anterior), arranca con la primera interacción de
+// la persona con la página — cualquiera, no hace falta que sea el ícono de
+// sonido puntual. Es la misma política de autoplay del navegador de siempre:
+// necesita un gesto real, así que hay que esperarlo.
+let firstInteractionDone = false;
+function tryStartOnFirstInteraction(){
+  if(firstInteractionDone) return;
+  firstInteractionDone = true;
+  document.removeEventListener("click", tryStartOnFirstInteraction);
+  document.removeEventListener("touchstart", tryStartOnFirstInteraction);
+  document.removeEventListener("keydown", tryStartOnFirstInteraction);
+
+  if(soundOn){
     startAmbient();
-    document.removeEventListener("click", resumeOnFirstGesture);
-  };
-  document.addEventListener("click", resumeOnFirstGesture, { once:true });
+    // El ícono ya refleja soundOn desde el reflectSoundUI() de más arriba,
+    // pero se vuelve a llamar para quedar coherente con el mismo cambio
+    // visual que dispara el click manual, sin dejarlo desincronizado.
+    reflectSoundUI();
+  }
 }
+document.addEventListener("click", tryStartOnFirstInteraction, {once:false});
+document.addEventListener("touchstart", tryStartOnFirstInteraction, {once:false, passive:true});
+document.addEventListener("keydown", tryStartOnFirstInteraction, {once:false});
 
 // Sonido del cabezal, solo cuando el preloader se está mostrando de verdad.
 if(soundOn && !prefersReducedMotion) playPrinterBoot();
