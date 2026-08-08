@@ -1265,8 +1265,12 @@ const PRODUCTS = [
   // de material, 4h31m). El precio sale de comparar contra talleres
   // artesanales en MercadoLibre, no de la fórmula: no lo recalcules.
   { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:15800, g:121, mat:"PLA · negro / blanco", desc:"Se pliega para viajar y se abre en el ángulo que necesites para mirar, tipear o hacer videollamadas. Base antideslizante, sin mecanismos que se rompan.", mpLink:null, status:"extruyendo", imgs:["assets/products/soporte-celular-1.jpg","assets/products/soporte-celular-2.jpg","assets/products/soporte-celular-3.jpg"] },
-  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:24800, g:188, mat:"PETG · apto exterior", desc:"El agua de riego queda en el depósito de la base — regás cada dos semanas, no cada dos días. Apta para exterior.", mpLink:null, status:"listo" },            // [estimado +25%]
-  { id:"p4",  name:"Portarretrato personalizado",       cat:"Regalos",  price:7900,  g:60,  mat:"PLA · texto grabado", desc:"Un marco simple con el texto que quieras grabado — nombre, fecha, una frase. Para esa foto que ya sacaste pero nunca imprimiste.", mpLink:null, status:"extruyendo" },
+  // p3: laminado real, 140 g y $5.500 de material → $39.286/kg (más alto
+  // que el PLA estándar por el cambio de color cáscara/inserto). Precio
+  // pedido $31.500 — la fórmula da $31.564, cerca pero no exacto: se
+  // respeta el precio real, no se recalcula.
+  { id:"p3",  name:"Maceta Autorregante", cat:"Deco", price:31500, g:140, mat:"PLA · 2 colores", desc:"Reserva de agua propia en la base y orificios de drenaje calibrados: regás menos seguido y la planta no se ahoga. Cáscara exterior texturada + inserto interior extraíble para limpiar fácil.", mpLink:null, status:"listo", imgs:["assets/products/maceta-autorregante-1.jpg","assets/products/maceta-autorregante-2.jpg","assets/products/maceta-autorregante-3.jpg","assets/products/maceta-autorregante-4.jpg"] },
+  { id:"p4", name:"Portarretrato personalizado",       cat:"Regalos",  price:7900,  g:60,  mat:"PLA · texto grabado", desc:"Un marco simple con el texto que quieras grabado — nombre, fecha, una frase. Para esa foto que ya sacaste pero nunca imprimiste.", mpLink:null, status:"extruyendo" },
   // p5: suma ~$1.000 de LED + pila CR2032 antes del markup. Si lo recalculás
   // solo desde g te va a dar $14.800 y estarías regalando los componentes.
   { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:20500, g:112, mat:"PLA · incluye base", desc:"Superficie texturada como la luna real, con luz LED cálida incluida. Se enciende con un toque, funciona a pila.", mpLink:null, status:"pedido" },             // [estimado +25%]
