@@ -1921,18 +1921,40 @@ if(soundOn && !prefersReducedMotion) playPrinterBoot();
    ============================================================ */
 let modalProduct = null;
 let modalIdx = 0;
+// Color elegido puntualmente en el modal, para el botón "Cotizar por
+// WhatsApp". Es estado propio del modal — no toca selectedColor (el que
+// usan las cards y el carrito) para no mezclar el pedido puntual con la
+// cola. Arranca en null: sin swatch tocado, el mensaje no menciona color.
+let modalColor = null;
 
 function openProductModal(id){
   const p = PRODUCTS.find(x => x.id === id);
   if(!p) return;
   modalProduct = p;
   modalIdx = 0;
+  modalColor = null;
 
   document.getElementById("modalCat").textContent = `${p.cat} · ${p.mat}`;
   document.getElementById("modalName").textContent = p.name;
   document.getElementById("modalDesc").textContent = p.desc || "";
   document.getElementById("modalMat").textContent = p.mat;
   document.getElementById("modalPrice").textContent = `$ ${p.price.toLocaleString("es-AR")}`;
+
+  const swatchesEl = document.getElementById("modalSwatches");
+  swatchesEl.innerHTML = COLORS.map(c => `
+    <button type="button" class="swatch"
+      style="background:${c.hex}"
+      data-mcolor="${c.name}"
+      title="${c.name}" aria-label="Color ${c.name}"></button>
+  `).join("") + `<span class="swatch-label" id="modalSwatchLabel">Elegí un color</span>`;
+  swatchesEl.querySelectorAll(".swatch").forEach(btn => {
+    btn.onclick = () => {
+      modalColor = COLORS.find(c => c.name === btn.dataset.mcolor);
+      swatchesEl.querySelectorAll(".swatch").forEach(b => b.classList.toggle("active", b === btn));
+      document.getElementById("modalSwatchLabel").textContent = modalColor.name;
+      playBlip(700);
+    };
+  });
 
   const track = document.getElementById("modalTrack");
   const dots = document.getElementById("modalDots");
@@ -1953,6 +1975,16 @@ function openProductModal(id){
     closeProductModal();
   };
 
+  // Pedido puntual por WhatsApp, aparte del flujo de carrito: menciona el
+  // color solo si se tocó algún swatch (modalColor sigue null si no).
+  const quoteWaBtn = document.getElementById("modalQuoteWaBtn");
+  quoteWaBtn.onclick = () => {
+    let msg = `¡Hola STICKOS 3D! Quiero pedir ${p.name}`;
+    if(modalColor) msg += ` en color ${modalColor.name}`;
+    msg += ".";
+    window.open(wa(msg), "_blank");
+  };
+
   document.getElementById("productModal").hidden = false;
   document.body.style.overflow = "hidden";
 }
@@ -1961,6 +1993,7 @@ function closeProductModal(){
   document.getElementById("productModal").hidden = true;
   document.body.style.overflow = "";
   modalProduct = null;
+  modalColor = null;
 }
 
 function modalSlide(dir){
@@ -2007,10 +2040,14 @@ console.log(
     <div class="product-modal-info">
       <div class="eyebrow" id="modalCat"></div>
       <h3 id="modalName"></h3>
+      <div class="swatches" role="group" aria-label="Elegir color" id="modalSwatches"></div>
       <p class="product-modal-desc" id="modalDesc"></p>
       <p class="product-modal-mat" id="modalMat"></p>
       <div class="product-modal-price" id="modalPrice"></div>
-      <button type="button" class="btn btn-primary" id="modalAddBtn">A la cola</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" class="btn btn-primary" id="modalAddBtn">A la cola</button>
+        <button type="button" class="btn btn-ghost" id="modalQuoteWaBtn">Cotizar por WhatsApp</button>
+      </div>
     </div>
   </div>
 </div>
