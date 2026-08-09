@@ -238,8 +238,9 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 }
 .mobile-nav a{
   display:flex;align-items:center;min-height:48px;
-  padding:0 4px;font-size:16px;font-weight:500;color:var(--text);
+  padding:0 4px;font-size:15px;font-weight:500;color:var(--text);
   border-bottom:1px solid var(--line);
+  font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;
 }
 .mobile-nav a:last-child{border-bottom:none}
 .mobile-nav a::before{
@@ -287,9 +288,12 @@ header{
 .wm .wm-b{display:block;clip-path:inset(52% 0 0 0)}
 .wm .wm-t{position:absolute;left:0;top:0;clip-path:inset(0 0 48% 0);transform:translateX(.108em)}
 header .logo .wm{font-size:27px}
-.nav-links{display:flex;gap:28px;font-size:14.5px;font-weight:500;color:var(--muted)}
+/* El nav habla el mismo idioma tipográfico que los eyebrows, los badges y los
+   precios: mono, tracked, mayúsculas. Antes usaba la fuente de cuerpo, que es
+   lo más genérico del sitio. */
+.nav-links{display:flex;gap:26px;font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .nav-links a{transition:color .18s}
-.nav-links a:hover{color:var(--text)}
+.nav-links a:hover{color:var(--accent)}
 .cart-btn{
   display:flex;align-items:center;gap:9px;
   background:var(--surface-2);border:1px solid var(--line);
@@ -402,6 +406,56 @@ section{padding:96px 0}
 .tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .tile.has-photo::after{display:none}
 .tile.has-photo .card-status{z-index:3}
+/* Slider de fotos (hasta 4 por producto) — track con flexbox que se
+   desplaza en X; flechas ocultas hasta hover, siempre visibles en touch. */
+.tile-slider{position:absolute;inset:0;overflow:hidden;border-radius:inherit}
+.tile-slider-track{display:flex;height:100%;transition:transform .32s ease}
+/* .tile-photo base es position:absolute (mecanismo de foto única); adentro
+   del track hay que devolverla a flujo normal o el flex de arriba no puede
+   ubicarlas una al lado de la otra y las 3 quedan apiladas en el mismo lugar */
+.tile-slider-track .tile-photo{position:static;flex:0 0 100%;width:100%;height:100%;object-fit:cover}
+.tile-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;border:none;
+  background:rgba(20,18,15,.55);color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;line-height:1;cursor:pointer;z-index:4;
+  opacity:0;transition:opacity .18s;
+}
+.tile-slider:hover .tile-nav{opacity:1}
+.tile-nav.prev{left:8px}
+.tile-nav.next{right:8px}
+.tile-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:4}
+.tile-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45)}
+.tile-dot.active{background:var(--accent)}
+@media(hover:none){.tile-nav{opacity:1}}
+/* Modal de detalle de producto — reusa .tile-slider/.tile-nav/.tile-dot
+   de arriba adentro de .product-modal-gallery, solo en tamaño grande. */
+.product-modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
+.product-modal[hidden]{display:none}
+.product-modal-backdrop{position:absolute;inset:0;background:rgba(10,9,7,.78);backdrop-filter:blur(3px)}
+.product-modal-content{
+  position:relative;z-index:1;background:var(--ink-2);border:1px solid var(--line);
+  border-radius:16px;max-width:920px;width:100%;max-height:88vh;overflow:auto;
+  display:grid;grid-template-columns:1.1fr 1fr;gap:0;
+}
+.product-modal-gallery{position:relative;aspect-ratio:1;background:var(--ink)}
+.product-modal-gallery .tile-slider{position:absolute;inset:0}
+.product-modal-gallery .tile-nav{opacity:1}
+.product-modal-info{padding:32px;display:flex;flex-direction:column;gap:10px}
+.product-modal-info h3{font-family:var(--font-display);font-size:28px;margin:0}
+.product-modal-desc{color:var(--muted);line-height:1.5;font-size:15px}
+.product-modal-mat{color:var(--muted);font-size:13px;font-family:var(--font-mono)}
+.product-modal-price{font-family:var(--font-mono);font-size:26px;color:var(--accent);font-weight:700;margin-top:8px}
+.product-modal-close{
+  position:absolute;top:14px;right:14px;z-index:2;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:18px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+@media(max-width:720px){
+  .product-modal-content{grid-template-columns:1fr;max-height:92vh}
+  .product-modal-gallery{aspect-ratio:1.2}
+}
 .tile::after{
   content:"FOTO PRÓXIMAMENTE";
   /* centrado entre las dos marcas de calibración de abajo, para no pisarlas */
@@ -813,13 +867,13 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
       <a href="#comprar">Cómo comprar</a>
       <a href="#nosotros">El taller</a>
       <a href="#contacto">Contacto</a>
-      <a href="https://instagram.com/stickos3d" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener">Instagram</a>
     </nav>
     <div class="nav-actions">
       <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mobileNav" aria-label="Abrir menú">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
       </button>
-      <a href="https://instagram.com/stickos3d" target="_blank" rel="noopener" class="sound-btn" aria-label="Seguinos en Instagram" title="Seguinos en Instagram">
+      <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener" class="sound-btn" aria-label="Seguinos en Instagram" title="Seguinos en Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/></svg>
       </a>
       <button class="sound-btn" id="soundToggle" type="button" aria-pressed="false" aria-label="Sonido del taller" title="Sonido del taller">
@@ -837,9 +891,13 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
     <a href="#comprar">Cómo comprar</a>
     <a href="#nosotros">El taller</a>
     <a href="#contacto">Contacto</a>
-    <a href="https://instagram.com/stickos3d" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener">Instagram</a>
   </nav>
 </header>
+
+<!-- Loop ambiente del taller. preload="none": no se descarga hasta que alguien
+     activa el sonido, así no pesa en la carga inicial. -->
+<audio id="workshopAudio" src="assets/workshop-loop.mp3" loop preload="none"></audio>
 
 <!-- ================= HERO ================= -->
 <div class="hero">
@@ -1078,7 +1136,7 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
     </div>
     <a class="btn btn-primary" id="socialIg" href="https://instagram.com/stickos3d" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/></svg>
-      <span>Ver más en @stickos3d</span>
+      <span>Ver más en @stickos3de</span>
     </a>
   </div>
 </section>
@@ -1108,7 +1166,7 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
       </div>
       <div>
         <h4>Redes</h4>
-        <a href="https://instagram.com/stickos3d" target="_blank" rel="noopener">Instagram — @stickos3d</a>
+        <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener">Instagram — @stickos3de</a>
       </div>
     </div>
     <div class="foot-base">
@@ -1151,7 +1209,7 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
    ============================================================ */
 const CONFIG = {
   whatsapp: "5492915164996",          // ← número con código de país, sin + ni espacios
-  instagram: "stickos3d",
+  instagram: "stickos3de",
   email: "hola@stickos3d.com.ar"    // ← mismo destino que el formulario de contacto
 };
 
@@ -1202,23 +1260,41 @@ const QUOTE = {
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 const PRODUCTS = [
-  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:29700, g:225, mat:"PLA · varios colores", mpLink:null, status:"listo" },            // [estimado +25%]
+  { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:29700, g:225, mat:"PLA · varios colores", desc:"Ordená lápices, cargadores y clips en un solo módulo apilable. Se ensambla sin herramientas y se adapta al espacio que tengas en el escritorio.", mpLink:null, status:"listo" },            // [estimado +25%]
   // p2: único con laminado real (Creality Print, 120,52 g de Soleyin, $2.772
   // de material, 4h31m). El precio sale de comparar contra talleres
   // artesanales en MercadoLibre, no de la fórmula: no lo recalcules.
-  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:15800, g:121, mat:"PLA · negro / blanco", mpLink:null, status:"extruyendo" },
-  { id:"p3",  name:"Maceta autorregante hexagonal",     cat:"Deco",     price:24800, g:188, mat:"PETG · apto exterior", mpLink:null, status:"listo" },            // [estimado +25%]
-  { id:"p4",  name:"Portarretrato personalizado",       cat:"Regalos",  price:7900,  g:60,  mat:"PLA · texto grabado", mpLink:null, status:"extruyendo" },
+  { id:"p2",  name:"Soporte de celular ajustable",      cat:"Gadgets",  price:15800, g:121, mat:"PLA · negro / blanco", desc:"Se pliega para viajar y se abre en el ángulo que necesites para mirar, tipear o hacer videollamadas. Base antideslizante, sin mecanismos que se rompan.", mpLink:null, status:"extruyendo", imgs:["assets/products/soporte-celular-1.jpg","assets/products/soporte-celular-2.jpg","assets/products/soporte-celular-3.jpg"] },
+  // p3: laminado real, 140 g y $5.500 de material → $39.286/kg (más alto
+  // que el PLA estándar por el cambio de color cáscara/inserto). Precio
+  // pedido $31.500 — la fórmula da $31.564, cerca pero no exacto: se
+  // respeta el precio real, no se recalcula.
+  { id:"p3",  name:"Maceta Autorregante", cat:"Deco", price:31500, g:140, mat:"PLA · 2 colores", desc:"Reserva de agua propia en la base y orificios de drenaje calibrados: regás menos seguido y la planta no se ahoga. Cáscara exterior texturada + inserto interior extraíble para limpiar fácil. Elegís los colores de cáscara e inserto a tu gusto.", mpLink:null, status:"listo", imgs:["assets/products/maceta-autorregante-1.jpg","assets/products/maceta-autorregante-2.jpg","assets/products/maceta-autorregante-3.jpg","assets/products/maceta-autorregante-4.jpg"] },
+  { id:"p4", name:"Portarretrato personalizado",       cat:"Regalos",  price:7900,  g:60,  mat:"PLA · texto grabado", desc:"Un marco simple con el texto que quieras grabado — nombre, fecha, una frase. Para esa foto que ya sacaste pero nunca imprimiste.", mpLink:null, status:"extruyendo" },
   // p5: suma ~$1.000 de LED + pila CR2032 antes del markup. Si lo recalculás
   // solo desde g te va a dar $14.800 y estarías regalando los componentes.
-  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:20500, g:112, mat:"PLA · incluye base", mpLink:null, status:"pedido" },             // [estimado +25%]
-  { id:"p6",  name:"Rompecabezas de píxeles personalizado", cat:"Juguetes", price:9200, g:70, mat:"PLA · no tóxico", mpLink:null, status:"listo" },
-  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:5000,  g:38,  mat:"TPU · flexible", mpLink:null, status:"listo" },                  // [estimado +25%]
-  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:3500,  g:12,  mat:"PLA · elegís color", mpLink:null, status:"extruyendo" },         // [estimado +25%] · piso
-  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:19800, g:150, mat:"PETG · resistente", mpLink:null, status:"listo" },              // [estimado +25%]
-  { id:"p10", name:"Jarrón decorativo personalizado",   cat:"Deco",     price:17200, g:130, mat:"PLA · varios tamaños", mpLink:null, status:"pedido" },
-  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:13200, g:100, mat:"PLA · flexible articulado", mpLink:null, status:"listo" },       // [estimado +25%]
-  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:13200, g:100, mat:"PLA · a medida", mpLink:null, status:"pedido" }                  // [estimado +25%]
+  { id:"p5",  name:"Lámpara de luna (con luz LED)",     cat:"Deco",     price:20500, g:112, mat:"PLA · incluye base", desc:"Superficie texturada como la luna real, con luz LED cálida incluida. Se enciende con un toque, funciona a pila.", mpLink:null, status:"pedido" },             // [estimado +25%]
+  { id:"p6",  name:"Rompecabezas de píxeles personalizado", cat:"Juguetes", price:9200, g:70, mat:"PLA · no tóxico", desc:"Elegís la imagen, la convertimos en piezas para armar. Entretiene más de una tarde y queda de recuerdo.", mpLink:null, status:"listo" },
+  { id:"p7",  name:"Gancho organizador de cables x6",   cat:"Hogar",    price:5000,  g:38,  mat:"TPU · flexible", desc:"Seis clips flexibles para que los cables del escritorio dejen de ser un nudo. Se pegan o atornillan, como prefieras.", mpLink:null, status:"listo" },                  // [estimado +25%]
+  { id:"p8",  name:"Llavero personalizado con nombre",  cat:"Regalos",  price:3500,  g:12,  mat:"PLA · elegís color", desc:"Tu nombre o el de quien se lo vas a regalar, en la tipografía que elijas. Diez minutos de trabajo, un regalo que no se olvida.", mpLink:null, status:"extruyendo" },         // [estimado +25%] · piso
+  { id:"p9",  name:"Portamate con manija",              cat:"Hogar",    price:19800, g:150, mat:"PETG · resistente", desc:"Para llevar el mate a todos lados sin quemarte ni derramarlo — la manija hace toda la diferencia. PETG, resiste el uso diario.", mpLink:null, status:"listo" },              // [estimado +25%]
+  { id:"p10", name:"Jarrón decorativo personalizado",   cat:"Deco",     price:17200, g:130, mat:"PLA · varios tamaños", desc:"Una pieza escultórica para la mesa o la estantería, en el tamaño que necesites. Cada una sale un poco distinta — es parte de la gracia.", mpLink:null, status:"pedido" },
+  { id:"p11", name:"Fidget articulado (pulpo/dragón)",  cat:"Juguetes", price:13200, g:100, mat:"PLA · flexible articulado", desc:"Se mueve articulación por articulación, como el animal real. Impreso en una sola pieza, sin armado ni piezas sueltas que perder.", mpLink:null, status:"listo" },       // [estimado +25%]
+  { id:"p12", name:"Cartel / logo para emprendimientos",cat:"Regalos",  price:13200, g:100, mat:"PLA · a medida", desc:"Tu logo o el nombre de tu local, en 3D, listo para colgar o apoyar en el mostrador. Buen regalo para quien recién arranca un negocio.", mpLink:null, status:"pedido" },                 // [estimado +25%]
+  // p13: laminado real, 122 g y $2.800 de material → $22.951/kg, que confirma
+  // otra vez el costo de $23.000/kg. El precio sale de la fórmula, sin ajuste.
+  { id:"p13", name:"Soporte elevador con guarda-auriculares", cat:"Regalos", price:16100, g:122, mat:"PLA · una sola pieza", desc:"Levanta el celular a la altura justa para mirar de reojo mientras trabajás, con un espacio abajo para guardar los auriculares.", mpLink:null, status:"pedido" },
+  // p14: laminado real, 13 g y $300 → $23.077/kg, otra confirmación del costo
+  // base. La fórmula daría $1.700: acá manda el piso de $3.500.
+  { id:"p14", name:"Ala Nocturna — anillo lector sujeta páginas", cat:"Regalos", price:3500, g:13, mat:"PLA · negro", desc:"Se desliza en el dedo pulgar y sostiene el libro abierto solo, sin que tengas que usar las dos manos. Para leer comiendo, en el bondi, o en la cama.", mpLink:null, status:"pedido", imgs:["assets/products/ala-nocturna-1.jpg","assets/products/ala-nocturna-2.jpg","assets/products/ala-nocturna-3.jpg"] },   // piso
+  // p15: laminado real, 136 g y $5.300 de material → $38.971/kg, calza con
+  // el $40.000/kg de Silk ya confirmado antes. Precio = costo real x 5.739,
+  // sin ajuste.
+  { id:"p15", name:"Now Playing — soporte para vinilo", cat:"Deco", price:30400, g:136, mat:"PLA Silk · azul/violeta", desc:"Apoyá el disco que estás escuchando en este momento, bien visible. En PLA Silk, con un brillo que cambia según la luz.", mpLink:null, status:"listo", imgs:["assets/products/now-playing-1.jpg","assets/products/now-playing-2.jpg","assets/products/now-playing-3.jpg","assets/products/now-playing-4.jpg"] },
+  // p16: laminado real, 130 g y $3.000 de material → $23.077/kg, confirma
+  // otra vez el costo de $23.000/kg. Precio = costo real x 5.739, sin
+  // ajuste (redondeado a la centena).
+  { id:"p16", name:"Soporte Universal Desmontable para Notebook", cat:"Hogar", price:17200, g:130, mat:"PLA · negro + acento a elección", desc:"Se pliega para viajar, se arma en segundos, y el riel dentado te deja elegir el ángulo exacto. Para notebook, tablet o lo que necesites elevar del escritorio.", mpLink:null, status:"pedido", imgs:["assets/products/soporte-notebook-1.jpg","assets/products/soporte-notebook-2.jpg","assets/products/soporte-notebook-3.jpg"] }
 ];
 
 // Vocabulario de estado — reutilizado del badge tipo máquina de la cola de impresión.
@@ -1287,7 +1363,20 @@ PRODUCTS.forEach(p => selectedColor[p.id] = COLORS[0]);
 const gridEl = document.getElementById("productGrid");
 let firstProductRender = true;
 function renderProducts(){
-  const list = activeCat === "Todos" ? PRODUCTS : PRODUCTS.filter(p => p.cat === activeCat);
+  // .slice() antes del filtro/sort: cuando activeCat === "Todos" el ternario
+  // de abajo devolvía la referencia real a PRODUCTS (no una copia), y
+  // sort() muta in-place — sin el slice() cada render reordenaría el array
+  // global de productos para siempre, no solo la lista mostrada.
+  const list = (activeCat === "Todos" ? PRODUCTS.slice() : PRODUCTS.filter(p => p.cat === activeCat))
+    // Con foto real primero — evita tener que reordenar PRODUCTS a mano cada
+    // vez que se suma una foto. sort() de JS es estable: entre los que
+    // empatan (con foto entre sí, sin foto entre sí) se mantiene el orden
+    // original del array.
+    .sort((a, b) => {
+      const aHasPhoto = a.imgs && a.imgs.length ? 1 : 0;
+      const bHasPhoto = b.imgs && b.imgs.length ? 1 : 0;
+      return bHasPhoto - aHasPhoto;
+    });
   gridEl.innerHTML = list.map((p, i) => {
     const sel = selectedColor[p.id];
     const st = STOCK_STATUS[p.status];
@@ -1296,11 +1385,20 @@ function renderProducts(){
     return `
     <article class="${cardClass}" data-card="${p.id}" style="${cardStyle}">
       <div class="card-top"></div>
-      <div class="tile ${p.img ? "has-photo" : ""}">
+      <div class="tile ${(p.imgs && p.imgs.length) ? "has-photo" : ""}" data-idx="0" onclick="openProductModal('${p.id}')">
         <div class="tick tl"></div><div class="tick tr"></div><div class="tick bl"></div><div class="tick br"></div>
-        ${p.img
-          ? `<img class="tile-photo" src="${p.img}" alt="${p.name}" loading="lazy">`
-          : `<div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>`}
+        ${(p.imgs && p.imgs.length) ? `
+          <div class="tile-slider">
+            <div class="tile-slider-track">
+              ${p.imgs.slice(0,4).map(src => `<img class="tile-photo" src="${src}" alt="${p.name}" loading="lazy">`).join("")}
+            </div>
+            ${p.imgs.length > 1 ? `
+              <button type="button" class="tile-nav prev" aria-label="Foto anterior" onclick="slidePhoto(event,'${p.id}',-1)">‹</button>
+              <button type="button" class="tile-nav next" aria-label="Foto siguiente" onclick="slidePhoto(event,'${p.id}',1)">›</button>
+              <div class="tile-dots">${p.imgs.slice(0,4).map((_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("")}</div>
+            ` : ""}
+          </div>
+        ` : `<div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>`}
         <div class="card-status"><span class="badge ${st.cls}"><span class="dot"></span>${st.label}</span></div>
         <div class="sweep"></div>
       </div>
@@ -1431,6 +1529,43 @@ document.addEventListener("click", e => {
     renderCart();
   }
 });
+
+// Slider de fotos por producto (hasta 4 por producto vía p.imgs)
+function slidePhoto(e, id, dir){
+  e.stopPropagation();
+  e.preventDefault();
+  const tileSlider = e.currentTarget.closest(".tile-slider");
+  if(!tileSlider) return;
+  const track = tileSlider.querySelector(".tile-slider-track");
+  const dots = tileSlider.querySelectorAll(".tile-dot");
+  const tile = tileSlider.closest(".tile");
+  let idx = parseInt(tile.dataset.idx || "0", 10);
+  const total = dots.length;
+  idx = (idx + dir + total) % total;
+  tile.dataset.idx = idx;
+  track.style.transform = `translateX(-${idx * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+}
+// Swipe táctil delegado en document (no en querySelectorAll de un
+// DOMContentLoaded puntual): el grid se re-arma entero con innerHTML cada
+// vez que se cambia de filtro de categoría, así que atar el swipe una sola
+// vez a los elementos de esa primera tanda lo dejaría roto en cualquier
+// tile que aparezca después. Con delegación no hace falta re-atarlo nunca.
+let tileTouchStartX = 0;
+let tileTouchSlider = null;
+document.addEventListener("touchstart", e => {
+  tileTouchSlider = e.target.closest(".tile-slider");
+  if(tileTouchSlider) tileTouchStartX = e.touches[0].clientX;
+}, { passive:true });
+document.addEventListener("touchend", e => {
+  if(!tileTouchSlider) return;
+  const dx = e.changedTouches[0].clientX - tileTouchStartX;
+  if(Math.abs(dx) >= 40){
+    const btn = tileTouchSlider.querySelector(dx < 0 ? ".tile-nav.next" : ".tile-nav.prev");
+    if(btn) btn.click();
+  }
+  tileTouchSlider = null;
+}, { passive:true });
 
 function openCart(){ drawer.classList.add("open"); overlay.classList.add("open"); }
 function closeCart(){ drawer.classList.remove("open"); overlay.classList.remove("open"); }
@@ -1630,17 +1765,21 @@ window.addEventListener("scroll", () => {
 }, { passive:true });
 
 /* ============================================================
-   SONIDO DEL TALLER — opt-in, apagado por defecto.
-   Generado con Web Audio (sin archivos externos): blips en
-   interacciones + hum ambiente muy suave. Los navegadores
-   bloquean el autoplay con audio, así que solo arranca con
-   un gesto del usuario (el toggle, o el primer click si ya
-   lo tenía activado de una visita anterior).
+   SONIDO DEL TALLER — activado por defecto en la primera visita,
+   salvo que la persona ya lo haya apagado a mano antes (se respeta
+   esa elección). Blips de interacción por Web Audio + loop real del
+   taller de fondo. Los navegadores bloquean el autoplay con audio,
+   así que solo arranca con un gesto real de la persona: el toggle,
+   o cualquier primer click/touch/tecla en la página.
    ============================================================ */
 const SOUND_KEY = "stickos_sound_on";
-let soundOn = localStorage.getItem(SOUND_KEY) === "1";
+// Sin preferencia guardada (primera visita) arranca activado. Si alguien lo
+// apagó a mano en una visita anterior (quedó guardado "0"), se respeta esa
+// elección — el default nuevo no pisa una decisión explícita.
+const storedSoundPref = localStorage.getItem(SOUND_KEY);
+let soundOn = storedSoundPref === null ? true : storedSoundPref === "1";
+// audioCtx sigue en uso para playBlip() y el sonido del preloader.
 let audioCtx = null;
-let ambientNodes = null;
 
 function ensureAudioCtx(){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1663,32 +1802,41 @@ function playBlip(freq){
   osc.stop(ctx.currentTime + 0.13);
 }
 
+/* Ambiente: un loop real del taller, no sonido generado. El <audio> lleva
+   preload="none", así que los 2,7 MB no se bajan con la página — recién cuando
+   alguien activa el sonido. Los blips de interacción siguen por Web Audio. */
+const workshopAudio = document.getElementById("workshopAudio");
+let fadeInterval = null;
+
+/* Fade a mano con setInterval: HTMLMediaElement.volume no es automatizable
+   como los AudioParam de Web Audio, no acepta rampas. */
+function fadeAudio(target, duration = 800){
+  if(fadeInterval) clearInterval(fadeInterval);
+  const steps = 20;
+  const stepTime = duration / steps;
+  const startVol = workshopAudio.volume;
+  const diff = target - startVol;
+  let i = 0;
+  fadeInterval = setInterval(() => {
+    i++;
+    workshopAudio.volume = Math.max(0, Math.min(1, startVol + diff * (i / steps)));
+    if(i >= steps){
+      clearInterval(fadeInterval);
+      fadeInterval = null;
+      // Pausar recién al final del fade, si no se corta de golpe.
+      if(target === 0) workshopAudio.pause();
+    }
+  }, stepTime);
+}
+
 function startAmbient(){
-  if(ambientNodes) return;
-  const ctx = ensureAudioCtx();
-  const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for(let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
-  noise.loop = true;
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.value = 220;
-  filter.Q.value = 0.7;
-  const gain = ctx.createGain();
-  gain.gain.value = 0.018;
-  noise.connect(filter).connect(gain).connect(ctx.destination);
-  noise.start();
-  ambientNodes = { noise, gain };
+  workshopAudio.volume = 0;
+  // El catch se traga el rechazo por política de autoplay: si el navegador lo
+  // bloquea, no pasa nada y arranca con el primer gesto del usuario.
+  workshopAudio.play().catch(() => {});
+  fadeAudio(0.28);
 }
-function stopAmbient(){
-  if(!ambientNodes) return;
-  ambientNodes.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
-  const nodes = ambientNodes;
-  setTimeout(() => nodes.noise.stop(), 400);
-  ambientNodes = null;
-}
+function stopAmbient(){ fadeAudio(0); }
 
 /* Sonido del cabezal durante el preloader: seis pasadas de motor paso a paso,
    una por capa, sincronizadas con la animación. Ojo: los navegadores bloquean
@@ -1738,17 +1886,98 @@ soundBtn.addEventListener("click", () => {
   else { stopAmbient(); }
 });
 
-// Si venía activado de una visita anterior, esperamos el primer gesto del usuario para arrancarlo (política de autoplay del navegador).
-if(soundOn){
-  const resumeOnFirstGesture = () => {
+// Si el sonido está activado (por default en la primera visita, o porque
+// venía así de una visita anterior), arranca con la primera interacción de
+// la persona con la página — cualquiera, no hace falta que sea el ícono de
+// sonido puntual. Es la misma política de autoplay del navegador de siempre:
+// necesita un gesto real, así que hay que esperarlo.
+let firstInteractionDone = false;
+function tryStartOnFirstInteraction(){
+  if(firstInteractionDone) return;
+  firstInteractionDone = true;
+  document.removeEventListener("click", tryStartOnFirstInteraction);
+  document.removeEventListener("touchstart", tryStartOnFirstInteraction);
+  document.removeEventListener("keydown", tryStartOnFirstInteraction);
+
+  if(soundOn){
     startAmbient();
-    document.removeEventListener("click", resumeOnFirstGesture);
-  };
-  document.addEventListener("click", resumeOnFirstGesture, { once:true });
+    // El ícono ya refleja soundOn desde el reflectSoundUI() de más arriba,
+    // pero se vuelve a llamar para quedar coherente con el mismo cambio
+    // visual que dispara el click manual, sin dejarlo desincronizado.
+    reflectSoundUI();
+  }
 }
+document.addEventListener("click", tryStartOnFirstInteraction, {once:false});
+document.addEventListener("touchstart", tryStartOnFirstInteraction, {once:false, passive:true});
+document.addEventListener("keydown", tryStartOnFirstInteraction, {once:false});
 
 // Sonido del cabezal, solo cuando el preloader se está mostrando de verdad.
 if(soundOn && !prefersReducedMotion) playPrinterBoot();
+
+/* ============================================================
+   MODAL DE DETALLE DE PRODUCTO — se abre al tocar la foto/tile de
+   una card; reusa el mismo slider (.tile-slider) que ya arma
+   renderProducts(), solo que acá con las fotos en grande.
+   ============================================================ */
+let modalProduct = null;
+let modalIdx = 0;
+
+function openProductModal(id){
+  const p = PRODUCTS.find(x => x.id === id);
+  if(!p) return;
+  modalProduct = p;
+  modalIdx = 0;
+
+  document.getElementById("modalCat").textContent = `${p.cat} · ${p.mat}`;
+  document.getElementById("modalName").textContent = p.name;
+  document.getElementById("modalDesc").textContent = p.desc || "";
+  document.getElementById("modalMat").textContent = p.mat;
+  document.getElementById("modalPrice").textContent = `$ ${p.price.toLocaleString("es-AR")}`;
+
+  const track = document.getElementById("modalTrack");
+  const dots = document.getElementById("modalDots");
+  const imgs = (p.imgs && p.imgs.length) ? p.imgs : null;
+
+  if(imgs){
+    track.innerHTML = imgs.map(src => `<img class="tile-photo" src="${src}" alt="${p.name}">`).join("");
+    dots.innerHTML = imgs.length > 1 ? imgs.map((_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("") : "";
+    track.style.transform = "translateX(0)";
+  } else {
+    track.innerHTML = `<div class="obj" style="--obj:var(--accent);width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px">${p.name.charAt(0)}</div>`;
+    dots.innerHTML = "";
+  }
+
+  const addBtn = document.getElementById("modalAddBtn");
+  addBtn.onclick = () => {
+    addToCart(p.id);
+    closeProductModal();
+  };
+
+  document.getElementById("productModal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeProductModal(){
+  document.getElementById("productModal").hidden = true;
+  document.body.style.overflow = "";
+  modalProduct = null;
+}
+
+function modalSlide(dir){
+  if(!modalProduct || !modalProduct.imgs || modalProduct.imgs.length < 2) return;
+  const total = modalProduct.imgs.length;
+  modalIdx = (modalIdx + dir + total) % total;
+  document.getElementById("modalTrack").style.transform = `translateX(-${modalIdx * 100}%)`;
+  document.querySelectorAll("#modalDots .tile-dot").forEach((d,i) => d.classList.toggle("active", i === modalIdx));
+}
+
+document.addEventListener("keydown", e => {
+  const modal = document.getElementById("productModal");
+  if(modal.hidden) return;
+  if(e.key === "Escape") closeProductModal();
+  if(e.key === "ArrowLeft") modalSlide(-1);
+  if(e.key === "ArrowRight") modalSlide(1);
+});
 
 /* ============================================================
    BANNER DE CONSOLA — para el que abre DevTools y se pone a mirar.
@@ -1760,5 +1989,30 @@ console.log(
   "background:#14120F;color:#F4EFE4;font:400 12px/1.8 'IBM Plex Mono',Menlo,monospace;padding:0 20px 12px"
 );
 </script>
+
+<!-- Modal de detalle de producto — se muestra/oculta con [hidden], el
+     contenido lo llena openProductModal() al tocar la foto de una card. -->
+<div class="product-modal" id="productModal" hidden>
+  <div class="product-modal-backdrop" onclick="closeProductModal()"></div>
+  <div class="product-modal-content">
+    <button type="button" class="product-modal-close" onclick="closeProductModal()" aria-label="Cerrar">✕</button>
+    <div class="product-modal-gallery">
+      <div class="tile-slider" id="modalSlider">
+        <div class="tile-slider-track" id="modalTrack"></div>
+        <button type="button" class="tile-nav prev" aria-label="Foto anterior" onclick="modalSlide(-1)">‹</button>
+        <button type="button" class="tile-nav next" aria-label="Foto siguiente" onclick="modalSlide(1)">›</button>
+        <div class="tile-dots" id="modalDots"></div>
+      </div>
+    </div>
+    <div class="product-modal-info">
+      <div class="eyebrow" id="modalCat"></div>
+      <h3 id="modalName"></h3>
+      <p class="product-modal-desc" id="modalDesc"></p>
+      <p class="product-modal-mat" id="modalMat"></p>
+      <div class="product-modal-price" id="modalPrice"></div>
+      <button type="button" class="btn btn-primary" id="modalAddBtn">A la cola</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
