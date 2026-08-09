@@ -1308,6 +1308,10 @@ const STOCK_STATUS = {
    Lógica (no hace falta tocar de acá para abajo)
    ============================================================ */
 const fmt = n => "$ " + Math.round(n).toLocaleString("es-AR");
+// Un producto muestra precio final solo si ya tiene foto real cargada
+// (imgs con al menos un elemento). Sin eso el precio es una estimación
+// interna (ver PRICING.md) y no debe salir como si fuera definitivo.
+function hasConfirmedPrice(p){ return Array.isArray(p.imgs) && p.imgs.length > 0; }
 const wa  = msg => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
 
 /* wa.me resuelve bien en celular pero en escritorio suele rebotar contra la
@@ -1415,10 +1419,14 @@ function renderProducts(){
           <span class="swatch-label">${sel.name}</span>
         </div>
         <div class="card-foot">
-          <span class="price">${fmt(p.price)}</span>
+          ${hasConfirmedPrice(p)
+            ? `<span class="price">${fmt(p.price)}</span>`
+            : `<span class="price" style="color:var(--muted)">PRÓXIMAMENTE</span>`}
           <div class="foot-btns">
             ${p.mpLink ? `<a class="mp-btn" href="${p.mpLink}" target="_blank" rel="noopener">Comprar ahora</a>` : ""}
-            <button class="add-btn" data-add="${p.id}">A la cola</button>
+            ${hasConfirmedPrice(p)
+              ? `<button class="add-btn" data-add="${p.id}">A la cola</button>`
+              : `<a class="add-btn" href="#contacto">Consultar</a>`}
           </div>
         </div>
       </div>
@@ -1488,6 +1496,10 @@ function renderCart(){
 
 function addToCart(id){
   const p = PRODUCTS.find(x => x.id === id);
+  // Cinturón de seguridad: la UI ya oculta "A la cola" para estos productos,
+  // pero esto bloquea el agregado igual si alguien fuerza el click (teclado,
+  // devtools, etc.) sobre un precio todavía no confirmado.
+  if(!hasConfirmedPrice(p)) return;
   const c = selectedColor[id];
   const key = `${id}|${c.name}`;
   if(!cart[key]) cart[key] = { name:p.name, price:p.price, color:c.name, colorHex:c.hex, qty:0 };
@@ -1938,7 +1950,14 @@ function openProductModal(id){
   document.getElementById("modalName").textContent = p.name;
   document.getElementById("modalDesc").textContent = p.desc || "";
   document.getElementById("modalMat").textContent = p.mat;
-  document.getElementById("modalPrice").textContent = `$ ${p.price.toLocaleString("es-AR")}`;
+  const priceEl = document.getElementById("modalPrice");
+  if(hasConfirmedPrice(p)){
+    priceEl.textContent = `$ ${p.price.toLocaleString("es-AR")}`;
+    priceEl.style.color = "";
+  } else {
+    priceEl.textContent = "PRÓXIMAMENTE";
+    priceEl.style.color = "var(--muted)";
+  }
 
   const swatchesEl = document.getElementById("modalSwatches");
   swatchesEl.innerHTML = COLORS.map(c => `
@@ -1970,10 +1989,19 @@ function openProductModal(id){
   }
 
   const addBtn = document.getElementById("modalAddBtn");
-  addBtn.onclick = () => {
-    addToCart(p.id);
-    closeProductModal();
-  };
+  if(hasConfirmedPrice(p)){
+    addBtn.textContent = "A la cola";
+    addBtn.onclick = () => {
+      addToCart(p.id);
+      closeProductModal();
+    };
+  } else {
+    addBtn.textContent = "Consultar";
+    addBtn.onclick = () => {
+      closeProductModal();
+      document.getElementById("contacto").scrollIntoView({behavior:"smooth"});
+    };
+  }
 
   // Pedido puntual por WhatsApp, aparte del flujo de carrito: menciona el
   // color solo si se tocó algún swatch (modalColor sigue null si no).
