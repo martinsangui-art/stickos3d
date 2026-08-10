@@ -262,16 +262,20 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 header.scrolled{box-shadow:0 10px 28px rgba(0,0,0,.35)}
 header{transition:box-shadow .3s ease}
 
-/* ---------- Header ---------- */
+/* ---------- Header flotante ---------- */
+body{padding-top:22px}
 header{
-  position:sticky;top:0;z-index:60;
-  background:rgba(20,18,15,.82);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);
+  position:sticky;top:16px;z-index:60;
+  background:rgba(29,26,21,.92);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(201,194,180,.14);
+  border-radius:18px;
+  margin:0 24px;
+  box-shadow:0 20px 40px -12px rgba(0,0,0,.5);
 }
-.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 22px}
 .logo{display:flex;align-items:center;gap:11px}
-.logo small{display:block;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
+.logo small{display:none;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
 
 /* ============================================================
    WORDMARK — "layer shift": la mitad de arriba sale corrida una
@@ -291,16 +295,16 @@ header .logo .wm{font-size:27px}
 /* El nav habla el mismo idioma tipográfico que los eyebrows, los badges y los
    precios: mono, tracked, mayúsculas. Antes usaba la fuente de cuerpo, que es
    lo más genérico del sitio. */
-.nav-links{display:flex;gap:26px;font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.nav-links a{transition:color .18s}
-.nav-links a:hover{color:var(--accent)}
+.nav-links{display:flex;gap:30px;font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.72}
+.nav-links a{opacity:.8;transition:color .18s,opacity .18s}
+.nav-links a:hover{color:var(--accent);opacity:1}
 .cart-btn{
   display:flex;align-items:center;gap:9px;
-  background:var(--surface-2);border:1px solid var(--line);
-  color:var(--text);border-radius:99px;padding:9px 18px;
-  font-size:14px;font-weight:600;transition:border-color .18s;
+  background:var(--signal-orange);border:1px solid transparent;
+  color:var(--ink);border-radius:99px;padding:9px 18px;
+  font-size:14px;font-weight:700;transition:background .18s;
 }
-.cart-btn:hover{border-color:var(--accent)}
+.cart-btn:hover{background:var(--signal-orange-hi)}
 .cart-count{
   font-family:var(--font-mono);
   background:var(--accent);color:var(--ink);
@@ -308,6 +312,9 @@ header .logo .wm{font-size:27px}
   display:inline-flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:700;
 }
+/* Adentro del cart-btn ya sólido naranja, el badge necesita otro
+   contraste — si no, queda del mismo color que el botón y desaparece. */
+.cart-btn .cart-count{background:var(--ink);color:var(--paper)}
 
 /* ---------- Hero ---------- */
 .hero{
@@ -370,6 +377,31 @@ header .logo .wm{font-size:27px}
 .strip b{color:var(--accent);font-weight:400}
 @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
+/* ---------- Respiro Paper (entre hero/strip y catálogo) ---------- */
+.breather{
+  background:var(--paper);color:var(--ink);
+  padding:96px 0 88px;position:relative;overflow:hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 92%);
+}
+.breather::before{content:"";position:absolute;right:-8%;top:-30%;width:46%;height:180%;
+  background:repeating-linear-gradient(115deg, rgba(20,18,15,.09) 0 2px, transparent 2px 11px);
+  transform:skewX(-6deg);
+}
+.breather .tick{position:absolute;width:14px;height:14px;opacity:.55}
+.breather .tick::before,.breather .tick::after{content:"";position:absolute;background:var(--ink)}
+.breather .tick::before{width:100%;height:1px;top:50%;left:0;transform:translateY(-50%)}
+.breather .tick::after{height:100%;width:1px;left:50%;top:0;transform:translateX(-50%)}
+.breather .tick.tl{top:28px;left:28px}
+.breather .tick.tr{top:28px;right:28px}
+.breather-eyebrow{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange);margin-bottom:18px}
+.breather h3{font-family:var(--font-display);font-size:clamp(30px,4.2vw,46px);font-weight:700;line-height:1.12;margin-bottom:16px;max-width:640px}
+.breather h3 span.accent{color:var(--signal-orange)}
+.breather p{color:var(--warm-grey);max-width:480px;font-size:16px;line-height:1.6;margin-bottom:26px}
+.breather-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.breather-badges span{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:100px;border:1.5px solid var(--ink);color:var(--ink)}
+.breather-badges span.b-orange{border-color:var(--signal-orange);color:var(--signal-orange)}
+.breather-badges span.b-teal{border-color:var(--layer-teal);color:var(--layer-teal)}
+
 section{padding:96px 0}
 .sec-head{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
 .sec-head p{color:var(--muted);max-width:46ch;margin-top:10px}
@@ -387,20 +419,27 @@ section{padding:96px 0}
 /* ---------- Grid de productos ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
 .card{
-  background:var(--surface);border:1px solid var(--line);
+  background:#221e17;border:1px solid rgba(201,194,180,.14);
   border-radius:var(--radius);overflow:hidden;
   display:flex;flex-direction:column;
   transition:transform .2s, border-color .2s;
 }
-.card:hover{transform:translateY(-4px);border-color:rgba(201,194,180,.4)}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,90,31,.35)}
 .card-top{height:3px;background:var(--filament, var(--soft-grey));transition:background .2s}
 .tile{
   aspect-ratio:4/3;position:relative;
   display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(160deg,var(--surface-2),#171310);
+  background:
+    radial-gradient(120% 90% at 50% 20%, rgba(10,175,160,.16), transparent 60%),
+    linear-gradient(160deg,var(--surface-2),#171310);
+  /* línea de luz superior, sutil — en box-shadow y no en ::after porque
+     ::after ya lo usa el cartel "FOTO PRÓXIMAMENTE" de abajo */
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
   overflow:hidden;
 }
-.tile::before{content:"";position:absolute;inset:0;background:var(--layers)}
+.tile::before{content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(to bottom, transparent 0 7px, rgba(244,239,228,.07) 7px 8px);
+}
 /* Foto real de producto: si un producto trae img, la foto reemplaza al
    placeholder y se apaga el cartel "FOTO PRÓXIMAMENTE". */
 .tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -756,6 +795,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   .steps,.trust{grid-template-columns:1fr}
   .nav-links{display:none}
   .menu-btn{display:flex}
+  header{margin:0 12px}
   section{padding:72px 0}
   .hero{padding:80px 0 64px}
   /* Objetivos táctiles: mínimo 44px en todo lo que se toca */
@@ -792,7 +832,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   }
   body{background:#fff;color:#000}
   /* Fuera todo lo interactivo, lo decorativo y lo que no se puede tocar en papel */
-  .preloader,header,.strip,.wa-float,.drawer,.overlay,.toast,footer,
+  .preloader,header,.strip,.wa-float,.drawer,.overlay,.toast,footer,.ig-backdrop,
   .hero-ctas,.hero-specs,.filters,.swatches,.card-top,.tile,.sweep,
   .add-btn,.mp-btn,.buy-link,form,.quote-box,.workshop,.pay-row,.social,.contact{display:none!important}
   /* Catálogo y secciones en una sola columna */
@@ -815,6 +855,52 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   .hero h1 .capa{opacity:1;transform:none}
   .reveal{opacity:1;transform:none}
   .preloader{display:none}
+}
+
+/* ---------- Modal "Seguinos en Instagram" ---------- */
+.ig-backdrop{
+  position:fixed;inset:0;z-index:190;
+  background:rgba(10,9,7,.72);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .35s ease;
+}
+.ig-backdrop.show{opacity:1;pointer-events:auto}
+.ig-modal{
+  width:min(460px, 90vw);
+  background:var(--paper);color:var(--ink);
+  border-radius:20px;padding:40px 36px 32px;
+  position:relative;overflow:hidden;
+  transform:scale(.92) translateY(10px);
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+  text-align:center;
+}
+.ig-backdrop.show .ig-modal{transform:scale(1) translateY(0)}
+.ig-modal::before{content:"";position:absolute;right:-20%;top:-40%;width:70%;height:200%;
+  background:repeating-linear-gradient(115deg, rgba(20,18,15,.07) 0 2px, transparent 2px 12px);
+  transform:skewX(-8deg);
+}
+.ig-modal-close{
+  position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;
+  background:rgba(20,18,15,.06);border:none;color:var(--ink);font-size:15px;cursor:pointer;
+}
+.ig-modal-icon{
+  width:64px;height:64px;border-radius:18px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--signal-orange),var(--layer-teal));
+  display:flex;align-items:center;justify-content:center;color:var(--ink);
+}
+.ig-modal-eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange);margin-bottom:10px}
+.ig-modal h4{font-family:var(--font-display);font-size:28px;font-weight:700;line-height:1.18;margin-bottom:12px;position:relative}
+.ig-modal p{font-size:15px;color:var(--warm-grey);line-height:1.55;margin-bottom:26px;max-width:340px;margin-left:auto;margin-right:auto;position:relative}
+.ig-modal-follow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);font-size:14px;font-weight:700;letter-spacing:.04em;
+  background:var(--ink);color:var(--paper);padding:14px 30px;border-radius:10px;
+  position:relative;
+}
+.ig-modal-dismiss{
+  display:block;margin:16px auto 0;background:none;border:none;
+  font-family:var(--font-mono);font-size:12px;color:var(--warm-grey);cursor:pointer;
+  position:relative;
 }
 </style>
 <!-- Meta Pixel Code -->
@@ -864,8 +950,6 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
     <nav class="nav-links">
       <a href="#catalogo">Catálogo</a>
       <a href="#pedido">Cotizador</a>
-      <a href="#comprar">Cómo comprar</a>
-      <a href="#nosotros">El taller</a>
       <a href="#contacto">Contacto</a>
       <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener">Instagram</a>
     </nav>
@@ -926,6 +1010,19 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
 <!-- ================= STRIP ================= -->
 <div class="strip" aria-hidden="true">
   <div class="strip-inner" id="strip"></div>
+</div>
+
+<!-- ================= RESPIRO PAPER ================= -->
+<div class="breather">
+  <span class="tick tl"></span><span class="tick tr"></span>
+  <div class="wrap">
+    <div class="breather-eyebrow">// A tu gusto</div>
+    <h3>Elegís el color. Elegís <span class="accent">el diseño.</span></h3>
+    <p>Nada de elegir entre los 3 colores que quedaron en stock. Nos contás la idea y lo imprimimos a tu manera.</p>
+    <div class="breather-badges">
+      <span class="b-orange">Color</span><span class="b-teal">Material</span><span>Diseño</span>
+    </div>
+  </div>
 </div>
 
 <!-- ================= CATÁLOGO ================= -->
@@ -1156,6 +1253,7 @@ src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
         <a href="#catalogo">Catálogo</a>
         <a href="#pedido">Cotizador instantáneo</a>
         <a href="#comprar">Cómo comprar</a>
+        <a href="#nosotros">El taller</a>
       </div>
       <div>
         <h4>Contacto</h4>
@@ -2079,5 +2177,42 @@ console.log(
     </div>
   </div>
 </div>
+
+<!-- Modal "Seguinos en Instagram" — aparece una sola vez a los 5s de
+     cargada la página, y no vuelve a aparecer hasta pasada una semana
+     (se guarda en localStorage). Cuenta real: @stickos3de. -->
+<div class="ig-backdrop" id="igBackdrop">
+  <div class="ig-modal">
+    <button class="ig-modal-close" id="igClose" aria-label="Cerrar">✕</button>
+    <div class="ig-modal-icon">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>
+    </div>
+    <div class="ig-modal-eyebrow">@stickos3de</div>
+    <h4>Mirá lo último del taller</h4>
+    <p>Piezas nuevas, colores y algún print que salió mal — lo mostramos ahí antes que en cualquier otro lado.</p>
+    <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener" class="ig-modal-follow">Seguir en Instagram</a>
+    <button class="ig-modal-dismiss" id="igDismiss">Ahora no</button>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY = 'stickos_ig_modal_seen';
+  var last = localStorage.getItem(KEY);
+  var now = Date.now();
+  var WEEK = 7*24*60*60*1000;
+  if(!last || (now - parseInt(last,10)) > WEEK){
+    setTimeout(function(){
+      document.getElementById('igBackdrop').classList.add('show');
+      localStorage.setItem(KEY, String(now));
+    }, 5000);
+  }
+  function hideModal(){ document.getElementById('igBackdrop').classList.remove('show'); }
+  document.getElementById('igClose').onclick = hideModal;
+  document.getElementById('igDismiss').onclick = hideModal;
+  document.getElementById('igBackdrop').addEventListener('click', function(e){
+    if(e.target.id==='igBackdrop') hideModal();
+  });
+})();
+</script>
 </body>
 </html>
