@@ -39,6 +39,12 @@
   --signal-orange:#FF5A1F;
   --signal-orange-hi:#FF7440;
   --layer-teal:#0AAFA0;
+  /* Mismos colores de marca, oscurecidos para cumplir contraste WCAG AA
+     cuando el texto cae sobre --paper (claro) en vez de --ink (oscuro).
+     Sobre --ink el naranja/teal originales ya dan 6:1 y 6.8:1 — no tocar
+     esos usos, esto es solo para texto/borde sobre fondo Paper. */
+  --signal-orange-on-paper:#BD4317;
+  --layer-teal-on-paper:#077A70;
   --warm-grey:#8C8579;
   --soft-grey:#C9C2B4;
 
@@ -393,14 +399,14 @@ header .logo .wm{font-size:27px}
 .breather .tick::after{height:100%;width:1px;left:50%;top:0;transform:translateX(-50%)}
 .breather .tick.tl{top:28px;left:28px}
 .breather .tick.tr{top:28px;right:28px}
-.breather-eyebrow{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange);margin-bottom:18px}
+.breather-eyebrow{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange-on-paper);margin-bottom:18px}
 .breather h3{font-family:var(--font-display);font-size:clamp(30px,4.2vw,46px);font-weight:700;line-height:1.12;margin-bottom:16px;max-width:640px}
-.breather h3 span.accent{color:var(--signal-orange);white-space:nowrap}
+.breather h3 span.accent{color:var(--signal-orange-on-paper);white-space:nowrap}
 .breather p{color:var(--warm-grey);max-width:480px;font-size:16px;line-height:1.6;margin-bottom:26px}
 .breather-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .breather-badges span{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:100px;border:1.5px solid var(--ink);color:var(--ink)}
-.breather-badges span.b-orange{border-color:var(--signal-orange);color:var(--signal-orange)}
-.breather-badges span.b-teal{border-color:var(--layer-teal);color:var(--layer-teal)}
+.breather-badges span.b-orange{border-color:var(--signal-orange-on-paper);color:var(--signal-orange-on-paper)}
+.breather-badges span.b-teal{border-color:var(--layer-teal-on-paper);color:var(--layer-teal-on-paper)}
 
 section{padding:96px 0}
 .sec-head{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
@@ -888,7 +894,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   background:linear-gradient(135deg,var(--signal-orange),var(--layer-teal));
   display:flex;align-items:center;justify-content:center;color:var(--ink);
 }
-.ig-modal-eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange);margin-bottom:10px}
+.ig-modal-eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange-on-paper);margin-bottom:10px}
 .ig-modal h4{font-family:var(--font-display);font-size:28px;font-weight:700;line-height:1.18;margin-bottom:12px;position:relative}
 .ig-modal p{font-size:15px;color:var(--warm-grey);line-height:1.55;margin-bottom:26px;max-width:340px;margin-left:auto;margin-right:auto;position:relative}
 .ig-modal-follow{
@@ -916,10 +922,36 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('init', '4544907869062174');
 fbq('track', 'PageView');
 </script>
-<noscript><img height="1" width="1" style="display:none"
+<noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=4544907869062174&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
+
+<!-- Datos estructurados para SEO local. Sin openingHoursSpecification ni
+     dirección de calle: no están confirmados y un dato inventado en el
+     schema puede jugar en contra, no a favor. Actualizar acá si en algún
+     momento se confirma horario o dirección exacta. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "STICKOS 3D",
+  "url": "https://stickos3d.com.ar/",
+  "image": "https://stickos3d.com.ar/assets/og-image.png",
+  "description": "Impresión 3D en Bahía Blanca: diseños propios y piezas a pedido con cotización instantánea. Retiro local y envíos a todo el país.",
+  "telephone": "+5492915164996",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Bahía Blanca",
+    "addressRegion": "Buenos Aires",
+    "addressCountry": "AR"
+  },
+  "sameAs": [
+    "https://instagram.com/stickos3de"
+  ],
+  "priceRange": "$3.500 - $31.500"
+}
+</script>
 </head>
 <body>
 
