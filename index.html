@@ -474,6 +474,17 @@ section{padding:96px 0}
 .tile-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45)}
 .tile-dot.active{background:var(--accent)}
 @media(hover:none){.tile-nav{opacity:1}}
+/* Badge de "tiene video" — siempre visible (no depende de hover), igual
+   en mobile y desktop. Es solo señal: el preview real pasa en el ciclo
+   de hover (desktop) o adentro del modal (mobile/click). */
+.video-badge{
+  position:absolute;top:8px;right:8px;z-index:4;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(20,18,15,.55);
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.video-badge svg{width:11px;height:11px;fill:var(--text);margin-left:1px}
 /* Modal de detalle de producto — reusa .tile-slider/.tile-nav/.tile-dot
    de arriba adentro de .product-modal-gallery, solo en tamaño grande. */
 .product-modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
@@ -1524,15 +1535,17 @@ function renderProducts(){
       <div class="card-top"></div>
       <div class="tile ${(p.imgs && p.imgs.length) ? "has-photo" : ""}" data-idx="0" onclick="openProductModal('${p.id}')">
         <div class="tick tl"></div><div class="tick tr"></div><div class="tick bl"></div><div class="tick br"></div>
+        ${p.video ? `<span class="video-badge" title="Con video" aria-label="Este producto tiene video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>` : ""}
         ${(p.imgs && p.imgs.length) ? `
           <div class="tile-slider">
             <div class="tile-slider-track">
               ${p.imgs.slice(0,4).map(src => `<img class="tile-photo" src="${src}" alt="${p.name}" loading="lazy">`).join("")}
+              ${p.video ? `<video class="tile-photo" src="${p.video}" muted playsinline preload="metadata"></video>` : ""}
             </div>
-            ${p.imgs.length > 1 ? `
+            ${(p.imgs.slice(0,4).length + (p.video ? 1 : 0)) > 1 ? `
               <button type="button" class="tile-nav prev" aria-label="Foto anterior" onclick="slidePhoto(event,'${p.id}',-1)">‹</button>
               <button type="button" class="tile-nav next" aria-label="Foto siguiente" onclick="slidePhoto(event,'${p.id}',1)">›</button>
-              <div class="tile-dots">${p.imgs.slice(0,4).map((_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("")}</div>
+              <div class="tile-dots">${p.imgs.slice(0,4).map((_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("")}${p.video ? `<span class="tile-dot"></span>` : ""}</div>
             ` : ""}
           </div>
         ` : `<div class="obj" style="--obj:${sel.hex}"><span>${p.name.charAt(0)}</span></div>`}
@@ -1711,6 +1724,87 @@ document.addEventListener("touchend", e => {
   }
   tileTouchSlider = null;
 }, { passive:true });
+
+// Rotación automática por hover (solo desktop): mientras el mouse está
+// sobre una card con más de un ítem (fotos + video, si el producto trae
+// p.video), va avanzando sola por el mismo track/dots que usa el slider
+// manual de arriba. Al video le toca su turno como un ítem más del ciclo:
+// se reproduce muted desde el inicio hasta ~2.5s o su propia duración
+// (lo que sea más corto), y recién ahí sigue con la siguiente foto.
+// Igual que el swipe táctil, queda delegado en document porque el grid
+// se reconstruye entero al cambiar de filtro.
+const TILE_PHOTO_DWELL_MS = 1600;
+const TILE_VIDEO_DWELL_MS = 2500;
+
+function tileCycleGoTo(tile, track, dots, idx){
+  tile.dataset.idx = idx;
+  track.style.transform = `translateX(-${idx * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+}
+
+// Reproduce el slide de video y avisa cuando termina — por lo que pase
+// primero entre el 'ended' real (video más corto que el tope) o el tope
+// de TILE_VIDEO_DWELL_MS (video más largo, se corta ahí).
+function tilePlayVideoSlide(tile, slide, onDone){
+  let done = false;
+  const finish = () => {
+    if(done) return;
+    done = true;
+    slide.removeEventListener("ended", finish);
+    slide.pause();
+    onDone();
+  };
+  slide.currentTime = 0;
+  const playPromise = slide.play();
+  if(playPromise && playPromise.catch) playPromise.catch(() => {});
+  slide.addEventListener("ended", finish, { once:true });
+  tile._cycleTimer = setTimeout(finish, TILE_VIDEO_DWELL_MS);
+}
+
+function startTileHoverCycle(tile){
+  if(tile._cycleActive || !window.matchMedia("(hover: hover)").matches) return;
+  const track = tile.querySelector(".tile-slider-track");
+  const dots = tile.querySelectorAll(".tile-dot");
+  if(!track) return;
+  const slides = Array.from(track.children);
+  if(slides.length < 2) return; // nada para rotar
+  tile._cycleActive = true;
+  let idx = parseInt(tile.dataset.idx || "0", 10);
+  const step = () => {
+    if(!tile._cycleActive) return;
+    tileCycleGoTo(tile, track, dots, idx);
+    const slide = slides[idx];
+    if(slide.tagName === "VIDEO"){
+      tilePlayVideoSlide(tile, slide, () => { idx = (idx + 1) % slides.length; step(); });
+    } else {
+      tile._cycleTimer = setTimeout(() => { idx = (idx + 1) % slides.length; step(); }, TILE_PHOTO_DWELL_MS);
+    }
+  };
+  step();
+}
+
+function stopTileHoverCycle(tile){
+  if(!tile._cycleActive) return;
+  tile._cycleActive = false;
+  clearTimeout(tile._cycleTimer);
+  // Si el mouse se va en medio del preview del video, cortarlo ahí mismo
+  // (no lo dejamos sonando/corriendo de fondo).
+  const track = tile.querySelector(".tile-slider-track");
+  if(track){
+    Array.from(track.children).forEach(el => {
+      if(el.tagName === "VIDEO"){ el.pause(); el.currentTime = 0; }
+    });
+  }
+}
+
+document.addEventListener("mouseover", e => {
+  const tile = e.target.closest(".tile.has-photo");
+  if(tile && !tile.contains(e.relatedTarget)) startTileHoverCycle(tile);
+});
+document.addEventListener("mouseout", e => {
+  const tile = e.target.closest(".tile.has-photo");
+  if(tile && !tile.contains(e.relatedTarget)) stopTileHoverCycle(tile);
+});
 
 function openCart(){ drawer.classList.add("open"); overlay.classList.add("open"); }
 function closeCart(){ drawer.classList.remove("open"); overlay.classList.remove("open"); }
@@ -2112,9 +2206,14 @@ function openProductModal(id){
   const dots = document.getElementById("modalDots");
   const imgs = (p.imgs && p.imgs.length) ? p.imgs : null;
 
-  if(imgs){
-    track.innerHTML = imgs.map(src => `<img class="tile-photo" src="${src}" alt="${p.name}">`).join("");
-    dots.innerHTML = imgs.length > 1 ? imgs.map((_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("") : "";
+  if(imgs || p.video){
+    const imgsHtml = imgs ? imgs.map(src => `<img class="tile-photo" src="${src}" alt="${p.name}">`).join("") : "";
+    // Video completo (con controles y sonido) — a diferencia del preview
+    // muted del hover en la card, acá se ve entero si el usuario quiere.
+    const videoHtml = p.video ? `<video class="tile-photo" src="${p.video}" controls playsinline></video>` : "";
+    track.innerHTML = imgsHtml + videoHtml;
+    const slideCount = (imgs ? imgs.length : 0) + (p.video ? 1 : 0);
+    dots.innerHTML = slideCount > 1 ? Array.from({length:slideCount}, (_,i) => `<span class="tile-dot ${i===0?"active":""}"></span>`).join("") : "";
     track.style.transform = "translateX(0)";
   } else {
     track.innerHTML = `<div class="obj" style="--obj:var(--accent);width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px">${p.name.charAt(0)}</div>`;
@@ -2153,13 +2252,17 @@ function openProductModal(id){
 function closeProductModal(){
   document.getElementById("productModal").hidden = true;
   document.body.style.overflow = "";
+  // Si había un video sonando en el modal, no lo dejamos corriendo de
+  // fondo al cerrar — mismo criterio que el corte del preview en hover.
+  document.querySelectorAll("#modalTrack video").forEach(v => { v.pause(); v.currentTime = 0; });
   modalProduct = null;
   modalColor = null;
 }
 
 function modalSlide(dir){
-  if(!modalProduct || !modalProduct.imgs || modalProduct.imgs.length < 2) return;
-  const total = modalProduct.imgs.length;
+  if(!modalProduct) return;
+  const total = (modalProduct.imgs ? modalProduct.imgs.length : 0) + (modalProduct.video ? 1 : 0);
+  if(total < 2) return;
   modalIdx = (modalIdx + dir + total) % total;
   document.getElementById("modalTrack").style.transform = `translateX(-${modalIdx * 100}%)`;
   document.querySelectorAll("#modalDots .tile-dot").forEach((d,i) => d.classList.toggle("active", i === modalIdx));
