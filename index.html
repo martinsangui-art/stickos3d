@@ -1653,6 +1653,7 @@ function addToCart(id){
   const key = `${id}|${c.name}`;
   if(!cart[key]) cart[key] = { name:p.name, price:p.price, color:c.name, colorHex:c.hex, qty:0 };
   cart[key].qty++;
+  if(window.__igCartTrigger) window.__igCartTrigger();
   renderCart();
   playBlip(480);
   clearTimeout(toastTimer);
@@ -2342,10 +2343,22 @@ console.log(
   var now = Date.now();
   var WEEK = 7*24*60*60*1000;
   if(!last || (now - parseInt(last,10)) > WEEK){
-    setTimeout(function(){
+    // Dispara con lo que pase primero: scroll pasado el 50% de la página,
+    // o un agregado a la cola de impresión (ver __igCartTrigger en addToCart).
+    function onScroll(){
+      var doc = document.documentElement;
+      var scrollable = doc.scrollHeight - doc.clientHeight;
+      if(scrollable <= 0) return;
+      if(doc.scrollTop / scrollable > 0.5) trigger();
+    }
+    function trigger(){
+      window.removeEventListener('scroll', onScroll);
+      window.__igCartTrigger = null;
       document.getElementById('igBackdrop').classList.add('show');
       localStorage.setItem(KEY, String(now));
-    }, 5000);
+    }
+    window.addEventListener('scroll', onScroll, { passive:true });
+    window.__igCartTrigger = trigger;
   }
   function hideModal(){ document.getElementById('igBackdrop').classList.remove('show'); }
   document.getElementById('igClose').onclick = hideModal;
