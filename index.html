@@ -1402,6 +1402,8 @@ const QUOTE = {
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 const PRODUCTS = [
+  { id:"p17", name:"ONDA", cat:"Deco", price:44999, g:185, mat:"PLA · blanco", desc:"Lámpara de mesa con pantalla plisada, impresa en 3D. Luz cálida y continua que se filtra a través de la trama radial de la pantalla. Base y cuerpo en dos diámetros escalonados. Medidas y colores personalizables a pedido.", mpLink:null, status:"pedido", imgs:["assets/products/onda-1.jpg","assets/products/onda-2.jpg","assets/products/onda-3.jpg"] },
+  { id:"p19", name:"KETIL", cat:"Deco", price:48200, g:365, mat:"PLA · Base + Cap + Pantalla", desc:"Pantalla acanalada que envuelve la luz sin dejar una sola costura visible. Base E26/E27 — le entra cualquier bombita que ya tengas. 270mm de alto, 230mm de diámetro. Impresa capa por capa, a tu medida.", mpLink:null, status:"listo", imgs:["assets/products/ketil-1.jpg","assets/products/ketil-2.jpg","assets/products/ketil-3.jpg"] },
   { id:"p1",  name:"Organizador de escritorio modular", cat:"Hogar",    price:29700, g:225, mat:"PLA · varios colores", desc:"Ordená lápices, cargadores y clips en un solo módulo apilable. Se ensambla sin herramientas y se adapta al espacio que tengas en el escritorio.", mpLink:null, status:"listo" },            // [estimado +25%]
   // p2: único con laminado real (Creality Print, 120,52 g de Soleyin, $2.772
   // de material, 4h31m). El precio sale de comparar contra talleres
@@ -1437,9 +1439,7 @@ const PRODUCTS = [
   // otra vez el costo de $23.000/kg. Precio = costo real x 5.739, sin
   // ajuste (redondeado a la centena).
   { id:"p16", name:"Soporte Universal Desmontable para Notebook", cat:"Hogar", price:17200, g:130, mat:"PLA · negro + acento a elección", desc:"Se pliega para viajar, se arma en segundos, y el riel dentado te deja elegir el ángulo exacto. Para notebook, tablet o lo que necesites elevar del escritorio.", mpLink:null, status:"pedido", imgs:["assets/products/soporte-notebook-1.jpg","assets/products/soporte-notebook-2.jpg","assets/products/soporte-notebook-3.jpg"] },
-  { id:"p17", name:"ONDA", cat:"Deco", price:44999, g:185, mat:"PLA · blanco", desc:"Lámpara de mesa con pantalla plisada, impresa en 3D. Luz cálida y continua que se filtra a través de la trama radial de la pantalla. Base y cuerpo en dos diámetros escalonados. Medidas y colores personalizables a pedido.", mpLink:null, status:"pedido", imgs:["assets/products/onda-1.jpg","assets/products/onda-2.jpg","assets/products/onda-3.jpg"] },
   { id:"p18", name:"MIXTURE", cat:"Juguetes", price:12000, g:90, mat:"PLA · colores a elección", desc:"Doce controles, cero motivo. MIXTURE es un combo de dos piezas pensado para jugar con las manos mientras la cabeza hace otra cosa. Perillas, slider y una traba a rosca de bonus. Colores a elección.", mpLink:null, status:"pedido", imgs:["assets/products/mixture-1.jpg","assets/products/mixture-2.jpg"] },
-  { id:"p19", name:"KETIL", cat:"Deco", price:48200, g:365, mat:"PLA · Base + Cap + Pantalla", desc:"Pantalla acanalada que envuelve la luz sin dejar una sola costura visible. Base E26/E27 — le entra cualquier bombita que ya tengas. 270mm de alto, 230mm de diámetro. Impresa capa por capa, a tu medida.", mpLink:null, status:"listo", imgs:["assets/products/ketil-1.jpg","assets/products/ketil-2.jpg","assets/products/ketil-3.jpg"] },
 ];
 
 // Vocabulario de estado — reutilizado del badge tipo máquina de la cola de impresión.
