@@ -11,7 +11,7 @@ Filamento base $23.000/kg (PLA Soleyin) | PLA Silk $40.000/kg.
 | Ala Nocturna (anillo lector) | 13g | $300 | $3.500 | precio = piso, no fórmula |
 | Now Playing (soporte vinilo) | 136g | $5.300 | $30.400 | PLA Silk |
 | Soporte Universal Desmontable Notebook | 130g | $3.000 | $17.200 | |
-| Maceta Autorregante | 140g* | $5.500 | $31.500 | *peso no cierra con costo — probable purga por cambio de color, ver nota abajo |
+| Maceta Autorregante | 140g* | $5.500 | $20.000 | *peso no cierra con costo — probable purga por cambio de color, ver nota abajo. Precio bajado a pedido de $31.500 a $20.000 — queda por debajo de costo×5,74 (daría $31.564) |
 | ONDA (lámpara pantalla plisada) | 185g | — | $44.999 | precio fijado directo por Martín, no sale de la fórmula (sin costo de slicer cargado todavía) |
 
 ## ESTIMADO — colchón +25% sobre gramaje a ojo, pendiente laminar
