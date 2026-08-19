@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useReveal } from '../hooks/useReveal';
 import { computeQuote, type QuoteMaterial, type QuoteSize } from '../lib/quote';
 import { fmt, wa } from '../lib/format';
+import { trackPixel } from '../lib/pixel';
 
 const SIZE_OPTIONS: [QuoteSize, string][] = [
   ['S', 'Chico (hasta 5 cm)'],
@@ -52,6 +53,7 @@ export function QuoteForm() {
       `⚙️ Complejidad: ${cxLabel}\n🔢 Cantidad: ${qty}\n\n` +
       `💰 Estimado web: ${fmt(quote.low!)} – ${fmt(quote.high!)}\n\n` +
       `¿Me confirman el precio final? Si necesitan fotos o el archivo, los mando por acá.`;
+    trackPixel('Lead', { content_category: 'cotizador', value: quote.low, currency: 'ARS' });
     window.open(wa(msg), '_blank');
   }
 

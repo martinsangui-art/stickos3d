@@ -65,7 +65,18 @@ impresora o capacidad limitada.
   primero. (Se migró desde Web3Forms por fallas de entrega silenciosas:
   devolvía `success:true` pero no entregaba el mail.)
 - **Autoresponder:** EmailJS.
-- **Meta Pixel:** ID `4544907869062174`.
+- **Meta Pixel:** ID `4544907869062174`. Manda `PageView` (fijo, en
+  `index.html`) + eventos de conversión reales vía `src/lib/pixel.ts`:
+  `AddToCart` (agregar al carrito), `InitiateCheckout` (confirmar cola por
+  WhatsApp), `Lead` (enviar cotizador), `Contact` (form de contacto + botón
+  flotante de WhatsApp). Antes solo mandaba PageView — sin esto Meta no
+  puede optimizar campañas por conversión real ni armar públicos de
+  retargeting por intención de compra.
+- **SEO estructurado:** `LocalBusiness` + `Product` por cada producto con
+  precio confirmado, generado en runtime por `src/lib/seo.ts` desde
+  `PRODUCTS` — no vive más como bloque estático en `index.html` (eso se
+  desincronizaba: el `priceRange` quedó fijo en "$3.500 - $31.500" mucho
+  después de que el máximo real subiera a $78.000).
 - **Pagos:** Mercado Pago (link de pago por producto, campo `mpLink`).
 
 ---
@@ -325,3 +336,32 @@ igual que antes en términos de reglas de negocio (secciones 0, 4, 7) — lo
 adentro de `index.html`, y hay que correr `npm run build` (o esperar el CI)
 para ver el resultado, ya no alcanza con abrir el HTML directo en el
 navegador. Ver `README.md` para el flujo de desarrollo completo.
+
+---
+
+## 14. Marketing/SEO — primera tanda (19/08/2026)
+
+Auditoría + mejoras con sombrero de diseño/marketing, priorizadas por
+impacto/esfuerzo. Implementado:
+
+- **Eventos de conversión de Meta Pixel** (ver sección 2) — antes solo
+  `PageView`. Sin esto no se puede optimizar Ads por conversión real.
+- **SEO estructurado dinámico** (`Product` + `LocalBusiness`, ver sección 2)
+  — habilita rich snippets con precio en Google para los 10 productos con
+  foto real cargada.
+- **Botón "Compartir" por WhatsApp en el modal de producto**, con deep-link
+  (`?p=<id>` en la URL abre ese producto directo al cargar). Capitaliza el
+  boca en boca que ya existe por WhatsApp — antes un link compartido caía
+  siempre en la home, ahora cae en el producto puntual.
+- `sitemap.xml` con `lastmod` actualizado.
+
+**Pendiente, necesita contenido real de Martín (no se fabrica):**
+sección de reseñas/testimonios — el sitio no tiene ninguna prueba social
+todavía. Necesita 3-5 reseñas reales (capturas de Instagram/WhatsApp,
+lo que haya) antes de construir esa sección — nunca inventar testimonios,
+es publicidad engañosa.
+
+**Ideas que salieron en la auditoría pero no entraron en esta tanda**
+(no rechazadas por Martín, solo no priorizadas — vale la pena volver a
+proponerlas): Google Analytics 4 (hoy solo hay Meta Pixel, sin visibilidad
+de tráfico orgánico separado del de Ads); newsletter/email capture.

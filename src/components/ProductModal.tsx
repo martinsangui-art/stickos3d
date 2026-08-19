@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { COLORS } from '../data/config';
 import { hasConfirmedPrice } from '../data/products';
 import type { Color, Product } from '../data/types';
-import { wa } from '../lib/format';
+import { fmt, productShareUrl, shareWa, wa } from '../lib/format';
 import { useCart } from '../context/CartContext';
 import { useSoundContext } from '../context/SoundContext';
+import { trackCustomPixel } from '../lib/pixel';
 
 interface Props {
   product: Product | null;
@@ -86,6 +87,13 @@ export function ProductModal({ product: p, onClose }: Props) {
     window.open(wa(msg), '_blank');
   }
 
+  function handleShare() {
+    const priceLine = confirmedPrice ? ` (${fmt(p!.price)})` : '';
+    const msg = `Mirá ${p!.name}${priceLine} de STICKOS 3D 👇\n${productShareUrl(p!.id)}`;
+    trackCustomPixel('ShareProduct', { content_ids: [p!.id] });
+    window.open(shareWa(msg), '_blank');
+  }
+
   return (
     <div className="product-modal">
       <div className="product-modal-backdrop" onClick={handleClose}></div>
@@ -160,6 +168,9 @@ export function ProductModal({ product: p, onClose }: Props) {
               </button>
             )}
             <button type="button" className="btn btn-ghost" onClick={handleQuoteWa}>Cotizar por WhatsApp</button>
+            <button type="button" className="btn btn-ghost" onClick={handleShare} aria-label="Compartir este producto por WhatsApp">
+              Compartir
+            </button>
           </div>
         </div>
       </div>

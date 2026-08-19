@@ -1,5 +1,6 @@
 import { useCart } from '../context/CartContext';
 import { fmt, wa } from '../lib/format';
+import { trackPixel } from '../lib/pixel';
 
 interface Props {
   open: boolean;
@@ -20,6 +21,12 @@ export function CartDrawer({ open, onClose }: Props) {
       msg += `• ${i.name} — color ${i.color} — x${i.qty} — ${fmt(i.price * i.qty)}\n`;
     });
     msg += `\nTotal estimado: ${fmt(total)}\n\n¿Me confirman disponibilidad y forma de pago?`;
+    trackPixel('InitiateCheckout', {
+      value: total,
+      currency: 'ARS',
+      num_items: items.reduce((a, [, i]) => a + i.qty, 0),
+      content_ids: items.map(([key]) => key.split('|')[0]),
+    });
     window.open(wa(msg), '_blank');
   }
 

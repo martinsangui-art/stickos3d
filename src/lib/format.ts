@@ -10,6 +10,18 @@ export const wa = (msg: string): string =>
 export const waWeb = (msg: string): string =>
   `https://web.whatsapp.com/send?phone=${CONFIG.whatsapp}&text=${encodeURIComponent(msg)}`;
 
+/* Compartir un producto — a diferencia de wa()/waWeb() (que arman un mensaje
+   PARA el negocio), esto abre WhatsApp sin número de destino: el que
+   comparte elige a quién mandárselo. Es el mecanismo real por el que ya
+   circulan productos de STICKOS 3D — un botón de compartir con el link y el
+   precio precargados es gratis y capitaliza ese boca en boca existente. */
+export const shareWa = (msg: string): string => `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+
+// Deep-link a un producto puntual — la SPA no tiene rutas por producto, así
+// que el ?p=<id> en la URL es lo que le permite a alguien que recibe el link
+// compartido caer directo en el modal del producto, no solo en la home.
+export const productShareUrl = (id: string): string => `https://stickos3d.com.ar/?p=${id}`;
+
 export const mailBody = [
   'Hola STICKOS 3D:',
   '',

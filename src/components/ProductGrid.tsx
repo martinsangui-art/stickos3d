@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { COLORS } from '../data/config';
 import { PRODUCTS } from '../data/products';
 import type { Color } from '../data/types';
@@ -14,7 +14,26 @@ export function ProductGrid() {
   const [selectedColor, setSelectedColor] = useState<Record<string, Color>>(() =>
     Object.fromEntries(PRODUCTS.map((p) => [p.id, COLORS[0]])),
   );
-  const [openProductId, setOpenProductId] = useState<string | null>(null);
+  // Deep-link: ?p=<id> en la URL abre el modal de ese producto directo al
+  // cargar — lo que hace que el botón "Compartir por WhatsApp" de cada
+  // producto (ver ProductCard/ProductModal) lleve a quien lo recibe al
+  // producto puntual, no solo a la home. Se lee una sola vez al montar:
+  // no reacciona si alguien edita la URL a mano después sin recargar.
+  const [openProductId, setOpenProductId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const id = new URLSearchParams(window.location.search).get('p');
+    return id && PRODUCTS.some((p) => p.id === id) ? id : null;
+  });
+
+  // Mantiene la URL en sync con el modal abierto, sin recargar la página —
+  // así el link de la barra de direcciones ya es compartible tal cual
+  // mientras alguien mira un producto puntual.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (openProductId) url.searchParams.set('p', openProductId);
+    else url.searchParams.delete('p');
+    window.history.replaceState(null, '', url);
+  }, [openProductId]);
   // Solo la primera vez que se pinta el grid entero se anima con reveal/stagger,
   // igual que firstProductRender en el original — cambiar de filtro después no
   // vuelve a animar las cards, aparecen directo.

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useReveal } from '../hooks/useReveal';
 import { sendAutoReply } from '../lib/email';
+import { trackPixel } from '../lib/pixel';
 import { useSoundContext } from '../context/SoundContext';
 
 type Status = { kind: 'idle' | 'sending' | 'ok' | 'err'; text: string };
@@ -45,6 +46,7 @@ export function ContactForm() {
       form.reset();
       setStatus({ kind: 'ok', text: 'Listo, te respondemos a la brevedad.' });
       playBlip(660);
+      trackPixel('Contact');
       sendAutoReply({ name: payload.name, email: payload.email, message: payload.message }); // sin await: no debe demorar ni arrastrar el flujo
     } catch {
       setStatus({ kind: 'err', text: 'No pudimos enviarlo. Probá de nuevo, o escribinos por WhatsApp acá abajo.' });

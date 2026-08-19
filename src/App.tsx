@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Preloader } from './components/Preloader';
+import { StructuredData } from './components/StructuredData';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Strip } from './components/Strip';
@@ -61,6 +62,7 @@ function AppShell() {
 
   return (
     <>
+      <StructuredData />
       <Preloader done={preloader.done} onSkip={preloader.hide} />
       <Header cartSize={size} soundOn={soundOn} onToggleSound={toggle} onOpenCart={() => setCartOpen(true)} />
       <Hero />

@@ -43,31 +43,13 @@ fbq('track', 'PageView');
      y el build de Vite (parse5, estricto) rechaza un <img> en esa posición
      aunque los navegadores lo toleren. Meta mismo recomienda ponerlo apenas
      abre <body> — mismo efecto de tracking, sin el error de build. -->
-<!-- Datos estructurados para SEO local. Sin openingHoursSpecification ni
-     dirección de calle: no están confirmados y un dato inventado en el
-     schema puede jugar en contra, no a favor. Actualizar acá si en algún
-     momento se confirma horario o dirección exacta. -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "STICKOS 3D",
-  "url": "https://stickos3d.com.ar/",
-  "image": "https://stickos3d.com.ar/assets/og-image.png",
-  "description": "Impresión 3D en Bahía Blanca: diseños propios y piezas a pedido con cotización instantánea. Retiro local y envíos a todo el país.",
-  "telephone": "+5492915164996",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Bahía Blanca",
-    "addressRegion": "Buenos Aires",
-    "addressCountry": "AR"
-  },
-  "sameAs": [
-    "https://instagram.com/stickos3de"
-  ],
-  "priceRange": "$3.500 - $31.500"
-}
-</script>
+<!-- Datos estructurados (LocalBusiness + Product por cada producto con precio
+     confirmado) se generan en runtime desde src/lib/seo.ts, a partir de la
+     MISMA fuente que el catálogo (src/data/products.ts) — así priceRange y
+     los precios individuales no se pueden desincronizar del catálogo real
+     como pasaba acá (quedó fijo en "$3.500 - $31.500" mucho después de que
+     el máximo real pasara a $78.000 con FUELLE). Googlebot ejecuta JS antes
+     de indexar, así que un <script> inyectado por React se lee igual. -->
 <!-- SDK de EmailJS — solo para la autorespuesta al visitante. Sin defer:
      tiene que estar listo antes de que src/lib/email.ts llame a emailjs.init(). -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
