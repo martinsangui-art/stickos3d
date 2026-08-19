@@ -1,0 +1,888 @@
+/* ============================================================
+   STICKOS 3D — v2
+   Diferenciadores: color de filamento en vivo, cotizador
+   instantáneo, taller en vivo, garantía de reimpresión.
+
+   Portado verbatim del index.html estático original — mismos
+   selectores, mismos tokens, mismas animaciones. Los componentes
+   React usan las mismas classNames que usaba el HTML/JS a mano,
+   así que este archivo no necesitó reescritura, solo mudanza.
+   ============================================================ */
+:root{
+  /* ---- STICKOS 3D — tokens de marca (Toolpath Identity) ---- */
+  --ink:#14120F;
+  --ink-2:#1D1A15;
+  --paper:#F4EFE4;
+  --paper-2:#EAE3D3;
+  --signal-orange:#FF5A1F;
+  --signal-orange-hi:#FF7440;
+  --layer-teal:#0AAFA0;
+  /* Mismos colores de marca, oscurecidos para cumplir contraste WCAG AA
+     cuando el texto cae sobre --paper (claro) en vez de --ink (oscuro).
+     Sobre --ink el naranja/teal originales ya dan 6:1 y 6.8:1 — no tocar
+     esos usos, esto es solo para texto/borde sobre fondo Paper. */
+  --signal-orange-on-paper:#BD4317;
+  --layer-teal-on-paper:#077A70;
+  --warm-grey:#8C8579;
+  --soft-grey:#C9C2B4;
+
+  /* ---- alias funcionales (repuntan a los tokens de marca de arriba —
+     ajustá la paleta desde ahí, no acá) ---- */
+  --bg:var(--ink);
+  --surface:var(--ink-2);
+  --surface-2:#241F17;
+  --line:rgba(201,194,180,.16);
+  --text:var(--paper);
+  --muted:var(--warm-grey);
+  --accent:var(--signal-orange);
+  --accent-hi:var(--signal-orange-hi);
+  --accent-soft:rgba(255,90,31,.12);
+  --ok:var(--layer-teal);
+  --radius:4px;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --layers:repeating-linear-gradient(to bottom, transparent 0 6px, rgba(244,239,228,.05) 6px 7px);
+  --dots:radial-gradient(var(--soft-grey) 1px, transparent 1px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+/* Scrollbar con los colores de marca — el borde del thumb es del color
+   del track, así el naranja queda como una guía fina y no como una barra
+   maciza. Firefox usa scrollbar-color; el resto, ::-webkit-scrollbar. */
+html{scrollbar-color:var(--signal-orange) var(--ink);scrollbar-width:thin}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--signal-orange);border-radius:99px;border:3px solid var(--ink)}
+::-webkit-scrollbar-thumb:hover{background:var(--signal-orange-hi)}
+::-webkit-scrollbar-corner{background:var(--ink)}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+
+/* ============================================================
+   Motivos de marca — reutilizados en todas las secciones:
+   1) hachurado de capas → var(--layers)
+   2) trayectoria punteada → .toolpath / .eyebrow::before
+   3) badges tipo máquina → .badge
+   4) marcas de calibración → .tick
+   5) grid de puntos → .dot-grid / var(--dots)
+   ============================================================ */
+.toolpath{
+  height:1px;
+  background-image:repeating-linear-gradient(to right, var(--warm-grey) 0 6px, transparent 6px 12px);
+  opacity:.6;
+}
+.dot-grid{background-image:var(--dots);background-size:20px 20px}
+
+.tick{position:absolute;width:13px;height:13px;opacity:.5;pointer-events:none;z-index:2}
+.tick::before,.tick::after{content:"";position:absolute;background:var(--paper)}
+.tick::before{width:100%;height:1px;top:50%;left:0;transform:translateY(-50%)}
+.tick::after{height:100%;width:1px;left:50%;top:0;transform:translateX(-50%)}
+.tick.tl{top:10px;left:10px} .tick.tr{top:10px;right:10px} .tick.bl{bottom:10px;left:10px} .tick.br{bottom:10px;right:10px}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 10px;border-radius:100px;border:1px solid currentColor;line-height:1;
+}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge.b-orange{color:var(--signal-orange)}
+.badge.b-teal{color:var(--layer-teal)}
+.badge.b-grey{color:var(--warm-grey);border-color:var(--soft-grey)}
+
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:18px;
+}
+.eyebrow::before{content:"";width:34px;height:1px;background-image:repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 9px)}
+h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.2}
+
+/* ============================================================
+   Motion — un solo momento fuerte (el boot dibuja el isotipo)
+   y detalles quietos y consistentes alrededor (scroll-reveal,
+   barrido de capa en hover, feedback táctil).
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.16,.8,.24,1), transform .7s cubic-bezier(.16,.8,.24,1)}
+.reveal.in{opacity:1;transform:none}
+.steps .step:nth-child(2){transition-delay:.08s}
+.steps .step:nth-child(3){transition-delay:.16s}
+.trust .trust-card:nth-child(2){transition-delay:.08s}
+.trust .trust-card:nth-child(3){transition-delay:.16s}
+
+/* ============================================================
+   PRELOADER — un cabezal FDM imprime el logo capa por capa.
+   El logo se revela en 6 pasos discretos (steps) de abajo hacia
+   arriba, el cabezal barre en horizontal a la velocidad de una
+   capa y sube con cada una. Duración total ~1.7s, y solo la
+   primera carga de la sesión (después el JS lo saltea).
+   ============================================================ */
+.preloader{
+  position:fixed;inset:0;z-index:200;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
+  transition:opacity .45s ease, visibility .45s ease;
+  cursor:pointer; /* se puede saltear con un toque */
+  animation:autohide 0s linear 5s forwards; /* red de seguridad si el JS no llega a ocultarlo */
+}
+@keyframes autohide{to{opacity:0;visibility:hidden;pointer-events:none}}
+.preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+
+.rig{position:relative;display:inline-block;padding-top:38px}
+/* La cama es la referencia del pórtico: así el cabezal recorre exactamente
+   el alto del logo y siempre queda apoyado sobre la pieza, nunca flotando. */
+.rig .bed{position:relative}
+.rig .wm{font-size:clamp(46px,12vw,100px);color:var(--paper)}
+.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 2.9s steps(6,end) forwards}
+@keyframes layerUp{to{clip-path:inset(0 0 0 0)}}
+
+/* El pórtico (riel + cabezal) sube una capa por vez, como el eje Z real */
+.rig .gantry{
+  position:absolute;left:0;right:0;top:100%;z-index:2;
+  animation:gantryRise 2.9s steps(6,end) forwards;
+}
+.rig .rail{
+  position:absolute;top:0;left:-34px;right:-34px;height:2px;
+  background:repeating-linear-gradient(to right,var(--warm-grey) 0 7px,transparent 7px 14px);
+  opacity:.45;
+}
+.rig .head{
+  /* acompaña el tamaño del logo para que no quede una boquilla diminuta */
+  position:absolute;top:0;left:0;width:clamp(21px,3vw,32px);aspect-ratio:19/24;
+  /* -100% deja la punta de la boquilla justo sobre la capa que se está imprimiendo */
+  transform:translate(-50%,-100%);
+  animation:headSweep .483s linear infinite alternate;
+}
+@keyframes headSweep{from{left:3%}to{left:97%}}
+@keyframes gantryRise{from{top:100%}to{top:0%}}
+.rig .head svg{width:100%;height:100%;display:block}
+.rig .head::after{ /* filamento saliendo de la boquilla */
+  content:"";position:absolute;left:50%;bottom:-4px;width:2px;height:5px;
+  background:var(--accent);transform:translateX(-50%);border-radius:1px;
+}
+
+.preloader .plabel{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.preloader .pbar{width:min(230px,52vw);height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+/* La barra avanza en los mismos 6 pasos que las capas: cada tramo es una capa
+   impresa, así termina exactamente con la última pasada del cabezal. */
+.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 2.9s steps(6,end) forwards}
+@keyframes pfill{to{width:100%}}
+
+/* Hover de producto: la pieza se "imprime" de abajo hacia arriba.
+   El panel arranca justo debajo del tile (101% para esconder también la
+   línea del cabezal) y sube hasta cubrirlo, con el filo naranja al frente
+   y el relleno desvaneciéndose atrás, como una pasada de material. */
+.tile .sweep{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  transform:translateY(101%);
+  border-top:2px solid var(--accent);
+  background:linear-gradient(to bottom, rgba(255,90,31,.16), rgba(255,90,31,.05) 45%, transparent);
+  transition:transform .32s cubic-bezier(.2,.75,.3,1);
+}
+.card:hover .tile .sweep{transform:translateY(0)}
+
+/* Feedback táctil */
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.4)}100%{transform:scale(1)}}
+.cart-count.bump{animation:bump .4s ease}
+@keyframes addPulse{0%{box-shadow:0 0 0 0 rgba(255,90,31,.45)}100%{box-shadow:0 0 0 14px rgba(255,90,31,0)}}
+.add-btn.pulse{animation:addPulse .55s ease}
+
+.nav-actions{display:flex;align-items:center;gap:10px}
+
+/* ---------- Menú mobile ---------- */
+.menu-btn{
+  display:none;align-items:center;justify-content:center;
+  width:42px;height:42px;border-radius:99px;flex-shrink:0;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+}
+.menu-btn svg{width:18px;height:18px}
+.menu-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.mobile-nav{
+  display:none;flex-direction:column;
+  border-top:1px solid var(--line);
+  /* padding-top/bottom por separado: el shorthand pisaría el padding lateral de .wrap */
+  padding-top:6px;padding-bottom:12px;
+}
+.mobile-nav a{
+  display:flex;align-items:center;min-height:48px;
+  padding:0 4px;font-size:15px;font-weight:500;color:var(--text);
+  border-bottom:1px solid var(--line);
+  font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;
+}
+.mobile-nav a:last-child{border-bottom:none}
+.mobile-nav a::before{
+  content:"";width:14px;height:1px;margin-right:12px;flex-shrink:0;
+  background-image:repeating-linear-gradient(to right,var(--accent) 0 4px,transparent 4px 7px);
+}
+.mobile-nav:not([hidden]){display:flex}
+
+.sound-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:99px;flex-shrink:0;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--muted);
+  transition:border-color .18s,color .18s;
+}
+.sound-btn:hover{border-color:var(--accent);color:var(--text)}
+.sound-btn.on{color:var(--accent);border-color:var(--accent)}
+.sound-btn svg{width:16px;height:16px}
+
+header.scrolled{box-shadow:0 10px 28px rgba(0,0,0,.35)}
+header{transition:box-shadow .3s ease}
+
+/* ---------- Header flotante ---------- */
+body{padding-top:22px}
+header{
+  position:sticky;top:16px;z-index:60;
+  background:rgba(29,26,21,.92);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(201,194,180,.14);
+  border-radius:18px;
+  margin:0 24px;
+  box-shadow:0 20px 40px -12px rgba(0,0,0,.5);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 22px}
+.logo{display:flex;align-items:center;gap:11px}
+.logo small{display:none;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
+
+/* ============================================================
+   WORDMARK — "layer shift": la mitad de arriba sale corrida una
+   capa, como cuando la impresora pierde pasos. Son dos copias
+   del mismo texto recortadas a la altura del corte; la de arriba
+   se desplaza .108em, así el corrimiento escala con el cuerpo.
+   ============================================================ */
+.wm{
+  position:relative;display:inline-block;
+  font-family:var(--font-display);font-weight:700;
+  font-size:18px;letter-spacing:-.01em;line-height:1;white-space:nowrap;
+}
+.wm em{font-style:normal;color:var(--accent)}
+.wm .wm-b{display:block;clip-path:inset(52% 0 0 0)}
+.wm .wm-t{position:absolute;left:0;top:0;clip-path:inset(0 0 48% 0);transform:translateX(.108em)}
+header .logo .wm{font-size:27px}
+/* El nav habla el mismo idioma tipográfico que los eyebrows, los badges y los
+   precios: mono, tracked, mayúsculas. Antes usaba la fuente de cuerpo, que es
+   lo más genérico del sitio. */
+.nav-links{display:flex;gap:30px;font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.72}
+.nav-links a{opacity:.8;transition:color .18s,opacity .18s}
+.nav-links a:hover{color:var(--accent);opacity:1}
+.cart-btn{
+  display:flex;align-items:center;gap:9px;
+  background:var(--signal-orange);border:1px solid transparent;
+  color:var(--ink);border-radius:99px;padding:9px 18px;
+  font-size:14px;font-weight:700;transition:background .18s;
+}
+.cart-btn:hover{background:var(--signal-orange-hi)}
+.cart-count{
+  font-family:var(--font-mono);
+  background:var(--accent);color:var(--ink);
+  min-width:21px;height:21px;border-radius:99px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;
+}
+/* Adentro del cart-btn ya sólido naranja, el badge necesita otro
+   contraste — si no, queda del mismo color que el botón y desaparece. */
+.cart-btn .cart-count{background:var(--ink);color:var(--paper)}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;overflow:hidden;
+  padding:110px 0 90px;
+  background:
+    radial-gradient(700px 380px at 82% 10%, rgba(255,90,31,.14), transparent 65%),
+    var(--layers), var(--bg);
+}
+.hero h1{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(34px,5.6vw,64px);
+  line-height:1.12;
+  max-width:15ch;
+  margin-bottom:22px;
+}
+.hero h1 .capa{
+  display:block;
+  opacity:0;transform:translateY(14px);
+  animation:printLayer .55s ease forwards;
+}
+.hero h1 .capa:nth-child(2){animation-delay:.22s}
+.hero h1 .capa:nth-child(3){animation-delay:.44s;color:var(--accent)}
+@keyframes printLayer{to{opacity:1;transform:none}}
+.hero p{color:var(--muted);font-size:18px;max-width:52ch;margin-bottom:36px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  border-radius:10px;padding:14px 26px;
+  font-size:15px;font-weight:600;border:1px solid transparent;
+  transition:transform .15s, background .18s, border-color .18s;
+}
+.btn:active{transform:scale(.98)}
+.btn:hover{transform:translateY(-3px)}
+.btn-primary:hover{background:var(--accent-hi);box-shadow:0 10px 24px rgba(255,90,31,.35)}
+.btn-ghost:hover{border-color:var(--accent);transform:translateY(-3px)}
+.btn-primary{background:var(--accent);color:var(--ink)}
+.btn-primary:hover{background:var(--accent-hi)}
+.btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
+.btn-ghost:hover{border-color:var(--accent)}
+.hero-specs{
+  display:flex;gap:34px;flex-wrap:wrap;
+  margin-top:56px;padding-top:26px;
+  border-top:1px solid var(--line);
+}
+.hero-specs div{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
+.hero-specs strong{display:block;color:var(--text);font-size:15px;letter-spacing:0;margin-bottom:3px}
+
+/* ---------- Strip ---------- */
+.strip{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;white-space:nowrap;
+  background:var(--surface);
+  padding:13px 0;
+  font-family:var(--font-mono);font-size:12.5px;letter-spacing:.18em;color:var(--muted);
+}
+.strip-inner{display:inline-block;animation:slide 34s linear infinite}
+.strip span{margin:0 26px}
+.strip b{color:var(--accent);font-weight:400}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- Respiro Paper (entre hero/strip y catálogo) ---------- */
+.breather{
+  background:var(--paper);color:var(--ink);
+  padding:96px 0 88px;position:relative;overflow:hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 92%);
+}
+.breather::before{content:"";position:absolute;right:-8%;top:-30%;width:46%;height:180%;
+  background:repeating-linear-gradient(115deg, rgba(20,18,15,.09) 0 2px, transparent 2px 11px);
+  transform:skewX(-6deg);
+}
+.breather .tick{position:absolute;width:14px;height:14px;opacity:.55}
+.breather .tick::before,.breather .tick::after{content:"";position:absolute;background:var(--ink)}
+.breather .tick::before{width:100%;height:1px;top:50%;left:0;transform:translateY(-50%)}
+.breather .tick::after{height:100%;width:1px;left:50%;top:0;transform:translateX(-50%)}
+.breather .tick.tl{top:28px;left:28px}
+.breather .tick.tr{top:28px;right:28px}
+.breather-eyebrow{font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange-on-paper);margin-bottom:18px}
+.breather h3{font-family:var(--font-display);font-size:clamp(30px,4.2vw,46px);font-weight:700;line-height:1.12;margin-bottom:16px;max-width:640px}
+.breather h3 span.accent{color:var(--signal-orange-on-paper);white-space:nowrap}
+.breather p{color:var(--warm-grey);max-width:480px;font-size:16px;line-height:1.6;margin-bottom:26px}
+.breather-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.breather-badges span{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:100px;border:1.5px solid var(--ink);color:var(--ink)}
+.breather-badges span.b-orange{border-color:var(--signal-orange-on-paper);color:var(--signal-orange-on-paper)}
+.breather-badges span.b-teal{border-color:var(--layer-teal-on-paper);color:var(--layer-teal-on-paper)}
+
+section{padding:96px 0}
+.sec-head{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.sec-head p{color:var(--muted);max-width:46ch;margin-top:10px}
+
+/* ---------- Filtros ---------- */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px}
+.chip{
+  font-family:var(--font-mono);font-size:12.5px;letter-spacing:.06em;
+  border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:99px;padding:8px 18px;transition:all .18s;
+}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700}
+
+/* ---------- Grid de productos ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
+.card{
+  background:#221e17;border:1px solid rgba(201,194,180,.14);
+  border-radius:var(--radius);overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:transform .2s, border-color .2s;
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,90,31,.35)}
+.card-top{height:3px;background:var(--filament, var(--soft-grey));transition:background .2s}
+.tile{
+  aspect-ratio:4/3;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(120% 90% at 50% 20%, rgba(10,175,160,.16), transparent 60%),
+    linear-gradient(160deg,var(--surface-2),#171310);
+  /* línea de luz superior, sutil — en box-shadow y no en ::after porque
+     ::after ya lo usa el cartel "FOTO PRÓXIMAMENTE" de abajo */
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+  overflow:hidden;
+}
+.tile::before{content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(to bottom, transparent 0 7px, rgba(244,239,228,.07) 7px 8px);
+}
+/* Foto real de producto: si un producto trae img, la foto reemplaza al
+   placeholder y se apaga el cartel "FOTO PRÓXIMAMENTE". */
+.tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile.has-photo::after{display:none}
+.tile.has-photo .card-status{z-index:3}
+/* Slider de fotos (hasta 4 por producto) — track con flexbox que se
+   desplaza en X; flechas ocultas hasta hover, siempre visibles en touch. */
+.tile-slider{position:absolute;inset:0;overflow:hidden;border-radius:inherit}
+.tile-slider-track{display:flex;height:100%;transition:transform .32s ease}
+/* .tile-photo base es position:absolute (mecanismo de foto única); adentro
+   del track hay que devolverla a flujo normal o el flex de arriba no puede
+   ubicarlas una al lado de la otra y las 3 quedan apiladas en el mismo lugar */
+.tile-slider-track .tile-photo{position:static;flex:0 0 100%;width:100%;height:100%;object-fit:cover}
+.tile-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;border:none;
+  background:rgba(20,18,15,.55);color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;line-height:1;cursor:pointer;z-index:4;
+  opacity:0;transition:opacity .18s;
+}
+.tile-slider:hover .tile-nav{opacity:1}
+.tile-nav.prev{left:8px}
+.tile-nav.next{right:8px}
+.tile-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:4}
+.tile-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45)}
+.tile-dot.active{background:var(--accent)}
+@media(hover:none){.tile-nav{opacity:1}}
+/* Modal de detalle de producto — reusa .tile-slider/.tile-nav/.tile-dot
+   de arriba adentro de .product-modal-gallery, solo en tamaño grande. */
+.product-modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
+.product-modal[hidden]{display:none}
+.product-modal-backdrop{position:absolute;inset:0;background:rgba(10,9,7,.78);backdrop-filter:blur(3px)}
+.product-modal-content{
+  position:relative;z-index:1;background:var(--ink-2);border:1px solid var(--line);
+  border-radius:16px;max-width:920px;width:100%;max-height:88vh;overflow:auto;
+  display:grid;grid-template-columns:1.1fr 1fr;gap:0;
+}
+.product-modal-gallery{position:relative;aspect-ratio:1;background:var(--ink)}
+.product-modal-gallery .tile-slider{position:absolute;inset:0}
+.product-modal-gallery .tile-nav{opacity:1}
+.product-modal-info{padding:32px;display:flex;flex-direction:column;gap:10px}
+.product-modal-info h3{font-family:var(--font-display);font-size:28px;margin:0}
+.product-modal-desc{color:var(--muted);line-height:1.5;font-size:15px}
+.product-modal-mat{color:var(--muted);font-size:13px;font-family:var(--font-mono)}
+.product-modal-price{font-family:var(--font-mono);font-size:26px;color:var(--accent);font-weight:700;margin-top:8px}
+.product-modal-close{
+  position:absolute;top:14px;right:14px;z-index:2;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:18px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+@media(max-width:720px){
+  .product-modal-content{grid-template-columns:1fr;max-height:92vh}
+  .product-modal-gallery{aspect-ratio:1.2}
+}
+.tile::after{
+  content:"FOTO PRÓXIMAMENTE";
+  /* centrado entre las dos marcas de calibración de abajo, para no pisarlas */
+  position:absolute;bottom:11px;left:50%;transform:translateX(-50%);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;white-space:nowrap;
+  color:var(--warm-grey);opacity:.6;
+}
+.card-status{position:absolute;top:12px;left:12px;z-index:2}
+.tile .obj{
+  position:relative;
+  width:92px;height:92px;border-radius:18px;
+  background:var(--obj,#2A2A2E);
+  box-shadow:inset 0 -14px 22px rgba(0,0,0,.35), 0 10px 26px rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .25s;
+}
+.tile .obj::before{
+  content:"";position:absolute;inset:0;border-radius:18px;
+  background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.14) 3px 4px);
+}
+.tile .obj span{
+  font-family:var(--font-display);font-weight:700;font-size:38px;
+  color:rgba(255,255,255,.55);mix-blend-mode:overlay;user-select:none;
+}
+.card-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card-cat{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.card-body h3{font-size:17px;font-weight:600;line-height:1.35}
+.card-mat{font-size:13px;color:var(--muted)}
+
+/* Swatches de color */
+.swatches{display:flex;align-items:center;gap:8px;margin-top:4px}
+.swatch{
+  width:20px;height:20px;border-radius:99px;border:2px solid transparent;
+  outline:1px solid var(--line);cursor:pointer;padding:0;
+  transition:transform .15s, outline-color .15s;
+}
+.swatch:hover{transform:scale(1.15)}
+.swatch.active{outline:2px solid var(--accent);border-color:var(--bg)}
+.swatch-label{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em;margin-left:2px}
+
+.card-foot{margin-top:auto;padding-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.price{font-family:var(--font-mono);font-size:16.5px;font-weight:700;color:var(--text)}
+.add-btn{
+  background:var(--accent-soft);color:var(--accent);
+  border:1px solid transparent;border-radius:9px;
+  padding:9px 16px;font-size:13.5px;font-weight:700;
+  transition:all .18s;
+}
+.add-btn:hover{background:var(--accent);color:var(--ink)}
+/* Los dos caminos de compra conviven en el pie de la tarjeta: Mercado Pago
+   (directo, sólido) y la cola por WhatsApp (blando). Envuelve en flex para
+   que en tarjetas angostas bajen juntos en vez de romper el renglón. */
+.foot-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.mp-btn{
+  background:var(--accent);color:var(--ink);
+  border:1px solid var(--accent);border-radius:9px;
+  padding:9px 16px;font-size:13.5px;font-weight:700;white-space:nowrap;
+  transition:background .18s, border-color .18s;
+}
+.mp-btn:hover{background:var(--accent-hi);border-color:var(--accent-hi)}
+.buy-link{
+  display:block;text-align:center;
+  font-size:12.5px;font-weight:600;color:var(--muted);
+  padding:9px;border-top:1px solid var(--line);
+  transition:color .18s;
+}
+.buy-link:hover{color:var(--accent)}
+
+/* ---------- A pedido + Cotizador ---------- */
+.custom{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.custom-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:start}
+.custom ul{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:28px}
+.custom li{display:flex;gap:16px;color:var(--muted);font-size:15.5px}
+.custom li b{color:var(--text);font-weight:600}
+.li-mark{
+  font-family:var(--font-mono);font-size:11px;color:var(--accent);
+  border:1px solid var(--line);border-radius:8px;
+  min-width:52px;height:28px;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);flex-shrink:0;margin-top:2px;
+}
+form{display:flex;flex-direction:column;gap:16px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+.form-title{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--accent);text-transform:uppercase}
+label{font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:7px}
+input,select,textarea{
+  font-family:var(--font-body);color:var(--text);
+  /* 16px es el mínimo que evita que iOS Safari haga zoom al enfocar un campo */
+  font-size:16px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:9px;padding:13px 14px;width:100%;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.form-note{font-size:12.5px;color:var(--muted)}
+
+.quote-box{
+  border:1px dashed var(--line);border-radius:10px;
+  background:var(--surface);padding:18px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.quote-box .q-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.quote-value{font-family:var(--font-mono);font-size:clamp(20px,2.4vw,26px);font-weight:700;color:var(--accent)}
+.quote-box small{display:block;font-size:11.5px;color:var(--muted);max-width:24ch;line-height:1.45}
+
+/* ---------- Cómo comprar ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.step{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:28px;
+}
+.step-n{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.15em;margin-bottom:14px}
+.step h3{font-size:18px;margin-bottom:10px}
+.step p{color:var(--muted);font-size:14.5px}
+.pay-row{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap}
+.pay-tag{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;
+  border:1px solid var(--line);border-radius:99px;padding:8px 18px;color:var(--muted);
+}
+.pay-tag b{color:var(--text);font-weight:700}
+
+/* ---------- Garantía / confianza ---------- */
+.trust{
+  margin-top:56px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+}
+.trust-card{
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px;background:linear-gradient(160deg,var(--surface),#18140D);
+  position:relative;overflow:hidden;
+}
+.trust-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.trust-card h3{font-size:16.5px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.trust-card p{color:var(--muted);font-size:14px}
+.trust-mark{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;
+  color:var(--accent);text-transform:uppercase;display:block;margin-bottom:12px;
+}
+
+/* ---------- Taller en vivo ---------- */
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.about p{color:var(--muted);font-size:16.5px;margin-bottom:18px}
+.about p b{color:var(--text)}
+.workshop{
+  border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--layers),linear-gradient(160deg,var(--surface),#18140D);
+  padding:26px 28px;font-family:var(--font-mono);
+}
+.workshop-head{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;
+  margin-bottom:20px;
+}
+.live-dot{
+  display:inline-flex;align-items:center;gap:8px;color:var(--ok);
+}
+.live-dot::before{
+  content:"";width:8px;height:8px;border-radius:99px;background:var(--ok);
+  animation:pulse 1.6s ease infinite;
+}
+@keyframes pulse{50%{opacity:.35}}
+.job{margin-bottom:18px}
+.job:last-child{margin-bottom:0}
+.job-name{font-size:13px;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.bar{
+  height:8px;border-radius:99px;background:var(--surface-2);
+  border:1px solid var(--line);overflow:hidden;
+}
+.bar i{
+  display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hi));
+  border-radius:99px;
+  background-size:200% 100%;
+  animation:flow 2.2s linear infinite;
+}
+@keyframes flow{to{background-position:-200% 0}}
+.workshop-foot{
+  margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);letter-spacing:.04em;line-height:1.7;
+}
+.workshop-foot b{color:var(--accent);font-weight:400}
+.cursor{animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--surface)}
+.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:40px}
+.foot-grid h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;color:var(--muted);margin-bottom:14px;text-transform:uppercase}
+.foot-grid a{display:block;font-size:14.5px;color:var(--text);margin-bottom:8px;opacity:.85}
+.foot-grid a:hover{color:var(--accent);opacity:1}
+.foot-base{border-top:1px solid var(--line);padding-top:22px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+/* El mail va como texto, no como link: así se puede copiar o seleccionar sin
+   que el navegador dispare el cliente de correo. */
+.foot-mail{display:block;font-family:var(--font-mono);font-size:13.5px;color:var(--muted);margin-bottom:8px;letter-spacing:.04em;word-break:break-all}
+
+/* ---------- Contacto ----------
+   Reusa el <form> global, así los campos son idénticos a los del cotizador
+   sin duplicar una sola regla. */
+.contact{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:start}
+.contact-copy{color:var(--muted);font-size:16.5px;margin-top:4px}
+.contact-list{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:28px}
+.contact-list li{display:flex;gap:16px;color:var(--muted);font-size:15.5px}
+.contact-list li b{color:var(--text);font-weight:600}
+.hp{display:none!important}
+.form-note.ok{color:var(--ok)}
+.form-note.err{color:var(--accent)}
+
+/* ---------- Redes ----------
+   Única sección clara del sitio: el corte de Ink a Paper es lo que le da
+   presencia sin agregar decoración. Usa el grid de puntos del manual de
+   marca, que está pensado justo para las secciones claras. */
+.social{
+  background:var(--dots), var(--paper);
+  background-size:22px 22px;
+  border-top:1px solid rgba(20,18,15,.14);
+  text-align:center;
+}
+.social .eyebrow{justify-content:center}
+.social .sec-title{color:var(--ink);margin-bottom:14px}
+/* margin auto, no 0: la sección está centrada y con margen 0 la grilla
+   quedaba pegada a la izquierda. */
+.social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:420px;margin:28px auto}
+.social-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.social-copy{color:var(--warm-grey);max-width:52ch;margin:0 auto 36px;font-size:16.5px}
+.social-handle{
+  display:inline-flex;align-items:center;gap:.32em;
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(30px,6vw,58px);line-height:1;letter-spacing:-.02em;
+  color:var(--ink);
+  border:2px solid var(--ink);border-radius:99px;
+  padding:.3em .6em .34em;
+  transition:background .2s, border-color .2s, color .2s, transform .15s;
+}
+/* Sin fill acá: el ícono es de trazo y define su propio fill/stroke por
+   atributo. Una regla CSS de fill pisaría esos atributos y lo rellenaría. */
+.social-handle svg{width:.82em;height:.82em;flex-shrink:0}
+.social-handle:hover{background:var(--signal-orange);border-color:var(--signal-orange);color:var(--paper)}
+.social-handle:active{transform:scale(.98)}
+
+/* ---------- Carrito ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(20,18,15,.6);
+  opacity:0;pointer-events:none;transition:opacity .25s;z-index:70;
+}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;height:100dvh;width:min(420px,100vw);
+  background:var(--surface);border-left:1px solid var(--line);
+  transform:translateX(100%);transition:transform .28s ease;
+  z-index:80;display:flex;flex-direction:column;
+}
+.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--line)}
+.drawer-head h3{font-family:var(--font-display);font-size:16px;font-weight:600}
+.drawer-close{background:none;border:none;color:var(--muted);font-size:24px;line-height:1}
+.drawer-close:hover{color:var(--text)}
+.drawer-items{flex:1;overflow-y:auto;padding:18px 24px;display:flex;flex-direction:column;gap:16px}
+.d-item{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.d-item h4{font-size:14.5px;font-weight:600;margin-bottom:2px}
+.d-color{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:5px}
+.d-color i{width:11px;height:11px;border-radius:99px;display:inline-block;outline:1px solid var(--line)}
+.d-item .price{font-size:13.5px}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{
+  width:26px;height:26px;border-radius:7px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+  font-size:15px;display:flex;align-items:center;justify-content:center;
+}
+.qty button:hover{border-color:var(--accent)}
+.qty span{font-family:var(--font-mono);font-size:14px;min-width:18px;text-align:center}
+.empty-cart{color:var(--muted);font-size:14.5px;text-align:center;margin-top:40px}
+.drawer-foot{border-top:1px solid var(--line);padding:20px 24px 26px}
+.total-row{display:flex;justify-content:space-between;font-size:15px;font-weight:600;margin-bottom:16px}
+.total-row .price{font-size:19px;color:var(--accent)}
+.drawer-foot .btn{width:100%;justify-content:center}
+.drawer-note{font-size:12px;color:var(--muted);margin-top:12px;text-align:center;line-height:1.5}
+
+.toast{
+  position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);
+  background:var(--surface-2);border:1px solid var(--accent);color:var(--text);
+  border-radius:10px;padding:12px 22px;font-size:14px;font-weight:600;
+  opacity:0;pointer-events:none;z-index:90;
+  transition:opacity .25s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.wa-float{
+  position:fixed;bottom:24px;right:24px;z-index:65;
+  width:56px;height:56px;border-radius:99px;
+  background:#25D366;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 24px rgba(0,0,0,.4);transition:transform .18s;
+}
+.wa-float:hover{transform:scale(1.07)}
+.wa-float svg{width:28px;height:28px;fill:#fff}
+
+@media(max-width:900px){
+  .custom-grid,.about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
+  .steps,.trust{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .menu-btn{display:flex}
+  header{margin:0 12px}
+  section{padding:72px 0}
+  .hero{padding:80px 0 64px}
+  /* Objetivos táctiles: mínimo 44px en todo lo que se toca */
+  .swatch{width:28px;height:28px}
+  .qty button{width:40px;height:40px;font-size:18px}
+  .chip{padding:13px 19px;font-size:13.5px}
+  .add-btn,.mp-btn{padding:13px 20px;font-size:14.5px}
+  .drawer-close{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+  .buy-link{padding:15px 9px}
+  .btn{padding:16px 26px}
+}
+@media(max-width:520px){
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .hero-specs{gap:20px}
+  .logo small{display:none}
+  .nav-actions{gap:6px}
+  header .logo .wm{font-size:23px}
+  .sound-btn{width:38px;height:38px}
+  .menu-btn{width:38px;height:38px}
+  .cart-btn{padding:9px 14px}
+}
+/* ============================================================
+   IMPRESIÓN EN PAPEL (@media print) — el catálogo tiene que poder
+   imprimirse como lista de precios. Se redefinen los tokens en vez
+   de pisar regla por regla: así el modo oscuro no se arrastra a la
+   hoja y todo lo que usa var(--…) queda en tinta negra sobre blanco.
+   ============================================================ */
+@media print{
+  :root{
+    --bg:#fff;--surface:#fff;--surface-2:#fff;
+    --text:#000;--muted:#333;--line:#bbb;
+    --accent:#000;--accent-hi:#000;--accent-soft:transparent;--ok:#000;
+    --layers:none;--dots:none;
+  }
+  body{background:#fff;color:#000}
+  /* Fuera todo lo interactivo, lo decorativo y lo que no se puede tocar en papel */
+  .preloader,header,.strip,.wa-float,.drawer,.overlay,.toast,footer,.ig-backdrop,
+  .hero-ctas,.hero-specs,.filters,.swatches,.card-top,.tile,.sweep,
+  .add-btn,.mp-btn,.buy-link,form,.quote-box,.workshop,.pay-row,.social,.contact{display:none!important}
+  /* Catálogo y secciones en una sola columna */
+  .grid,.steps,.trust,.custom-grid,.about-grid{grid-template-columns:1fr!important;gap:12px!important}
+  .card{border:1px solid #bbb;break-inside:avoid;page-break-inside:avoid}
+  .card-body{padding:10px 12px;gap:4px}
+  .card-foot{padding-top:6px}
+  .price{color:#000;font-weight:700}
+  section{padding:18px 0}
+  .hero{padding:18px 0;background:none}
+  a{color:#000;text-decoration:none}
+  /* El scroll-reveal deja los elementos en opacity:0 hasta que entran en
+     viewport; al imprimir hay que forzarlos visibles o salen páginas vacías. */
+  .reveal{opacity:1!important;transform:none!important}
+  @page{margin:14mm}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .hero h1 .capa{opacity:1;transform:none}
+  .reveal{opacity:1;transform:none}
+  .preloader{display:none}
+}
+
+/* ---------- Modal "Seguinos en Instagram" ---------- */
+.ig-backdrop{
+  position:fixed;inset:0;z-index:190;
+  background:rgba(10,9,7,.72);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .35s ease;
+}
+.ig-backdrop.show{opacity:1;pointer-events:auto}
+.ig-modal{
+  width:min(460px, 90vw);
+  background:var(--paper);color:var(--ink);
+  border-radius:20px;padding:40px 36px 32px;
+  position:relative;overflow:hidden;
+  transform:scale(.92) translateY(10px);
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+  text-align:center;
+}
+.ig-backdrop.show .ig-modal{transform:scale(1) translateY(0)}
+.ig-modal::before{content:"";position:absolute;right:-20%;top:-40%;width:70%;height:200%;
+  background:repeating-linear-gradient(115deg, rgba(20,18,15,.07) 0 2px, transparent 2px 12px);
+  transform:skewX(-8deg);
+}
+.ig-modal-close{
+  position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;
+  background:rgba(20,18,15,.06);border:none;color:var(--ink);font-size:15px;cursor:pointer;
+}
+.ig-modal-icon{
+  width:64px;height:64px;border-radius:18px;margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--signal-orange),var(--layer-teal));
+  display:flex;align-items:center;justify-content:center;color:var(--ink);
+}
+.ig-modal-eyebrow{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-orange-on-paper);margin-bottom:10px}
+.ig-modal h4{font-family:var(--font-display);font-size:28px;font-weight:700;line-height:1.18;margin-bottom:12px;position:relative}
+.ig-modal p{font-size:15px;color:var(--warm-grey);line-height:1.55;margin-bottom:26px;max-width:340px;margin-left:auto;margin-right:auto;position:relative}
+.ig-modal-follow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);font-size:14px;font-weight:700;letter-spacing:.04em;
+  background:var(--ink);color:var(--paper);padding:14px 30px;border-radius:10px;
+  position:relative;
+}
+.ig-modal-dismiss{
+  display:block;margin:16px auto 0;background:none;border:none;
+  font-family:var(--font-mono);font-size:12px;color:var(--warm-grey);cursor:pointer;
+  position:relative;
+}
