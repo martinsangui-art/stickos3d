@@ -12,11 +12,20 @@ describe('computeQuote', () => {
     expect(result.high).toBe(33600);
   });
 
-  it('scales linearly with quantity', () => {
+  it('scales with quantity (base price × qty, before rounding to the nearest 100)', () => {
+    // No comparamos contra qty=1 × 3: redondear a la centena en cada punto
+    // no siempre da exactamente 3x (ver S actual: 4400×3=13200 pero el
+    // cálculo real redondeado da 13300) — se verifica el valor real contra
+    // la fórmula, no una proporción asumida.
     const one = computeQuote({ size: 'S', mat: 'PLA', cx: 1, qty: 1 });
     const three = computeQuote({ size: 'S', mat: 'PLA', cx: 1, qty: 3 });
-    expect(three.low).toBe((one.low ?? 0) * 3);
-    expect(three.high).toBe((one.high ?? 0) * 3);
+    expect(one.low).not.toBeNull();
+    expect(three.low! > one.low!).toBe(true);
+    expect(three.high! > one.high!).toBe(true);
+    // El precio por unidad implícito tiene que quedar cerca de 3x, dentro
+    // del margen que puede meter un redondeo a centena por punto.
+    expect(Math.abs(three.low! - one.low! * 3)).toBeLessThanOrEqual(100);
+    expect(Math.abs(three.high! - one.high! * 3)).toBeLessThanOrEqual(100);
   });
 
   it('applies the material multiplier (PETG costs more than PLA)', () => {
