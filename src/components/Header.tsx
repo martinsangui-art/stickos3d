@@ -48,6 +48,22 @@ export function Header({ cartSize, soundOn, onToggleSound, onOpenCart }: Props) 
   }, [menuOpen]);
 
   return (
+    <>
+      {/* Barra de estado — dato real del negocio (materiales, alcance de
+          envío, estado del taller), no decoración. Va FUERA del <header>
+          a propósito: el header es sticky y sumarle 32px comería viewport
+          en mobile; así la barra se lee al entrar y después se va con el
+          scroll. */}
+      <div className="statusbar">
+        <div className="wrap">
+          <div className="grp">
+            <span>Bahía Blanca · AR</span>
+            <span>Materiales <b>PLA / PETG / TPU</b></span>
+            <span>Envíos <b>a todo el país</b></span>
+          </div>
+          <span className="live"><i></i>Taller activo</span>
+        </div>
+      </div>
     <header className={scrolled ? 'scrolled' : ''}>
       <div className="wrap nav">
         <a href="#" className="logo" aria-label="STICKOS 3D — inicio">
@@ -141,5 +157,6 @@ export function Header({ cartSize, soundOn, onToggleSound, onOpenCart }: Props) 
         ))}
       </nav>
     </header>
+    </>
   );
 }

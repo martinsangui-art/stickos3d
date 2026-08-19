@@ -170,8 +170,16 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
         <div className="sweep"></div>
       </div>
       <div className="card-body">
-        <div className="card-cat">{p.cat} · {p.mat}</div>
+        {/* Nº de índice + categoría en una sola línea. El número sale del id
+            real del producto (p17 -> 17), que es la misma referencia que usa
+            el link para compartir (?p=p17). Va acá y no sobre la foto: ahí
+            chocaba con el badge de estado, que ocupa la misma esquina. */}
+        <div className="card-cat"><span className="card-idx">N° {p.id.replace(/^p/, '').padStart(2, '0')}</span>{p.cat}</div>
         <h3>{p.name}</h3>
+        <div className="card-spec">
+          <span>{p.mat}</span>
+          <span><b>{p.g} g</b></span>
+        </div>
         <div className="swatches" role="group" aria-label="Elegir color">
           {/* COLORS viene por contexto implícito de quien nos pasó selectedColor;
               el color set completo se resuelve arriba en ProductGrid. */}

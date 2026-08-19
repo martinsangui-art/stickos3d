@@ -38,12 +38,20 @@
   --accent-hi:var(--signal-orange-hi);
   --accent-soft:rgba(255,90,31,.12);
   --ok:var(--layer-teal);
-  --radius:4px;
+  /* Ruta A (Taller): esquina recta. La pieza impresa tiene aristas; el
+     redondeo genérico era lo que hacía que el sitio leyera como plantilla. */
+  --radius:0px;
+  --line-hi:rgba(201,194,180,.28);
   --font-display:'Space Grotesk',sans-serif;
   --font-body:'Inter',sans-serif;
   --font-mono:'IBM Plex Mono',monospace;
   --layers:repeating-linear-gradient(to bottom, transparent 0 6px, rgba(244,239,228,.05) 6px 7px);
   --dots:radial-gradient(var(--soft-grey) 1px, transparent 1px);
+  /* Hoja cuadriculada de plano técnico — reemplaza al degradado radial del
+     hero. Es el fondo sobre el que se dibuja una pieza, no un adorno. */
+  --plot:
+    linear-gradient(to right, rgba(201,194,180,.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(201,194,180,.055) 1px, transparent 1px);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -96,7 +104,7 @@ html{scrollbar-color:var(--signal-orange) var(--ink);scrollbar-width:thin}
 .badge{
   display:inline-flex;align-items:center;gap:6px;
   font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
-  padding:5px 10px;border-radius:100px;border:1px solid currentColor;line-height:1;
+  padding:5px 10px;border:1px solid currentColor;line-height:1;
 }
 .badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
 .badge.b-orange{color:var(--signal-orange)}
@@ -209,7 +217,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 /* ---------- Menú mobile ---------- */
 .menu-btn{
   display:none;align-items:center;justify-content:center;
-  width:42px;height:42px;border-radius:99px;flex-shrink:0;
+  width:42px;height:42px;flex-shrink:0;
   background:var(--surface-2);border:1px solid var(--line);color:var(--text);
 }
 .menu-btn svg{width:18px;height:18px}
@@ -235,7 +243,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 
 .sound-btn{
   display:flex;align-items:center;justify-content:center;
-  width:38px;height:38px;border-radius:99px;flex-shrink:0;
+  width:38px;height:38px;flex-shrink:0;
   background:var(--surface-2);border:1px solid var(--line);color:var(--muted);
   transition:border-color .18s,color .18s;
 }
@@ -247,17 +255,36 @@ header.scrolled{box-shadow:0 10px 28px rgba(0,0,0,.35)}
 header{transition:box-shadow .3s ease}
 
 /* ---------- Header flotante ---------- */
-body{padding-top:22px}
+body{padding-top:0}
+/* Ruta A: la barra va al ras y ancla con reglas, no flotando en una
+   píldora redondeada. El header deja de ser un objeto sobre la página y
+   pasa a ser el borde superior del instrumento. */
 header{
-  position:sticky;top:16px;z-index:60;
-  background:rgba(29,26,21,.92);
+  position:sticky;top:0;z-index:60;
+  background:rgba(20,18,15,.94);
   backdrop-filter:blur(16px);
-  border:1px solid rgba(201,194,180,.14);
-  border-radius:18px;
-  margin:0 24px;
-  box-shadow:0 20px 40px -12px rgba(0,0,0,.5);
+  border-bottom:1px solid var(--line-hi);
+  margin:0;
 }
-.nav{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 22px}
+header.scrolled{box-shadow:0 12px 28px -18px rgba(0,0,0,.8)}
+/* Barra de estado: dato real del negocio, no decoración. */
+.statusbar{
+  border-bottom:1px solid var(--line);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
+.statusbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:32px}
+.statusbar .grp{display:flex;align-items:center;gap:24px;min-width:0}
+.statusbar b{color:var(--soft-grey);font-weight:400}
+.statusbar .live{display:inline-flex;align-items:center;gap:7px;color:var(--layer-teal);white-space:nowrap}
+.statusbar .live i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+@media(max-width:900px){
+  .statusbar .grp span:nth-child(n+3){display:none}
+}
+@media(max-width:560px){
+  .statusbar .grp span:nth-child(n+2){display:none}
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:66px}
 .logo{display:flex;align-items:center;gap:11px}
 .logo small{display:none;font-family:var(--font-mono);font-weight:400;font-size:9px;letter-spacing:.3em;color:var(--muted);margin-top:2px}
 
@@ -279,20 +306,22 @@ header .logo .wm{font-size:27px}
 /* El nav habla el mismo idioma tipográfico que los eyebrows, los badges y los
    precios: mono, tracked, mayúsculas. Antes usaba la fuente de cuerpo, que es
    lo más genérico del sitio. */
-.nav-links{display:flex;gap:30px;font-family:var(--font-mono);font-size:12.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.72}
-.nav-links a{opacity:.8;transition:color .18s,opacity .18s}
+.nav-links{display:flex;gap:0;font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);opacity:.85}
+.nav-links a{padding:0 18px;border-left:1px solid var(--line);opacity:.8;transition:color .18s,opacity .18s}
+.nav-links a:last-child{border-right:1px solid var(--line)}
 .nav-links a:hover{color:var(--accent);opacity:1}
 .cart-btn{
   display:flex;align-items:center;gap:9px;
   background:var(--signal-orange);border:1px solid transparent;
-  color:var(--ink);border-radius:99px;padding:9px 18px;
-  font-size:14px;font-weight:700;transition:background .18s;
+  color:var(--ink);padding:11px 18px;
+  font-family:var(--font-mono);font-size:11.5px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;transition:background .18s;
 }
 .cart-btn:hover{background:var(--signal-orange-hi)}
 .cart-count{
   font-family:var(--font-mono);
   background:var(--accent);color:var(--ink);
-  min-width:21px;height:21px;border-radius:99px;
+  min-width:20px;height:20px;
   display:inline-flex;align-items:center;justify-content:center;
   font-size:12px;font-weight:700;
 }
@@ -303,17 +332,37 @@ header .logo .wm{font-size:27px}
 /* ---------- Hero ---------- */
 .hero{
   position:relative;overflow:hidden;
-  padding:110px 0 90px;
+  padding:96px 0 84px;
   background:
-    radial-gradient(700px 380px at 82% 10%, rgba(255,90,31,.14), transparent 65%),
-    var(--layers), var(--bg);
+    /* templado: queda un rastro cálido, muy por debajo del degradado
+       anterior, para que la retícula no lea helada */
+    radial-gradient(760px 420px at 88% 6%, rgba(255,90,31,.07), transparent 62%),
+    var(--plot), var(--bg);
+  background-size:auto, 48px 48px, 48px 48px, auto;
+}
+/* Dos columnas separadas por una regla: el argumento a la izquierda, el
+   estado real del taller a la derecha. */
+.hero-grid{display:grid;grid-template-columns:1fr 1px .82fr;gap:0;align-items:start}
+.hero-grid .rule{background:var(--line);align-self:stretch}
+.hero-main{padding-right:56px}
+.hero-side{padding-left:56px}
+@media(max-width:900px){
+  .hero{padding:64px 0 60px}
+  .hero-grid{grid-template-columns:1fr;gap:44px}
+  .hero-grid .rule{display:none}
+  .hero-main,.hero-side{padding:0}
+}
+.hero-idx{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:22px;
 }
 .hero h1{
   font-family:var(--font-display);
   font-weight:700;
-  font-size:clamp(34px,5.6vw,64px);
-  line-height:1.12;
-  max-width:15ch;
+  font-size:clamp(34px,5.2vw,60px);
+  line-height:1.06;
+  letter-spacing:-.02em;
+  max-width:14ch;
   margin-bottom:22px;
 }
 .hero h1 .capa{
@@ -328,25 +377,71 @@ header .logo .wm{font-size:27px}
 .hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
 .btn{
   display:inline-flex;align-items:center;gap:10px;
-  border-radius:10px;padding:14px 26px;
-  font-size:15px;font-weight:600;border:1px solid transparent;
+  padding:15px 26px;
+  font-family:var(--font-mono);font-size:12px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid transparent;
   transition:transform .15s, background .18s, border-color .18s;
 }
 .btn:active{transform:scale(.98)}
-.btn:hover{transform:translateY(-3px)}
+.btn:hover{transform:translateY(-2px)}
 .btn-primary:hover{background:var(--accent-hi);box-shadow:0 10px 24px rgba(255,90,31,.35)}
 .btn-ghost:hover{border-color:var(--accent);transform:translateY(-3px)}
 .btn-primary{background:var(--accent);color:var(--ink)}
 .btn-primary:hover{background:var(--accent-hi)}
 .btn-ghost{border-color:var(--line);color:var(--text);background:transparent}
 .btn-ghost:hover{border-color:var(--accent)}
-.hero-specs{
-  display:flex;gap:34px;flex-wrap:wrap;
-  margin-top:56px;padding-top:26px;
-  border-top:1px solid var(--line);
+/* Tabla de specs: el dato ES el argumento de venta, así que se lee como
+   ficha técnica (clave a la izquierda, valor a la derecha) en vez de como
+   cuatro bloques sueltos. */
+.hero-specs{margin-top:44px;border-top:1px solid var(--line-hi)}
+.hero-specs div{
+  display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:baseline;
+  padding:13px 0;border-bottom:1px solid var(--line);
+  font-family:var(--font-mono);font-size:13px;color:var(--text);letter-spacing:.01em;
 }
-.hero-specs div{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.06em}
-.hero-specs strong{display:block;color:var(--text);font-size:15px;letter-spacing:0;margin-bottom:3px}
+.hero-specs strong{
+  font-family:var(--font-mono);font-weight:400;font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--muted);
+}
+@media(max-width:560px){
+  .hero-specs div{grid-template-columns:1fr;gap:5px}
+}
+
+/* ---------- Panel del taller en el hero ----------
+   Lo más difícil de copiar que tiene STICKOS 3D es que muestra su cola de
+   impresión real. Hasta ahora eso vivía al final de la página; acá sube a
+   la primera pantalla como una sola línea de estado (la cola completa
+   sigue estando en la sección "El taller", sin duplicar el listado). */
+.rig-panel{border:1px solid var(--line-hi);background:var(--surface)}
+.rig-head{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:14px 18px;border-bottom:1px solid var(--line);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
+.rig-live{display:inline-flex;align-items:center;gap:7px;color:var(--layer-teal);white-space:nowrap}
+.rig-live i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+.rig-body{padding:18px}
+.rig-job{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px}
+.rig-job .nm{font-family:var(--font-mono);font-size:12.5px;color:var(--text);line-height:1.5}
+.rig-job .pc{font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:var(--accent)}
+.rig-track{height:2px;background:rgba(244,239,228,.09);position:relative;overflow:hidden}
+.rig-track i{position:absolute;inset:0 auto 0 0;background:var(--accent);display:block}
+.rig-photo{position:relative;border-top:1px solid var(--line);aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
+.rig-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.rig-cap{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+  padding:14px 18px;border-top:1px solid var(--line);
+}
+.rig-cap .nm{font-family:var(--font-display);font-size:16px;font-weight:600;line-height:1.2}
+.rig-cap .mt{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.05em;margin-top:4px}
+.rig-cap .pr{font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--accent);white-space:nowrap}
+.rig-foot{
+  padding:12px 18px;border-top:1px solid var(--line);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);
+}
 
 /* ---------- Strip ---------- */
 .strip{
@@ -395,7 +490,7 @@ section{padding:96px 0}
 .chip{
   font-family:var(--font-mono);font-size:12.5px;letter-spacing:.06em;
   border:1px solid var(--line);background:transparent;color:var(--muted);
-  border-radius:99px;padding:8px 18px;transition:all .18s;
+  padding:10px 18px;text-transform:uppercase;transition:all .18s;
 }
 .chip:hover{border-color:var(--accent);color:var(--text)}
 .chip.active{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700}
@@ -403,12 +498,25 @@ section{padding:96px 0}
 /* ---------- Grid de productos ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
 .card{
-  background:#221e17;border:1px solid rgba(201,194,180,.14);
-  border-radius:var(--radius);overflow:hidden;
+  background:var(--surface);border:1px solid var(--line);
+  overflow:hidden;position:relative;
   display:flex;flex-direction:column;
   transition:transform .2s, border-color .2s;
 }
-.card:hover{transform:translateY(-4px);border-color:rgba(255,90,31,.35)}
+.card:hover{transform:translateY(-3px);border-color:rgba(255,90,31,.35)}
+/* Número de índice: el catálogo se lee como un índice de piezas, y el id
+   real del producto es la referencia que ya usamos para compartir (?p=). */
+.card-cat{display:flex;align-items:center;gap:9px}
+.card-idx{color:var(--accent)}
+.card-idx::after{content:"";display:inline-block;width:1px;height:9px;margin-left:9px;
+  background:var(--soft-grey);opacity:.45;vertical-align:middle}
+/* Línea de ficha: material y gramaje, el dato que en Ruta A vale tanto
+   como la foto. */
+.card-spec{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;
+  color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;
+}
+.card-spec b{color:var(--soft-grey);font-weight:400}
 .card-top{height:3px;background:var(--filament, var(--soft-grey));transition:background .2s}
 .tile{
   aspect-ratio:4/3;position:relative;
@@ -439,8 +547,8 @@ section{padding:96px 0}
 .tile-slider-track .tile-photo{position:static;flex:0 0 100%;width:100%;height:100%;object-fit:cover}
 .tile-nav{
   position:absolute;top:50%;transform:translateY(-50%);
-  width:30px;height:30px;border-radius:50%;border:none;
-  background:rgba(20,18,15,.55);color:var(--text);
+  width:32px;height:32px;border:1px solid rgba(201,194,180,.22);
+  background:rgba(20,18,15,.66);backdrop-filter:blur(4px);color:var(--text);
   display:flex;align-items:center;justify-content:center;
   font-size:20px;line-height:1;cursor:pointer;z-index:4;
   opacity:0;transition:opacity .18s;
@@ -479,7 +587,7 @@ section{padding:96px 0}
    sticky para nada de esto en desktop. */
 .product-modal-content{
   position:relative;z-index:1;background:var(--ink-2);border:1px solid var(--line);
-  border-radius:16px;max-width:920px;width:100%;max-height:88vh;overflow:auto;
+  max-width:920px;width:100%;max-height:88vh;overflow:auto;
   display:grid;grid-template-columns:1.1fr 1fr;grid-template-rows:1fr auto;
   grid-template-areas:"gallery scroll" "gallery cta";
   gap:0;
@@ -555,10 +663,18 @@ section{padding:96px 0}
   font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;white-space:nowrap;
   color:var(--warm-grey);opacity:.6;
 }
+/* El badge se apoya sobre la foto del producto, que puede ser clara: sin
+   un fondo propio el texto gris se volvía ilegible (probado sobre las fotos
+   de las lámparas, que son las más brillantes del catálogo). */
 .card-status{position:absolute;top:12px;left:12px;z-index:2}
+.card-status .badge{
+  background:rgba(20,18,15,.78);backdrop-filter:blur(5px);
+  border-color:rgba(201,194,180,.28);
+}
+.card-status .badge.b-grey{color:var(--soft-grey)}
 .tile .obj{
   position:relative;
-  width:92px;height:92px;border-radius:18px;
+  width:92px;height:92px;
   background:var(--obj,#2A2A2E);
   box-shadow:inset 0 -14px 22px rgba(0,0,0,.35), 0 10px 26px rgba(0,0,0,.35);
   display:flex;align-items:center;justify-content:center;
@@ -592,8 +708,8 @@ section{padding:96px 0}
 .price{font-family:var(--font-mono);font-size:16.5px;font-weight:700;color:var(--text)}
 .add-btn{
   background:var(--accent-soft);color:var(--accent);
-  border:1px solid transparent;border-radius:9px;
-  padding:9px 16px;font-size:13.5px;font-weight:700;
+  border:1px solid transparent;
+  padding:10px 16px;font-size:13.5px;font-weight:700;
   transition:all .18s;
 }
 .add-btn:hover{background:var(--accent);color:var(--ink)}
@@ -624,7 +740,7 @@ section{padding:96px 0}
 .custom li b{color:var(--text);font-weight:600}
 .li-mark{
   font-family:var(--font-mono);font-size:11px;color:var(--accent);
-  border:1px solid var(--line);border-radius:8px;
+  border:1px solid var(--line);
   min-width:52px;height:28px;display:flex;align-items:center;justify-content:center;
   background:var(--bg);flex-shrink:0;margin-top:2px;
 }
@@ -636,7 +752,7 @@ input,select,textarea{
   /* 16px es el mínimo que evita que iOS Safari haga zoom al enfocar un campo */
   font-size:16px;
   background:var(--surface-2);border:1px solid var(--line);
-  border-radius:9px;padding:13px 14px;width:100%;
+  padding:13px 14px;width:100%;
 }
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 textarea{resize:vertical;min-height:80px}
@@ -650,7 +766,7 @@ textarea{resize:vertical;min-height:80px}
 .form-note{font-size:12.5px;color:var(--muted)}
 
 .quote-box{
-  border:1px dashed var(--line);border-radius:10px;
+  border:1px dashed var(--line);
   background:var(--surface);padding:18px 20px;
   display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
 }
@@ -775,7 +891,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 /* margin auto, no 0: la sección está centrada y con margen 0 la grilla
    quedaba pegada a la izquierda. */
 .social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:420px;margin:28px auto}
-.social-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.social-grid img{width:100%;aspect-ratio:1;object-fit:cover;border:1px solid var(--line)}
 .social-copy{color:var(--warm-grey);max-width:52ch;margin:0 auto 36px;font-size:16.5px}
 .social-handle{
   display:inline-flex;align-items:center;gap:.32em;
@@ -832,7 +948,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .d-item .price{font-size:13.5px}
 .qty{display:flex;align-items:center;gap:10px}
 .qty button{
-  width:26px;height:26px;border-radius:7px;
+  width:26px;height:26px;
   background:var(--surface-2);border:1px solid var(--line);color:var(--text);
   font-size:15px;display:flex;align-items:center;justify-content:center;
 }
@@ -848,7 +964,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .toast{
   position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);
   background:var(--surface-2);border:1px solid var(--accent);color:var(--text);
-  border-radius:10px;padding:12px 22px;font-size:14px;font-weight:600;
+  padding:12px 22px;font-size:14px;font-weight:600;
   opacity:0;pointer-events:none;z-index:90;
   transition:opacity .25s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
 }
@@ -884,10 +1000,17 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   .form-row,.form-row-3{grid-template-columns:1fr}
   .hero-specs{gap:20px}
   .logo small{display:none}
-  .nav-actions{gap:6px}
-  header .logo .wm{font-size:23px}
+  .nav-actions{gap:6px;flex-shrink:0}
+  header .logo .wm{font-size:21px}
   .sound-btn{width:38px;height:38px}
   .menu-btn{width:38px;height:38px}
+  /* En 390px el wordmark + menú + Instagram + sonido + Cola no entran y se
+     desbordaban del .wrap. Instagram ya está en el menú desplegable y en el
+     footer, así que en mobile sale de la barra. */
+  .nav-actions > a.sound-btn{display:none}
+  .nav{height:60px;gap:10px}
+  .logo{min-width:0}
+  .cart-btn{padding:10px 13px;font-size:11px;letter-spacing:.07em}
   .cart-btn{padding:9px 14px}
 }
 /* ============================================================
@@ -941,7 +1064,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .ig-modal{
   width:min(460px, 90vw);
   background:var(--paper);color:var(--ink);
-  border-radius:20px;padding:40px 36px 32px;
+  padding:40px 36px 32px;
   position:relative;overflow:hidden;
   transform:scale(.92) translateY(10px);
   transition:transform .4s cubic-bezier(.16,1,.3,1);
@@ -957,7 +1080,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   background:rgba(20,18,15,.06);border:none;color:var(--ink);font-size:15px;cursor:pointer;
 }
 .ig-modal-icon{
-  width:64px;height:64px;border-radius:18px;margin:0 auto 20px;
+  width:64px;height:64px;margin:0 auto 20px;
   background:linear-gradient(135deg,var(--signal-orange),var(--layer-teal));
   display:flex;align-items:center;justify-content:center;color:var(--ink);
 }
@@ -967,7 +1090,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .ig-modal-follow{
   display:inline-flex;align-items:center;gap:8px;
   font-family:var(--font-mono);font-size:14px;font-weight:700;letter-spacing:.04em;
-  background:var(--ink);color:var(--paper);padding:14px 30px;border-radius:10px;
+  background:var(--ink);color:var(--paper);padding:14px 30px;
   position:relative;
 }
 .ig-modal-dismiss{

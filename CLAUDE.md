@@ -528,3 +528,72 @@ Verificado con Playwright: carrito vacío muestra el toast (sin dialog
 nativo), con items el bottom sheet queda con headfoot fijos y los items
 scrolleando en su propio contenedor sin exceder el viewport, desktop sin
 cambios (sigue siendo panel lateral completo).
+
+---
+
+## 18. Rediseño visual — Ruta A "Taller" (19/08/2026)
+
+Martín pidió repensar el sitio con sombrero de diseñador ("me gusta pero
+siento que es una web más, no una web hermosa y moderna"), sin tocar paleta
+ni logo. Se presentaron **tres rutas** como mockups para que eligiera
+viendo, no describiendo: **A · Taller** (la web como máquina), **B ·
+Galería** (fondo claro, foto enorme) y **C · Editorial** (revista).
+Eligió **Ruta A, en versión "templada"**.
+
+**Aprendizaje de proceso:** la primera entrega fue UNA sola dirección con
+pedido de aprobación. Estuvo mal: cuando el cliente no sabe todavía qué
+quiere, corresponde mostrar rutas contrastantes. "Elegí vos la dirección"
+no es lo mismo que saltearse la comparación.
+
+**Qué define la Ruta A (implementado):**
+- **Esquina recta en todo el sitio** (`--radius:0`). La pieza impresa tiene
+  aristas; el redondeo genérico era lo que hacía leer el sitio como
+  plantilla. Únicas excepciones conservadas a propósito: los dos bottom
+  sheets de mobile (modal de producto y carrito), donde la esquina
+  redondeada superior ES la señal de "panel que sube" (ver secciones 15 y 17).
+- **Header al ras** en vez de píldora flotante redondeada, con reglas
+  verticales entre los links del nav. Arriba, una **barra de estado** con
+  dato real (ubicación, materiales, alcance de envío, taller activo) que
+  vive FUERA del `<header>` sticky a propósito: sumarle 32px al sticky
+  comía viewport en mobile.
+- **Hero a dos columnas separadas por una regla**: a la izquierda el
+  argumento con las specs como **tabla de ficha técnica** (clave/valor) en
+  vez de cuatro bloques sueltos; a la derecha un panel con **el trabajo que
+  está corriendo ahora** + la pieza destacada. Fondo: retícula de plano
+  técnico (`--plot`) en vez del degradado radial.
+- **El hero NO duplica la cola de impresión completa**: muestra solo el
+  trabajo en curso; el listado entero sigue viviendo en la sección "El
+  taller". La pieza destacada y el trabajo en curso salen de `PRODUCTS` y
+  `PRINT_QUEUE`, no hardcodeados — si Martín reordena la grilla o actualiza
+  la cola, el hero acompaña solo.
+- **Cards del catálogo como índice de piezas**: nº de índice derivado del
+  id real (`p17` → `N° 17`, la misma referencia del link para compartir) +
+  línea de ficha con material y gramaje.
+- **Botones mono, en mayúsculas, rectos.**
+
+**"Templado" (no full frío):** se conservó un rastro cálido muy tenue en el
+hero (radial naranja al 7% sobre la retícula) y se mantuvo el aire entre
+secciones. La Ruta A pura leía demasiado industrial para alguien que entra
+a comprar un regalo — ese era el riesgo declarado al presentarla.
+
+**No se tocó ni una línea de copy** — decisión explícita: el copy es de
+Martín (sección 0), así que "templar" se hizo con aire, escala y jerarquía,
+no reescribiendo textos.
+
+**Bugs reales encontrados y corregidos durante la implementación:**
+- El nº de índice sobre la foto **chocaba con el badge de estado** (misma
+  esquina). Se movió al cuerpo de la ficha, junto a la categoría.
+- En mobile el header **se desbordaba**: wordmark + menú + Instagram +
+  sonido + Cola no entran en 390px. Instagram salió de la barra (sigue en
+  el menú desplegable y en el footer).
+- El badge de estado **se volvía ilegible sobre las fotos claras** de las
+  lámparas (texto gris sin fondo propio). Se le agregó fondo con blur.
+
+**Pendiente de Martín:** va a comprar/imprimir un photo booth para
+estandarizar las fotos. Recomendación dada: **fondo gris medio neutro o
+negro mate, NO blanco puro** (el sitio va sobre INK; los fondos blancos
+quedan como rectángulos brillantes que pelean con todo), alto útil de
+70-80cm (la pieza más grande conocida es KETIL, 270mm), y sobre todo
+**repetir siempre el mismo setup** — misma distancia, altura de cámara y
+encuadre. La consistencia de fotografía es el techo real del sitio: ninguna
+decisión de CSS la reemplaza.
