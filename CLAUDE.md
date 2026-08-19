@@ -483,3 +483,48 @@ sumar `tsx`/`ts-node` solo para este script puntual.
 **No hizo falta tocar `.github/workflows/deploy.yml`:** ya corre `npm run
 build` como paso único, así que las páginas nuevas se generan y suben a
 Pages sin cambios en el workflow.
+
+**Nota sobre el preview de WhatsApp (sin resolver del todo):** después de
+desplegado, Martín probó compartir un producto y seguía sin aparecer la
+tarjeta de preview, incluso con URLs nunca antes vistas (para descartar
+caché) y con Bot Fight Mode de Cloudflare apagado. Confirmamos con
+metatags.io que los meta tags se leen perfecto desde afuera — el HTML está
+bien. Se corrigieron dos sospechosos reales del lado del código
+(`og:type="product"` sin los campos que ese schema exige → cambiado a
+`"website"`; se sacó el `<meta http-equiv="refresh">` por si WhatsApp lo
+seguía antes de leer los tags) en un PR aparte, pero el problema persistió
+incluso después de ese fix y de un redeploy confirmado. Martín decidió no
+seguir invirtiendo tiempo en esto por ahora ("si figura como ok en el
+deploy ya está") — quedó pendiente de retomar si en algún momento alguien
+prueba compartir desde otro celular (para descartar que sea un ajuste
+puntual de su WhatsApp/dispositivo, no del sitio).
+
+---
+
+## 17. Bottom sheet también en el carrito (19/08/2026)
+
+Mismo día, continuación del refresh de UX. Con el modal de producto ya
+convertido a bottom sheet en mobile (sección 15), quedó una inconsistencia
+real: el carrito (`CartDrawer.tsx`) seguía abriéndose como panel lateral
+que ocupa toda la pantalla — dos overlays con comportamiento distinto para
+el mismo tipo de acción en mobile.
+
+**Arreglado:** en mobile (`max-width:720px`), `.drawer` pasa de anclarse a
+la derecha (`translateX`) a anclarse abajo (`translateY`), con esquinas
+superiores redondeadas — mismo lenguaje visual que el modal. No hizo falta
+tocar el JSX: `CartDrawer.tsx` ya estaba armado en tres franjas hermanas
+(`.drawer-head` fijo / `.drawer-items` scrolleable / `.drawer-foot` fijo),
+la misma estructura que tuvimos que corregir a mano en el modal de
+producto (sección 15) — acá ya estaba bien desde el principio, solo hubo
+que cambiar el eje del panel.
+
+**Segundo fix, mismo commit lógico separado:** el carrito vacío tiraba un
+`alert()` nativo del navegador al tocar "Confirmar cola" — la única
+notificación de todo el sitio que no pasaba por el sistema de Toast propio
+(`ToastContext`/`useToast`, el mismo que muestra "agregado a la cola ✓").
+Ahora usa `notify()` como el resto.
+
+Verificado con Playwright: carrito vacío muestra el toast (sin dialog
+nativo), con items el bottom sheet queda con headfoot fijos y los items
+scrolleando en su propio contenedor sin exceder el viewport, desktop sin
+cambios (sigue siendo panel lateral completo).
