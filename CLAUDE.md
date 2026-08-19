@@ -83,6 +83,13 @@ impresora o capacidad limitada.
   desincronizaba: el `priceRange` quedó fijo en "$3.500 - $31.500" mucho
   después de que el máximo real subiera a $78.000).
 - **Pagos:** Mercado Pago (link de pago por producto, campo `mpLink`).
+- **Build de tres pasos:** `npm run build` = `tsc --noEmit && vite build &&
+  node scripts/generate-share-pages.mjs`. Ese tercer paso genera una página
+  estática por producto con foto (`dist/p/<id>.html`) con sus propios
+  `og:` tags, para que compartir un producto muestre SU foto y no la
+  genérica del home — ver sección 16. Si se agrega otro paso de build, va
+  ahí; `deploy.yml` corre `npm run build` como paso único y no hay que
+  tocarlo.
 
 ---
 
@@ -104,6 +111,21 @@ impresora o capacidad limitada.
   - Marca/institucional → fondo PAPER + wedge ink + hachure.
 - **Wordmark:** "STICKOS" en ink/paper + "3D" en orange, con split-shift
   (mitad inferior corrida ~0.108em a la derecha) cuando se hace en CSS.
+- **Dirección visual: Ruta A "Taller" (templada)**, elegida el 19/08/2026
+  entre tres rutas presentadas como mockups (ver sección 18). La web se
+  comporta como una máquina que opera a la vista: mono + reglas finas +
+  información densa + retícula de plano técnico, con un rastro cálido tenue
+  para que no lea helada.
+- **Esquina recta en todo el sitio** (`--radius:0`). Es regla de marca, no
+  preferencia estética: la pieza impresa tiene aristas. **Dos excepciones
+  conservadas a propósito**, y solo dos: el borde superior redondeado de los
+  bottom sheets de mobile (modal de producto y carrito), donde la curva ES
+  la señal de "panel que sube". Si aparece un `border-radius` nuevo fuera de
+  esos dos casos, está mal.
+- **Las tipografías NO cambiaron con el rediseño.** Siguen siendo las tres
+  de arriba (Space Grotesk / Inter / IBM Plex Mono). En los mockups de las
+  rutas B y C se probó una serif editorial (Newsreader) para texto corrido,
+  pero esas rutas no se eligieron — no está en el sitio.
 
 ---
 
@@ -597,3 +619,52 @@ quedan como rectángulos brillantes que pelean con todo), alto útil de
 **repetir siempre el mismo setup** — misma distancia, altura de cámara y
 encuadre. La consistencia de fotografía es el techo real del sitio: ninguna
 decisión de CSS la reemplaza.
+
+---
+
+## 19. Estado al cierre del 19/08/2026 — qué quedó y qué sigue
+
+Día largo: el sitio pasó de un `index.html` estático a Vite+React, y de ahí
+a un rediseño visual completo. Seis PRs, todos mergeados y desplegados.
+
+**Lo que está en producción hoy:**
+
+| # | Qué | Sección |
+|---|---|---|
+| PR #1 | Migración a Vite + React + TypeScript, CI/CD, tests | 13 |
+| PR #2 | Meta Pixel de conversión, SEO estructurado dinámico, compartir por WhatsApp | 14 |
+| PR #3 | Bottom sheet del modal, CTA siempre visible, swipe, preview con foto al compartir | 15 y 16 |
+| PR #4 | Intento de fix del preview de WhatsApp (`og:type`, redirect) | 16 |
+| PR #5 | Bottom sheet del carrito, toast en vez de `alert()` | 17 |
+| PR #6 | Rediseño visual — Ruta A "Taller" (templada) | 18 |
+
+**Abierto, en orden de impacto real:**
+
+1. **Fotografía de producto (Martín).** Es el techo del sitio, no el CSS.
+   Va a comprar/imprimir un photo booth. Specs recomendadas y el porqué,
+   en la sección 18. Cuando lo tenga, queda pendiente pasarle una plantilla
+   de encuadre fija para que las 20 fotos salgan intercambiables.
+2. **Reseñas / prueba social.** El sitio no tiene ninguna. Necesita 3-5
+   reseñas reales de Martín (capturas de Instagram/WhatsApp) antes de
+   construir la sección. **Nunca inventar testimonios** — ver sección 14.
+3. **Catálogo tabular en desktop (Ruta A).** El mockup de la Ruta A tenía
+   el catálogo como índice de piezas en TABLA (columnas: N°, foto chica,
+   pieza, material, peso, estado, precio). Se implementó con cards
+   técnicas en su lugar, porque una tabla no funciona en mobile y la mayor
+   parte del tráfico llega de Instagram. Queda disponible como mejora de
+   desktop (tabla en ancho grande, cards en mobile) si Martín la quiere —
+   es lo más distintivo que quedó sin construir de esa ruta.
+4. **Preview de WhatsApp al compartir.** Sin resolver. Los meta tags se
+   leen bien desde afuera (verificado con metatags.io), Bot Fight Mode de
+   Cloudflare está apagado, y con URLs nunca vistas tampoco aparece.
+   Martín decidió no seguir invirtiendo tiempo. Retomar si alguien prueba
+   compartir desde otro celular — ver sección 16.
+5. **Google Analytics 4** y **captura de emails / newsletter.** Propuestos
+   en la auditoría de marketing, no priorizados. No rechazados: vale
+   volver a proponerlos (sección 14).
+
+**Cómo verificar cambios visuales de acá en adelante:** el flujo que
+funcionó todo el día fue `npm run build` + `vite preview` + Playwright
+midiendo geometría real (`getBoundingClientRect`, desborde horizontal,
+solapamientos) en 1440px y 390/360px, ANTES de commitear. Tres bugs reales
+de la Ruta A aparecieron así y ninguno se veía en la lectura del código.
