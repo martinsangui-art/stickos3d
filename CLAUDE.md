@@ -29,6 +29,11 @@
   (chat, no Code) → ese chat le arma un prompt listo para pegar → lo pega acá
   en Claude Code → Claude Code ejecuta y commitea → Martín confirma que
   quedó bien en el sitio en vivo.
+- **Todo PR se abre con suscripción a su actividad, siempre.** Confirmado
+  explícitamente (19/08/2026): apenas se abre un PR, suscribirse a sus
+  eventos (CI, comentarios de review) sin volver a preguntar cada vez —
+  es comportamiento por defecto del proyecto, no algo a confirmar PR por
+  PR.
 
 ---
 
