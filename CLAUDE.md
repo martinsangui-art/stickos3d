@@ -49,7 +49,13 @@ impresora o capacidad limitada.
 
 ## 2. Stack técnico
 
-- **Sitio:** `index.html` single-file, sin frameworks ni build step.
+- **Sitio:** Vite + React + TypeScript (migrado desde un `index.html`
+  single-file el 19/08/2026 — mismo diseño/contenido, ahora componentizado
+  y con tests). Ver `README.md` para el flujo de desarrollo (`npm run dev`,
+  `npm test`, `npm run build`).
+- **Deploy:** GitHub Actions (`.github/workflows/deploy.yml`) build+publica
+  `dist/` a GitHub Pages en cada push a `main`. `ci.yml` corre lint+test+build
+  en cada PR.
 - **Hosting:** GitHub Pages, dominio `stickos3d.com.ar` (DNS/email por
   Cloudflare).
 - **Email:** `hola@stickos3d.com.ar` vía Zoho.
@@ -84,9 +90,9 @@ impresora o capacidad limitada.
 
 ---
 
-## 4. Schema del array `PRODUCTS` (en `index.html`)
+## 4. Schema del array `PRODUCTS` (en `src/data/products.ts`)
 
-```js
+```ts
 {
   id:      "pN",         // string, correlativo. Ver "próximo id libre" abajo.
   name:    "NOMBRE",      // string
@@ -104,10 +110,15 @@ impresora o capacidad limitada.
                                        // como referencia de tono).
   mpLink:  null,          // placeholder, no se usa activamente todavía
   status:  "listo",       // ver STOCK_STATUS, sección 6
-  imgs:    ["assets/products/slug-1.jpg", "assets/products/slug-2.jpg"]
+  imgs:    ["/assets/products/slug-1.jpg", "/assets/products/slug-2.jpg"],
            // OMITIR este campo (o dejar imgs:[]) = el producto muestra
            // "PRÓXIMAMENTE" en vez de precio. La función hasConfirmedPrice(p)
-           // chequea imgs.length > 0 — es el mecanismo real, no un flag aparte.
+           // (en el mismo archivo) chequea imgs.length > 0 — es el mecanismo
+           // real, no un flag aparte. Ojo con el "/" inicial: los archivos
+           // viven en public/assets/products/, Vite los sirve desde la raíz.
+  video:   "/assets/products/slug.mp4"  // opcional, se suma a imgs sin
+           // reemplazarlo — badge de video en la card + rotación automática
+           // por hover (desktop) + slide final con sonido en el modal.
 }
 ```
 
@@ -172,7 +183,9 @@ Piso mínimo: $3.500
 
 ## 8. Convención de nombres de archivos de imágenes
 
-`assets/products/{slug-del-producto}-{n}.jpg`, empezando en 1. Ejemplo:
+`public/assets/products/{slug-del-producto}-{n}.jpg`, empezando en 1
+(referenciado en el código como `/assets/products/...`, con `/` inicial —
+Vite sirve todo lo de `public/` desde la raíz). Ejemplo:
 `ketil-1.jpg`, `ketil-2.jpg`, `ketil-3.jpg`. Slug en minúsculas, sin tildes
 ni espacios (guion medio como separador).
 
