@@ -57,7 +57,8 @@ impresora o capacidad limitada.
   `dist/` a GitHub Pages en cada push a `main`. `ci.yml` corre lint+test+build
   en cada PR.
 - **Hosting:** GitHub Pages, dominio `stickos3d.com.ar` (DNS/email por
-  Cloudflare).
+  Cloudflare). Source de Pages = **GitHub Actions** (no "Deploy from a
+  branch" — se cambió el 19/08/2026, ver sección 13).
 - **Email:** `hola@stickos3d.com.ar` vía Zoho.
 - **Formulario de contacto:** Formspree. Ojo: la respuesta exitosa es
   `{ok:true}`, NO `{success:true}` — si algo del form falla, revisar esto
@@ -217,7 +218,7 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 | p2 | Soporte de celular ajustable | Gadgets | $15.800 | (pasado a PRÓXIMAMENTE) |
 | p3 | Maceta Autorregante | Deco | $20.000 | listo |
 | p4 | Portarretrato personalizado | Regalos | $7.900 | extruyendo |
-| p5 | Lámpara de luna (con luz LED) | Deco | $20.500 | pedido |
+| p5 | Porta líquido difusor de aromas | Deco | $15.000 | pedido |
 | p6 | Rompecabezas de píxeles personalizado | Juguetes | $9.200 | listo |
 | p7 | Gancho organizador de cables x6 | Hogar | $5.000 | listo |
 | p8 | Llavero personalizado con nombre | Regalos | $3.500 | extruyendo |
@@ -260,3 +261,67 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 - Cuenta de Instagram vieja `@stickos3d` quedó inaccesible — la cuenta
   activa es `@stickos3de` (con "e" al final). Verificar cuál está hardcoded
   antes de asumir.
+- **Un workflow de GitHub Actions recién agregado no corre en el push que lo
+  agrega.** Para el evento `pull_request`, GitHub sí lee el workflow desde la
+  rama del PR (no hace falta que esté en `main` primero, a pesar de lo que
+  parece al principio) — pero necesita un push *posterior* a que el archivo
+  ya exista en la rama para dispararse. El push que agrega `ci.yml` no
+  cuenta; el siguiente sí. `workflow_dispatch` (disparo manual) sí requiere
+  que el archivo esté en la rama default del repo — ahí si da 404 al
+  intentar dispararlo, es señal de que el workflow todavía no llegó a `main`.
+- **Al cambiar Settings → Pages → Source de "Deploy from a branch" a
+  "GitHub Actions"**, el dominio propio (`stickos3d.com.ar`) puede tirar el
+  404 genérico de GitHub ("There isn't a GitHub Pages site here") durante
+  15-20 minutos aunque el campo "Custom domain" en Settings se vea
+  configurado sin errores y el deploy haya corrido en verde — es demora de
+  propagación del lado de GitHub, no un problema de DNS ni de config. La
+  URL default (`usuario.github.io/repo`) sirve para confirmar que el deploy
+  en sí funciona mientras se espera. Pasó una vez, se resolvió solo (con un
+  redeploy manual de por medio, que puede o no haber acelerado algo).
+
+---
+
+## 13. Migración a Vite + React (19/08/2026)
+
+El sitio pasó de un `index.html` single-file (2251 líneas, sin build ni
+dependencias) a Vite + React + TypeScript, en PR #1
+(`claude/ecc-selective-install-rj4oau` → `main`). Motivo: alinear el
+proyecto con el resto del stack de Martín (JAM7, GestionComercialMCR, ambos
+Vite+React+Firebase) y poder testear la lógica de negocio en vez de
+confiar solo en verificación manual.
+
+**Qué NO cambió** (a propósito): diseño, copy, precios, integraciones
+(WhatsApp, Mercado Pago, Meta Pixel, Formspree, EmailJS), todas las
+animaciones (preloader FDM, scroll-reveal, header flotante, sonido del
+taller vía Web Audio API). El CSS se movió a `src/styles/global.css` sin
+tocar una sola regla — mismos selectores que usaba el HTML/JS original.
+
+**Qué sí cambió, estructuralmente:**
+- `PRODUCTS`/`CONFIG`/`QUOTE`/`PRINT_QUEUE`: de `index.html` a
+  `src/data/*.ts` (ver secciones 2 y 4 de este archivo).
+- Lógica de negocio extraída como funciones puras testeables:
+  `src/lib/quote.ts` (`computeQuote`), `src/context/cartReducer.ts`
+  (reglas del carrito). 17 tests unitarios cubren ambas.
+- Carrito, sonido, modal de Instagram: pasaron de variables globales/DOM a
+  React Context (`src/context/`) — mismo comportamiento, sin `window.__x`.
+- Fotos/audio/favicon/CNAME/robots.txt/sitemap.xml: de la raíz del repo a
+  `public/` (Vite los sirve igual, sin reescritura de ruta salvo el `/`
+  inicial en cada referencia — ver sección 8).
+- CI/CD nuevo: `.github/workflows/ci.yml` (lint+test+build en cada PR) y
+  `deploy.yml` (build+publica `dist/` a Pages en cada push a `main`).
+
+**Riesgo real durante la migración, ya resuelto:** el trabajo de migrar
+tardó lo suficiente como para que `main` avanzara 17 commits por separado
+(4 productos nuevos, cambios de precio, la función de video+hover en las
+cards). Se detectó al mergear (conflictos de archivo en `index.html` y en
+`assets/products/`) y se re-portó todo a mano contra el estado más
+reciente de `main` antes de mergear — no se perdió nada, pero es la razón
+por la que conviene avisar antes de arrancar una migración larga si va a
+haber cambios de contenido en paralelo.
+
+**Para agregar productos/tocar precios de acá en adelante:** todo sigue
+igual que antes en términos de reglas de negocio (secciones 0, 4, 7) — lo
+único que cambia es que el array vive en `src/data/products.ts` en vez de
+adentro de `index.html`, y hay que correr `npm run build` (o esperar el CI)
+para ver el resultado, ya no alcanza con abrir el HTML directo en el
+navegador. Ver `README.md` para el flujo de desarrollo completo.
