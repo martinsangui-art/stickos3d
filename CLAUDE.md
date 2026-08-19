@@ -365,3 +365,66 @@ es publicidad engañosa.
 (no rechazadas por Martín, solo no priorizadas — vale la pena volver a
 proponerlas): Google Analytics 4 (hoy solo hay Meta Pixel, sin visibilidad
 de tráfico orgánico separado del de Ads); newsletter/email capture.
+
+---
+
+## 15. Refresh de UX del modal de producto (19/08/2026)
+
+Segunda ronda de revisión de diseño (después de la tanda de marketing/SEO
+de la sección 14). Martín pidió específicamente "algo para rever en tema
+de diseño" con gorro de marketing/diseño web, y después confirmó hacer un
+refresh 100% de UX/interacción basado en tendencias 2026 **sin tocar la
+identidad de marca** — la estética "tactile/handmade" que ya tiene STICKOS
+3D está validada como tendencia vigente (no hacía falta rediseñar el look,
+solo la interacción).
+
+**Cambios implementados** (`src/components/ProductModal.tsx` +
+`src/styles/global.css`):
+
+1. **Bottom sheet en mobile en vez de modal centrado.** El modal de
+   producto ahora se ancla abajo (`align-items:flex-end`) con animación de
+   entrada (`sheetUp`), siguiendo el patrón que en investigación de UX
+   (NN/g) rinde mejor que el modal centrado tradicional en mobile — se
+   siente como una extensión natural de la pantalla en vez de una
+   interrupción.
+
+2. **"A la cola" siempre visible sin scrollear.** Antes había que
+   scrollear DENTRO del modal para encontrar el botón de compra — nadie lo
+   descubre solo. Ahora la franja de precio + "A la cola" / "Cotizar por
+   WhatsApp" queda fija abajo del sheet, y la descripción/specs scrollean
+   en su propio contenedor interno angosto.
+
+   **Bug real encontrado y corregido en el camino:** el bloque
+   `.product-modal-cta` vivía anidado ADENTRO de `.product-modal-info` en
+   el JSX (no como hermano), mientras el CSS (primero `position:sticky`,
+   después CSS Grid con `grid-template-areas`, después flexbox) siempre
+   asumió que eran hermanos dentro de `.product-modal-content`. Tres
+   enfoques de CSS distintos fallaron con el mismo síntoma exacto (CTA
+   solapado y empujado fuera del viewport) porque el problema nunca fue el
+   CSS — era la estructura del DOM. Se resolvió moviendo
+   `.product-modal-cta` a hermano de `.product-modal-info`, y ahí sí
+   `display:flex;flex-direction:column` con `.product-modal-info{flex:1;
+   min-height:0;overflow-y:auto}` funcionó a la primera. **Aprendizaje:**
+   si varios approaches de CSS distintos fallan con números idénticos,
+   sospechar de la estructura del DOM antes que seguir iterando CSS.
+
+3. **"Compartir" bajó de jerarquía visual.** Antes era un botón de texto
+   con el mismo peso que "A la cola"/"Cotizar por WhatsApp" (competía por
+   atención con las acciones que facturan). Ahora es un ícono circular
+   chico al lado del botón de cerrar (mismo tratamiento visual que
+   `.product-modal-close`) — sigue disponible pero no compite.
+
+4. **Placeholder del textarea del cotizador ya no se corta en mobile.**
+   El placeholder de ejemplo tiene 3 líneas; con el `min-height:80px`
+   genérico de todos los `textarea`, la última línea quedaba cortada.
+   Se agregó `#cfDesc{min-height:108px}` solo para esa caja puntual (el
+   textarea del form de contacto entra bien con el genérico, no se tocó).
+
+**Verificado con Playwright** (mobile 390×844 y desktop 1400×900):
+"A la cola" visible sin scroll en el primer render del modal, sin
+solapamiento entre galería/info/cta, desktop sin cambios de layout
+(sigue siendo grid centrado, no hereda el bottom sheet).
+
+**No se tocó:** paleta, tipografías, wordmark, ninguna copy, fórmula de
+precios, ni el modal en desktop (el bottom sheet es mobile-only, media
+query `max-width:720px`).

@@ -468,15 +468,26 @@ section{padding:96px 0}
 .product-modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
 .product-modal[hidden]{display:none}
 .product-modal-backdrop{position:absolute;inset:0;background:rgba(10,9,7,.78);backdrop-filter:blur(3px)}
+/* Grid con áreas explícitas en vez de solo columnas: la galería ocupa las
+   dos filas de su columna, mientras la columna de texto se parte en
+   "scroll" (contenido) arriba y "cta" (precio + botones) abajo. Así el
+   precio y "A la cola" quedan en su propia fila fija, nunca superpuestos
+   por nada — antes con position:sticky el bloque de precio+CTA se
+   "pegaba" desde el primer render (cuando el contenido de arriba no
+   alcanzaba a llenar la pantalla) y tapaba el precio y el material que
+   iban justo antes en el flujo normal. Con áreas de grid no hace falta
+   sticky para nada de esto en desktop. */
 .product-modal-content{
   position:relative;z-index:1;background:var(--ink-2);border:1px solid var(--line);
   border-radius:16px;max-width:920px;width:100%;max-height:88vh;overflow:auto;
-  display:grid;grid-template-columns:1.1fr 1fr;gap:0;
+  display:grid;grid-template-columns:1.1fr 1fr;grid-template-rows:1fr auto;
+  grid-template-areas:"gallery scroll" "gallery cta";
+  gap:0;
 }
-.product-modal-gallery{position:relative;aspect-ratio:1;background:var(--ink)}
+.product-modal-gallery{position:relative;aspect-ratio:1;background:var(--ink);grid-area:gallery}
 .product-modal-gallery .tile-slider{position:absolute;inset:0}
 .product-modal-gallery .tile-nav{opacity:1}
-.product-modal-info{padding:32px;display:flex;flex-direction:column;gap:10px}
+.product-modal-info{padding:32px 32px 8px;display:flex;flex-direction:column;gap:10px;grid-area:scroll}
 .product-modal-info h3{font-family:var(--font-display);font-size:28px;margin:0}
 .product-modal-desc{color:var(--muted);line-height:1.5;font-size:15px}
 .product-modal-mat{color:var(--muted);font-size:13px;font-family:var(--font-mono)}
@@ -486,10 +497,57 @@ section{padding:96px 0}
   border:1px solid var(--line);background:var(--ink-2);color:var(--text);font-size:18px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
 }
-@media(max-width:720px){
-  .product-modal-content{grid-template-columns:1fr;max-height:92vh}
-  .product-modal-gallery{aspect-ratio:1.2}
+/* "Compartir" es una acción de alcance, no de venta — un ícono chico al lado
+   del cierre no compite en peso visual con "A la cola"/"Cotizar", que son
+   las que importan para facturar. Mismo tratamiento (círculo, borde,
+   ink-2) que .product-modal-close, para que lean como del mismo sistema. */
+.product-modal-share{
+  position:absolute;top:14px;right:58px;z-index:2;width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--line);background:var(--ink-2);color:var(--muted);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:color .18s,border-color .18s;
 }
+.product-modal-share:hover{color:var(--accent);border-color:var(--accent)}
+.product-modal-share svg{width:16px;height:16px}
+.product-modal-cta{display:flex;flex-direction:column;gap:12px;grid-area:cta;padding:16px 32px 32px}
+.product-modal-cta-buttons{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:720px){
+  .product-modal-gallery{aspect-ratio:1.2}
+
+  /* ---- Bottom sheet: el modal de producto se ancla abajo en vez de
+     quedar centrado. La galería queda fija arriba, la descripción
+     scrollea en su propio contenedor angosto (.product-modal-info), y
+     precio + "A la cola" quedan en una franja fija abajo que ningún
+     scroll puede tapar ni sacar de vista — antes había que scrollear
+     DENTRO del modal para encontrar el botón de compra, algo que nadie
+     descubre solo. ---- */
+  .product-modal{align-items:flex-end;padding:0}
+  /* CSS Grid con filas 1fr no se achica de forma confiable cuando el
+     contenedor solo tiene max-height (no height fija) — probado durante
+     el desarrollo de esto mismo: el bloque de precio+CTA terminaba
+     empujado fuera de la pantalla en vez de quedar fijo abajo. Flexbox
+     con flex:1 + min-height:0 en el medio es el patrón estándar para
+     "encabezado fijo + medio scrolleable + pie fijo" y sí respeta
+     max-height de forma consistente — por eso el mobile pasa a flex-column
+     en vez de heredar el grid de desktop. */
+  .product-modal-content{
+    display:flex;flex-direction:column;
+    width:100%;max-width:none;max-height:92vh;border-radius:20px 20px 0 0;
+    overflow:hidden; /* el scroll pasa a .product-modal-info, no acá */
+    animation:sheetUp .38s cubic-bezier(.16,.8,.24,1);
+  }
+  .product-modal-gallery{flex-shrink:0}
+  .product-modal-info{flex:1;min-height:0;overflow-y:auto}
+  .product-modal-cta{
+    flex-shrink:0;
+    padding:14px 32px calc(14px + env(safe-area-inset-bottom, 0px));
+    background:var(--ink-2);border-top:1px solid var(--line);
+  }
+}
+/* El .product-modal-content{animation:none} para prefers-reduced-motion ya
+   lo cubre la regla global de más abajo (*,*::before,*::after{animation:none
+   !important}) — no hace falta repetirla acá. */
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .tile::after{
   content:"FOTO PRÓXIMAMENTE";
   /* centrado entre las dos marcas de calibración de abajo, para no pisarlas */
@@ -582,6 +640,11 @@ input,select,textarea{
 }
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
 textarea{resize:vertical;min-height:80px}
+/* El placeholder de ejemplo del cotizador tiene 3 líneas — con el
+   min-height genérico de 80px la última quedaba cortada en mobile. Solo
+   esta caja necesita más alto; el textarea del form de contacto entra bien
+   con el genérico. */
+#cfDesc{min-height:108px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .form-note{font-size:12.5px;color:var(--muted)}

@@ -99,6 +99,12 @@ export function ProductModal({ product: p, onClose }: Props) {
       <div className="product-modal-backdrop" onClick={handleClose}></div>
       <div className="product-modal-content">
         <button type="button" className="product-modal-close" onClick={handleClose} aria-label="Cerrar">✕</button>
+        <button type="button" className="product-modal-share" onClick={handleShare} aria-label="Compartir este producto por WhatsApp" title="Compartir">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 16V4M12 4 8 8M12 4l4 4" />
+            <path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+          </svg>
+        </button>
         <div className="product-modal-gallery">
           <div className="tile-slider">
             <div className="tile-slider-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
@@ -149,10 +155,21 @@ export function ProductModal({ product: p, onClose }: Props) {
           </div>
           <p className="product-modal-desc">{p.desc || ''}</p>
           <p className="product-modal-mat">{p.mat}</p>
+        </div>
+        {/* Precio + acción principal van HERMANOS de .product-modal-info, no
+            adentro — así quedan fuera del contenedor que scrollea
+            (.product-modal-info tiene overflow-y:auto en mobile) y la franja
+            de precio+"A la cola" queda fija abajo del todo, sin que un
+            scroll interno se la lleve puesta. Antes vivía anidado adentro de
+            .product-modal-info: el CSS (grid-area/flex-shrink) asumía que
+            era hermano, pero en el DOM real era hijo — por eso "A la cola"
+            terminaba scrolleado fuera de vista pasara lo que pasara con el
+            layout de afuera. */}
+        <div className="product-modal-cta">
           <div className="product-modal-price" style={{ color: confirmedPrice ? '' : 'var(--muted)' }}>
             {confirmedPrice ? `$ ${p.price.toLocaleString('es-AR')}` : 'PRÓXIMAMENTE'}
           </div>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="product-modal-cta-buttons">
             {confirmedPrice ? (
               <button type="button" className="btn btn-primary" onClick={handleAdd}>A la cola</button>
             ) : (
@@ -168,9 +185,6 @@ export function ProductModal({ product: p, onClose }: Props) {
               </button>
             )}
             <button type="button" className="btn btn-ghost" onClick={handleQuoteWa}>Cotizar por WhatsApp</button>
-            <button type="button" className="btn btn-ghost" onClick={handleShare} aria-label="Compartir este producto por WhatsApp">
-              Compartir
-            </button>
           </div>
         </div>
       </div>
