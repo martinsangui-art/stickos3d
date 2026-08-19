@@ -1,4 +1,5 @@
 import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import { fmt, wa } from '../lib/format';
 import { trackPixel } from '../lib/pixel';
 
@@ -9,11 +10,15 @@ interface Props {
 
 export function CartDrawer({ open, onClose }: Props) {
   const { cart, total, inc, dec } = useCart();
+  const { notify } = useToast();
   const items = Object.entries(cart);
 
   function checkout() {
     if (!items.length) {
-      alert('Tu cola está vacía. Agregá algo del catálogo primero.');
+      // Mismo sistema de Toast que usa el resto del sitio (ej: "agregado a
+      // la cola ✓") — antes esto disparaba un alert() nativo del navegador,
+      // la única notificación de todo STICKOS 3D que no pasaba por acá.
+      notify('Tu cola está vacía — sumá algo del catálogo 👇');
       return;
     }
     let msg = '¡Hola STICKOS 3D! Quiero mandar esto a la cola de impresión:\n\n';
