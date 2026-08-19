@@ -1,4 +1,6 @@
 import { CONFIG } from '../data/config';
+import { hasConfirmedPrice } from '../data/products';
+import type { Product } from '../data/types';
 
 export const fmt = (n: number): string => '$ ' + Math.round(n).toLocaleString('es-AR');
 
@@ -17,10 +19,17 @@ export const waWeb = (msg: string): string =>
    precio precargados es gratis y capitaliza ese boca en boca existente. */
 export const shareWa = (msg: string): string => `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
 
-// Deep-link a un producto puntual — la SPA no tiene rutas por producto, así
-// que el ?p=<id> en la URL es lo que le permite a alguien que recibe el link
-// compartido caer directo en el modal del producto, no solo en la home.
-export const productShareUrl = (id: string): string => `https://stickos3d.com.ar/?p=${id}`;
+// Link para compartir un producto puntual. Con foto confirmada, apunta a la
+// página estática que genera scripts/generate-share-pages.mjs en el build
+// (dist/p/<id>.html) — WhatsApp/Facebook/Instagram leen el HTML crudo sin
+// ejecutar JS, así que la SPA sola nunca puede mostrar una foto de preview
+// distinta por producto: siempre se vería la og:image genérica del home. Esa
+// página estática tiene el og:image real del producto y manda a un humano
+// que la abre directo a /?p=<id> (la app de verdad, con el modal abierto).
+// Sin foto confirmada no hay nada que previsualizar — ahí se comparte el
+// deep-link ?p=<id> de siempre, sin pasar por la página estática (no existe).
+export const productShareUrl = (p: Product): string =>
+  hasConfirmedPrice(p) ? `https://stickos3d.com.ar/p/${p.id}.html` : `https://stickos3d.com.ar/?p=${p.id}`;
 
 export const mailBody = [
   'Hola STICKOS 3D:',

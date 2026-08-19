@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { productShareUrl, shareWa } from './format';
+import { PRODUCTS } from '../data/products';
 
 describe('shareWa', () => {
   it('opens WhatsApp without a destination number, unlike wa()/waWeb()', () => {
@@ -15,7 +16,13 @@ describe('shareWa', () => {
 });
 
 describe('productShareUrl', () => {
-  it('builds a deep link the app reads back via ?p=<id> on load', () => {
-    expect(productShareUrl('p17')).toBe('https://stickos3d.com.ar/?p=p17');
+  it('points to the static /p/<id>.html preview page when the product has a confirmed photo', () => {
+    const onda = PRODUCTS.find((p) => p.id === 'p17')!; // tiene imgs
+    expect(productShareUrl(onda)).toBe('https://stickos3d.com.ar/p/p17.html');
+  });
+
+  it('falls back to the plain ?p=<id> deep link when there is no photo to preview', () => {
+    const sinFoto = PRODUCTS.find((p) => p.id === 'p2')!; // sin imgs, PRÓXIMAMENTE
+    expect(productShareUrl(sinFoto)).toBe('https://stickos3d.com.ar/?p=p2');
   });
 });

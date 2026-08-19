@@ -29,6 +29,11 @@
   (chat, no Code) → ese chat le arma un prompt listo para pegar → lo pega acá
   en Claude Code → Claude Code ejecuta y commitea → Martín confirma que
   quedó bien en el sitio en vivo.
+- **Todo PR se abre con suscripción a su actividad, siempre.** Confirmado
+  explícitamente (19/08/2026): apenas se abre un PR, suscribirse a sus
+  eventos (CI, comentarios de review) sin volver a preguntar cada vez —
+  es comportamiento por defecto del proyecto, no algo a confirmar PR por
+  PR.
 
 ---
 
@@ -365,3 +370,116 @@ es publicidad engañosa.
 (no rechazadas por Martín, solo no priorizadas — vale la pena volver a
 proponerlas): Google Analytics 4 (hoy solo hay Meta Pixel, sin visibilidad
 de tráfico orgánico separado del de Ads); newsletter/email capture.
+
+---
+
+## 15. Refresh de UX del modal de producto (19/08/2026)
+
+Segunda ronda de revisión de diseño (después de la tanda de marketing/SEO
+de la sección 14). Martín pidió específicamente "algo para rever en tema
+de diseño" con gorro de marketing/diseño web, y después confirmó hacer un
+refresh 100% de UX/interacción basado en tendencias 2026 **sin tocar la
+identidad de marca** — la estética "tactile/handmade" que ya tiene STICKOS
+3D está validada como tendencia vigente (no hacía falta rediseñar el look,
+solo la interacción).
+
+**Cambios implementados** (`src/components/ProductModal.tsx` +
+`src/styles/global.css`):
+
+1. **Bottom sheet en mobile en vez de modal centrado.** El modal de
+   producto ahora se ancla abajo (`align-items:flex-end`) con animación de
+   entrada (`sheetUp`), siguiendo el patrón que en investigación de UX
+   (NN/g) rinde mejor que el modal centrado tradicional en mobile — se
+   siente como una extensión natural de la pantalla en vez de una
+   interrupción.
+
+2. **"A la cola" siempre visible sin scrollear.** Antes había que
+   scrollear DENTRO del modal para encontrar el botón de compra — nadie lo
+   descubre solo. Ahora la franja de precio + "A la cola" / "Cotizar por
+   WhatsApp" queda fija abajo del sheet, y la descripción/specs scrollean
+   en su propio contenedor interno angosto.
+
+   **Bug real encontrado y corregido en el camino:** el bloque
+   `.product-modal-cta` vivía anidado ADENTRO de `.product-modal-info` en
+   el JSX (no como hermano), mientras el CSS (primero `position:sticky`,
+   después CSS Grid con `grid-template-areas`, después flexbox) siempre
+   asumió que eran hermanos dentro de `.product-modal-content`. Tres
+   enfoques de CSS distintos fallaron con el mismo síntoma exacto (CTA
+   solapado y empujado fuera del viewport) porque el problema nunca fue el
+   CSS — era la estructura del DOM. Se resolvió moviendo
+   `.product-modal-cta` a hermano de `.product-modal-info`, y ahí sí
+   `display:flex;flex-direction:column` con `.product-modal-info{flex:1;
+   min-height:0;overflow-y:auto}` funcionó a la primera. **Aprendizaje:**
+   si varios approaches de CSS distintos fallan con números idénticos,
+   sospechar de la estructura del DOM antes que seguir iterando CSS.
+
+3. **"Compartir" bajó de jerarquía visual.** Antes era un botón de texto
+   con el mismo peso que "A la cola"/"Cotizar por WhatsApp" (competía por
+   atención con las acciones que facturan). Ahora es un ícono circular
+   chico al lado del botón de cerrar (mismo tratamiento visual que
+   `.product-modal-close`) — sigue disponible pero no compite.
+
+4. **Placeholder del textarea del cotizador ya no se corta en mobile.**
+   El placeholder de ejemplo tiene 3 líneas; con el `min-height:80px`
+   genérico de todos los `textarea`, la última línea quedaba cortada.
+   Se agregó `#cfDesc{min-height:108px}` solo para esa caja puntual (el
+   textarea del form de contacto entra bien con el genérico, no se tocó).
+
+**Verificado con Playwright** (mobile 390×844 y desktop 1400×900):
+"A la cola" visible sin scroll en el primer render del modal, sin
+solapamiento entre galería/info/cta, desktop sin cambios de layout
+(sigue siendo grid centrado, no hereda el bottom sheet).
+
+**No se tocó:** paleta, tipografías, wordmark, ninguna copy, fórmula de
+precios, ni el modal en desktop (el bottom sheet es mobile-only, media
+query `max-width:720px`).
+
+---
+
+## 16. Swipe en el modal + preview con foto al compartir (19/08/2026)
+
+Dos pedidos puntuales de Martín después de confirmar el refresh de UX de la
+sección 15.
+
+**1. Swipe táctil en el modal de producto.** Ya existía en las cards del
+catálogo (`ProductCard.tsx` — `onTouchStart`/`onTouchEnd`, umbral de 40px),
+pero faltaba en el modal grande (`ProductModal.tsx`): ahí solo se podía
+navegar con las flechitas `‹›`. Se agregó el mismo criterio (mismo umbral,
+mismo signo de dirección) al `.tile-slider` del modal.
+
+**2. Preview con foto real al compartir un producto por WhatsApp.** El
+`og:image` de `index.html` es fijo (uno solo, genérico, para todo el
+sitio) — como STICKOS 3D es una SPA sin server-side rendering, y WhatsApp
+lee el HTML crudo sin ejecutar JS, compartir cualquier producto (vía
+`?p=<id>`) siempre mostraba la misma imagen genérica del home, nunca la
+foto real del producto.
+
+**Solución:** `scripts/generate-share-pages.mjs`, que corre como parte de
+`npm run build` (después de `vite build`, antes tenía solo `tsc --noEmit
+&& vite build`) y genera una página HTML estática por cada producto con
+precio confirmado: `dist/p/<id>.html`, con `og:title`/`og:description`/
+`og:image` PROPIOS de ese producto (primera foto de `imgs`). Un humano que
+abre el link cae ahí un instante y un `<script>` + `<meta
+http-equiv="refresh">` lo mandan enseguida a `/?p=<id>` (la app real, con
+el modal ya abierto) — los bots de preview (WhatsApp/Facebook/Instagram)
+no ejecutan JS, así que solo leen los meta tags de esa página y arman la
+tarjeta con la foto correcta. Llevan `<meta name="robots" content="noindex">`
+porque son solo para bots de preview — la versión indexable de verdad para
+Google sigue siendo `/?p=<id>` + los datos estructurados de `src/lib/seo.ts`
+(Google sí ejecuta JS); sin el noindex, Google podría indexar estas páginas
+finitas de redirect como contenido duplicado.
+
+`productShareUrl()` (en `src/lib/format.ts`) ahora recibe el producto
+completo (antes solo el `id`) y decide el link según tenga foto confirmada
+o no: con foto → `/p/<id>.html` (la página de preview); sin foto (todavía
+"PRÓXIMAMENTE") → el deep-link de siempre, `/?p=<id>` (no hay nada que
+previsualizar, esa página estática ni se genera para esos productos).
+
+El script bundlea `src/data/products.ts` a un `.mjs` temporal con esbuild
+(ya vive en `node_modules` vía Vite, no se sumó dependencia nueva) porque
+es TypeScript pero sin dependencias en tiempo de ejecución — más simple que
+sumar `tsx`/`ts-node` solo para este script puntual.
+
+**No hizo falta tocar `.github/workflows/deploy.yml`:** ya corre `npm run
+build` como paso único, así que las páginas nuevas se generan y suben a
+Pages sin cambios en el workflow.
