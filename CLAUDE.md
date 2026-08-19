@@ -433,3 +433,53 @@ solapamiento entre galería/info/cta, desktop sin cambios de layout
 **No se tocó:** paleta, tipografías, wordmark, ninguna copy, fórmula de
 precios, ni el modal en desktop (el bottom sheet es mobile-only, media
 query `max-width:720px`).
+
+---
+
+## 16. Swipe en el modal + preview con foto al compartir (19/08/2026)
+
+Dos pedidos puntuales de Martín después de confirmar el refresh de UX de la
+sección 15.
+
+**1. Swipe táctil en el modal de producto.** Ya existía en las cards del
+catálogo (`ProductCard.tsx` — `onTouchStart`/`onTouchEnd`, umbral de 40px),
+pero faltaba en el modal grande (`ProductModal.tsx`): ahí solo se podía
+navegar con las flechitas `‹›`. Se agregó el mismo criterio (mismo umbral,
+mismo signo de dirección) al `.tile-slider` del modal.
+
+**2. Preview con foto real al compartir un producto por WhatsApp.** El
+`og:image` de `index.html` es fijo (uno solo, genérico, para todo el
+sitio) — como STICKOS 3D es una SPA sin server-side rendering, y WhatsApp
+lee el HTML crudo sin ejecutar JS, compartir cualquier producto (vía
+`?p=<id>`) siempre mostraba la misma imagen genérica del home, nunca la
+foto real del producto.
+
+**Solución:** `scripts/generate-share-pages.mjs`, que corre como parte de
+`npm run build` (después de `vite build`, antes tenía solo `tsc --noEmit
+&& vite build`) y genera una página HTML estática por cada producto con
+precio confirmado: `dist/p/<id>.html`, con `og:title`/`og:description`/
+`og:image` PROPIOS de ese producto (primera foto de `imgs`). Un humano que
+abre el link cae ahí un instante y un `<script>` + `<meta
+http-equiv="refresh">` lo mandan enseguida a `/?p=<id>` (la app real, con
+el modal ya abierto) — los bots de preview (WhatsApp/Facebook/Instagram)
+no ejecutan JS, así que solo leen los meta tags de esa página y arman la
+tarjeta con la foto correcta. Llevan `<meta name="robots" content="noindex">`
+porque son solo para bots de preview — la versión indexable de verdad para
+Google sigue siendo `/?p=<id>` + los datos estructurados de `src/lib/seo.ts`
+(Google sí ejecuta JS); sin el noindex, Google podría indexar estas páginas
+finitas de redirect como contenido duplicado.
+
+`productShareUrl()` (en `src/lib/format.ts`) ahora recibe el producto
+completo (antes solo el `id`) y decide el link según tenga foto confirmada
+o no: con foto → `/p/<id>.html` (la página de preview); sin foto (todavía
+"PRÓXIMAMENTE") → el deep-link de siempre, `/?p=<id>` (no hay nada que
+previsualizar, esa página estática ni se genera para esos productos).
+
+El script bundlea `src/data/products.ts` a un `.mjs` temporal con esbuild
+(ya vive en `node_modules` vía Vite, no se sumó dependencia nueva) porque
+es TypeScript pero sin dependencias en tiempo de ejecución — más simple que
+sumar `tsx`/`ts-node` solo para este script puntual.
+
+**No hizo falta tocar `.github/workflows/deploy.yml`:** ya corre `npm run
+build` como paso único, así que las páginas nuevas se generan y suben a
+Pages sin cambios en el workflow.

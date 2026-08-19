@@ -101,7 +101,7 @@ export function ProductModal({ product: p, onClose }: Props) {
 
   function handleShare() {
     const priceLine = confirmedPrice ? ` (${fmt(p!.price)})` : '';
-    const msg = `Mirá ${p!.name}${priceLine} de STICKOS 3D 👇\n${productShareUrl(p!.id)}`;
+    const msg = `Mirá ${p!.name}${priceLine} de STICKOS 3D 👇\n${productShareUrl(p!)}`;
     trackCustomPixel('ShareProduct', { content_ids: [p!.id] });
     window.open(shareWa(msg), '_blank');
   }
