@@ -18,6 +18,7 @@ import { IgModal } from './components/IgModal';
 import { CartProvider, useCart } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { SoundProvider, useSoundContext } from './context/SoundContext';
+import { IgModalProvider } from './context/IgModalContext';
 import { usePreloader } from './hooks/usePreloader';
 import { CONFIG } from './data/config';
 
@@ -25,9 +26,11 @@ export default function App() {
   return (
     <SoundProvider>
       <ToastProvider>
-        <CartProvider>
-          <AppShell />
-        </CartProvider>
+        <IgModalProvider>
+          <CartProvider>
+            <AppShell />
+          </CartProvider>
+        </IgModalProvider>
       </ToastProvider>
     </SoundProvider>
   );

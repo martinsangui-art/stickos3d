@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import { cartReducer, cartSize, cartTotal, type CartState } from './cartReducer';
 import type { Color } from '../data/types';
+import { useIgModalContext } from './IgModalContext';
 
 interface CartContextValue {
   cart: CartState;
@@ -15,10 +16,14 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, dispatch] = useReducer(cartReducer, {} as CartState);
+  const { triggerFromCart } = useIgModalContext();
 
   const addToCart = (id: string, name: string, price: number, color: Color) => {
     const key = `${id}|${color.name}`;
     dispatch({ type: 'add', key, item: { name, price, color: color.name, colorHex: color.hex } });
+    // Agregar a la cola es uno de los dos gatillos del modal de Instagram
+    // (el otro es scroll pasado el 50%) — ver useIgModal.
+    triggerFromCart();
     return key;
   };
   const inc = (key: string) => dispatch({ type: 'inc', key });

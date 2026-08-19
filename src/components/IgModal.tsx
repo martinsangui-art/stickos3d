@@ -1,7 +1,7 @@
-import { useIgModal } from '../hooks/useIgModal';
+import { useIgModalContext } from '../context/IgModalContext';
 
 export function IgModal() {
-  const { show, hide } = useIgModal();
+  const { show, hide } = useIgModalContext();
 
   return (
     <div className={'ig-backdrop' + (show ? ' show' : '')} onClick={(e) => { if (e.target === e.currentTarget) hide(); }}>
