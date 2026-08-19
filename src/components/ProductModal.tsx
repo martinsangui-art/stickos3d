@@ -24,6 +24,7 @@ export function ProductModal({ product: p, onClose }: Props) {
   const [idx, setIdx] = useState(0);
   const [modalColor, setModalColor] = useState<Color | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const touchStartX = useRef(0);
 
   // Reset al abrir un producto nuevo.
   useEffect(() => {
@@ -44,6 +45,17 @@ export function ProductModal({ product: p, onClose }: Props) {
   function slide(dir: number) {
     if (slideCount < 2) return;
     setIdx((i) => (i + dir + slideCount) % slideCount);
+  }
+
+  // Swipe táctil — mismo umbral (40px) y criterio que ya usa ProductCard
+  // para su slider chico; acá faltaba, solo se podía navegar con las flechas.
+  function onTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (slideCount < 2) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) >= 40) setIdx((i) => (i + (dx < 0 ? 1 : -1) + slideCount) % slideCount);
   }
 
   useEffect(() => {
@@ -106,7 +118,7 @@ export function ProductModal({ product: p, onClose }: Props) {
           </svg>
         </button>
         <div className="product-modal-gallery">
-          <div className="tile-slider">
+          <div className="tile-slider" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <div className="tile-slider-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
               {imgs || p.video ? (
                 <>
