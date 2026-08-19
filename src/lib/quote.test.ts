@@ -4,11 +4,12 @@ import { computeQuote } from './quote';
 describe('computeQuote', () => {
   it('matches the default form selection (M / PLA / complejidad media / qty 1)', () => {
     // Mismos defaults que el <select> del cotizador: tamaño M, material PLA,
-    // complejidad "Media/no sé" (1.3), cantidad 1.
+    // complejidad "Media/no sé" (1.3), cantidad 1. Precios base recalculados
+    // con el costo de filamento actualizado (commit 884eb42 en main).
     const result = computeQuote({ size: 'M', mat: 'PLA', cx: 1.3, qty: 1 });
     expect(result.needsContact).toBe(false);
-    expect(result.low).toBe(17500);
-    expect(result.high).toBe(25700);
+    expect(result.low).toBe(22900);
+    expect(result.high).toBe(33600);
   });
 
   it('scales linearly with quantity', () => {

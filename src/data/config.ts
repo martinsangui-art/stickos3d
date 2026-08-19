@@ -34,13 +34,14 @@ export const PRINT_QUEUE: PrintJob[] = [
 
 /* ============================================================
    COTIZADOR — precios base por tamaño y multiplicadores.
-   size usa la MISMA fórmula que el catálogo (gramos × 33 × 4), con los
-   gramos típicos de cada tamaño: S≈30g, M≈120g, L≈280g, XL≈600g. Si cambia
-   el precio del filamento, hay que mover estos cuatro y los de PRODUCTS
-   juntos, o el cotizador y el catálogo empiezan a contradecirse.
+   size usa la MISMA fórmula que el catálogo ((gramos / 1000) × costo/kg ×
+   5.74), con los gramos típicos de cada tamaño: S≈30g, M≈120g, L≈280g,
+   XL≈600g. Si cambia el precio del filamento, hay que mover estos cuatro
+   y los de PRODUCTS juntos, o el cotizador y el catálogo empiezan a
+   contradecirse.
    ============================================================ */
 export const QUOTE = {
-  size: { S: 4000, M: 15800, L: 37000, XL: 79200 } as const,
+  size: { S: 5200, M: 20700, L: 48200, XL: 79200 } as const,
   mat: { PLA: 1, PLA_MATE: 1.35, PLA_SILK: 1.74, PETG: 1.25, TPU: 1.5 } as const,
   rangeLow: 0.85,
   rangeHigh: 1.25,

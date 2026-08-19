@@ -16,6 +16,8 @@ export interface Product {
   mpLink: string | null;
   status: StockStatusKey;
   imgs?: string[];
+  /** Ruta a un mp4 opcional, se suma a imgs como slide final (no lo reemplaza). */
+  video?: string;
 }
 
 export interface PrintJob {

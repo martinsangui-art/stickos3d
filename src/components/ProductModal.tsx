@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { COLORS } from '../data/config';
 import { hasConfirmedPrice } from '../data/products';
 import type { Color, Product } from '../data/types';
@@ -22,6 +22,7 @@ export function ProductModal({ product: p, onClose }: Props) {
   const { playBlip } = useSoundContext();
   const [idx, setIdx] = useState(0);
   const [modalColor, setModalColor] = useState<Color | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // Reset al abrir un producto nuevo.
   useEffect(() => {
@@ -36,6 +37,14 @@ export function ProductModal({ product: p, onClose }: Props) {
     };
   }, [p]);
 
+  const imgs = p?.imgs && p.imgs.length ? p.imgs : null;
+  const slideCount = (imgs?.length ?? 0) + (p?.video ? 1 : 0);
+
+  function slide(dir: number) {
+    if (slideCount < 2) return;
+    setIdx((i) => (i + dir + slideCount) % slideCount);
+  }
+
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
       if (!p) return;
@@ -46,24 +55,28 @@ export function ProductModal({ product: p, onClose }: Props) {
     document.addEventListener('keydown', onKeydown);
     return () => document.removeEventListener('keydown', onKeydown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [p]);
+  }, [p, slideCount]);
+
+  function handleClose() {
+    // Si había un video sonando en el modal, no lo dejamos corriendo de
+    // fondo al cerrar — mismo criterio que el corte del preview en hover.
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+    onClose();
+  }
 
   if (!p) {
     return <div className="product-modal" hidden />;
   }
 
-  const imgs = p.imgs && p.imgs.length ? p.imgs : null;
   const confirmedPrice = hasConfirmedPrice(p);
-
-  function slide(dir: number) {
-    if (!imgs || imgs.length < 2) return;
-    setIdx((i) => (i + dir + imgs.length) % imgs.length);
-  }
 
   function handleAdd() {
     if (!p) return;
     addToCart(p.id, p.name, p.price, modalColor ?? COLORS[0]);
-    onClose();
+    handleClose();
   }
 
   function handleQuoteWa() {
@@ -75,14 +88,19 @@ export function ProductModal({ product: p, onClose }: Props) {
 
   return (
     <div className="product-modal">
-      <div className="product-modal-backdrop" onClick={onClose}></div>
+      <div className="product-modal-backdrop" onClick={handleClose}></div>
       <div className="product-modal-content">
-        <button type="button" className="product-modal-close" onClick={onClose} aria-label="Cerrar">✕</button>
+        <button type="button" className="product-modal-close" onClick={handleClose} aria-label="Cerrar">✕</button>
         <div className="product-modal-gallery">
           <div className="tile-slider">
             <div className="tile-slider-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
-              {imgs ? (
-                imgs.map((src) => <img key={src} className="tile-photo" src={src} alt={p.name} />)
+              {imgs || p.video ? (
+                <>
+                  {imgs?.map((src) => <img key={src} className="tile-photo" src={src} alt={p.name} />)}
+                  {/* Video completo (con controles y sonido) — a diferencia del preview
+                      muted del hover en la card, acá se ve entero si el usuario quiere. */}
+                  {p.video && <video ref={videoRef} className="tile-photo" src={p.video} controls playsInline />}
+                </>
               ) : (
                 <div
                   className="obj"
@@ -95,7 +113,9 @@ export function ProductModal({ product: p, onClose }: Props) {
             <button type="button" className="tile-nav prev" aria-label="Foto anterior" onClick={() => slide(-1)}>‹</button>
             <button type="button" className="tile-nav next" aria-label="Foto siguiente" onClick={() => slide(1)}>›</button>
             <div className="tile-dots">
-              {imgs && imgs.length > 1 && imgs.map((_, i) => <span key={i} className={'tile-dot' + (i === idx ? ' active' : '')}></span>)}
+              {slideCount > 1 && Array.from({ length: slideCount }, (_, i) => (
+                <span key={i} className={'tile-dot' + (i === idx ? ' active' : '')}></span>
+              ))}
             </div>
           </div>
         </div>
@@ -132,7 +152,7 @@ export function ProductModal({ product: p, onClose }: Props) {
                 type="button"
                 className="btn btn-primary"
                 onClick={() => {
-                  onClose();
+                  handleClose();
                   document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >

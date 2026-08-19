@@ -452,6 +452,17 @@ section{padding:96px 0}
 .tile-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45)}
 .tile-dot.active{background:var(--accent)}
 @media(hover:none){.tile-nav{opacity:1}}
+/* Badge de "tiene video" — siempre visible (no depende de hover), igual
+   en mobile y desktop. Es solo señal: el preview real pasa en el ciclo
+   de hover (desktop) o adentro del modal (mobile/click). */
+.video-badge{
+  position:absolute;top:8px;right:8px;z-index:4;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(20,18,15,.55);
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.video-badge svg{width:11px;height:11px;fill:var(--text);margin-left:1px}
 /* Modal de detalle de producto — reusa .tile-slider/.tile-nav/.tile-dot
    de arriba adentro de .product-modal-gallery, solo en tamaño grande. */
 .product-modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
