@@ -7,11 +7,13 @@
    og:image genérica del home (la del <head> de index.html), nunca la foto
    real del producto compartido.
 
-   Un humano que abre el link cae acá un instante y se lo manda enseguida a
-   /?p=<id> (la app de verdad, con el modal del producto ya abierto) — el
-   <meta http-equiv="refresh"> cubre el caso sin JS, el <script> cubre el
-   caso normal (más rápido, sin el parpadeo del refresh). Los bots de
-   preview no ejecutan JS: solo leen los meta tags de este HTML y ya está.
+   Un humano que abre el link cae acá un instante y un <script> lo manda
+   enseguida a /?p=<id> (la app de verdad, con el modal del producto ya
+   abierto). A propósito SIN <meta http-equiv="refresh">: WhatsApp sí llega
+   a seguir ese redirect (a diferencia del crawler de Facebook, que lo
+   ignora) — y si lo sigue antes de leer los og: tags, termina leyendo los
+   genéricos de index.html en vez de los del producto. El <script> no lo
+   ejecuta ningún bot de preview, así que solo redirige a humanos.
 
    Se corre después de "vite build" (ver npm run build) — necesita dist/
    ya generado para escribir ahí adentro. */
@@ -74,9 +76,13 @@ try {
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${esc(imageUrl)}">
 <meta property="og:url" content="${pageUrl}">
-<meta property="og:type" content="product">
+<!-- "website", no "product": el tipo Product de Open Graph exige campos
+     obligatorios propios (product:price:amount, availability, etc.) que
+     esta página no manda — declarar "product" sin ellos puede hacer que el
+     parser de Meta rechace la tarjeta entera en vez de mostrarla con lo
+     que sí tiene. "website" no tiene esos requisitos. -->
+<meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta http-equiv="refresh" content="0; url=${redirectPath}">
 <script>location.replace(${JSON.stringify(redirectPath)});</script>
 </head>
 <body>
