@@ -11,6 +11,13 @@ import type { Product } from './types';
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 export const PRODUCTS: Product[] = [
+  // p22: laminado real 280 g en Hyper PLA a $35.000/kg = $9.800 de filamento,
+  // mas $10.000 de kit electrico con foco LED blanco calido -> costo real
+  // $19.800. La formula (costo x 5,74) daria $113.700. Se fijo $47.999 por
+  // posicionamiento dentro de la linea de lamparas (ONDA 44.999 / FUELLE
+  // 46.999 / KENDAI 47.999 / KETIL 48.200 / HUSO 49.999). Margen 2,42x:
+  // excepcion consciente y documentada, no error. No recalcular.
+  { id: 'p22', name: 'KENDAI', cat: 'Deco', price: 47999, g: 280, mat: 'PLA · pantalla y patas en dos colores a elección', desc: 'Aletas en espiral que filtran la luz entre las láminas, nunca de frente. 23 cm de alto por 16 de ancho. Es 100 % decorativa: arma un rincón, no ilumina para leer ni para trabajar. Llega lista para enchufar, con cable y foco LED blanco cálido. También se puede hacer colgante. Elegís la combinación de colores de pantalla y patas.', mpLink: null, status: 'pedido', imgs: ['/assets/products/kendai-1.jpg', '/assets/products/kendai-2.jpg', '/assets/products/kendai-3.jpg'] },
   // p21: laminado real 345 g (128 + 189 de piezas + 28 de purga del cambio de
   // color) en Hyper PLA a $35.000/kg = $12.075 de filamento, más $15.000 de
   // cable y foco LED cálido → costo real $27.075. La fórmula (costo × 5,74)

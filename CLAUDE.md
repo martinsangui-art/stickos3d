@@ -274,8 +274,9 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 | p19 | KETIL (lámpara) | Deco | $48.200 | listo |
 | p20 | FUELLE (lámpara) | Deco | $46.999 | pedido |
 | p21 | HUSO (lámpara) | Deco | $49.999 | pedido |
+| p22 | KENDAI (lámpara) | Deco | $47.999 | pedido |
 
-**Próximo id libre: p22**
+**Próximo id libre: p23**
 
 ---
 
