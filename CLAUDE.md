@@ -29,6 +29,11 @@
   (chat, no Code) → ese chat le arma un prompt listo para pegar → lo pega acá
   en Claude Code → Claude Code ejecuta y commitea → Martín confirma que
   quedó bien en el sitio en vivo.
+- **Todo PR se abre con suscripción a su actividad, siempre.** Confirmado
+  explícitamente (19/08/2026): apenas se abre un PR, suscribirse a sus
+  eventos (CI, comentarios de review) sin volver a preguntar cada vez —
+  es comportamiento por defecto del proyecto, no algo a confirmar PR por
+  PR.
 
 ---
 
@@ -49,17 +54,42 @@ impresora o capacidad limitada.
 
 ## 2. Stack técnico
 
-- **Sitio:** `index.html` single-file, sin frameworks ni build step.
+- **Sitio:** Vite + React + TypeScript (migrado desde un `index.html`
+  single-file el 19/08/2026 — mismo diseño/contenido, ahora componentizado
+  y con tests). Ver `README.md` para el flujo de desarrollo (`npm run dev`,
+  `npm test`, `npm run build`).
+- **Deploy:** GitHub Actions (`.github/workflows/deploy.yml`) build+publica
+  `dist/` a GitHub Pages en cada push a `main`. `ci.yml` corre lint+test+build
+  en cada PR.
 - **Hosting:** GitHub Pages, dominio `stickos3d.com.ar` (DNS/email por
-  Cloudflare).
+  Cloudflare). Source de Pages = **GitHub Actions** (no "Deploy from a
+  branch" — se cambió el 19/08/2026, ver sección 13).
 - **Email:** `hola@stickos3d.com.ar` vía Zoho.
 - **Formulario de contacto:** Formspree. Ojo: la respuesta exitosa es
   `{ok:true}`, NO `{success:true}` — si algo del form falla, revisar esto
   primero. (Se migró desde Web3Forms por fallas de entrega silenciosas:
   devolvía `success:true` pero no entregaba el mail.)
 - **Autoresponder:** EmailJS.
-- **Meta Pixel:** ID `4544907869062174`.
+- **Meta Pixel:** ID `4544907869062174`. Manda `PageView` (fijo, en
+  `index.html`) + eventos de conversión reales vía `src/lib/pixel.ts`:
+  `AddToCart` (agregar al carrito), `InitiateCheckout` (confirmar cola por
+  WhatsApp), `Lead` (enviar cotizador), `Contact` (form de contacto + botón
+  flotante de WhatsApp). Antes solo mandaba PageView — sin esto Meta no
+  puede optimizar campañas por conversión real ni armar públicos de
+  retargeting por intención de compra.
+- **SEO estructurado:** `LocalBusiness` + `Product` por cada producto con
+  precio confirmado, generado en runtime por `src/lib/seo.ts` desde
+  `PRODUCTS` — no vive más como bloque estático en `index.html` (eso se
+  desincronizaba: el `priceRange` quedó fijo en "$3.500 - $31.500" mucho
+  después de que el máximo real subiera a $78.000).
 - **Pagos:** Mercado Pago (link de pago por producto, campo `mpLink`).
+- **Build de tres pasos:** `npm run build` = `tsc --noEmit && vite build &&
+  node scripts/generate-share-pages.mjs`. Ese tercer paso genera una página
+  estática por producto con foto (`dist/p/<id>.html`) con sus propios
+  `og:` tags, para que compartir un producto muestre SU foto y no la
+  genérica del home — ver sección 16. Si se agrega otro paso de build, va
+  ahí; `deploy.yml` corre `npm run build` como paso único y no hay que
+  tocarlo.
 
 ---
 
@@ -81,12 +111,27 @@ impresora o capacidad limitada.
   - Marca/institucional → fondo PAPER + wedge ink + hachure.
 - **Wordmark:** "STICKOS" en ink/paper + "3D" en orange, con split-shift
   (mitad inferior corrida ~0.108em a la derecha) cuando se hace en CSS.
+- **Dirección visual: Ruta A "Taller" (templada)**, elegida el 19/08/2026
+  entre tres rutas presentadas como mockups (ver sección 18). La web se
+  comporta como una máquina que opera a la vista: mono + reglas finas +
+  información densa + retícula de plano técnico, con un rastro cálido tenue
+  para que no lea helada.
+- **Esquina recta en todo el sitio** (`--radius:0`). Es regla de marca, no
+  preferencia estética: la pieza impresa tiene aristas. **Dos excepciones
+  conservadas a propósito**, y solo dos: el borde superior redondeado de los
+  bottom sheets de mobile (modal de producto y carrito), donde la curva ES
+  la señal de "panel que sube". Si aparece un `border-radius` nuevo fuera de
+  esos dos casos, está mal.
+- **Las tipografías NO cambiaron con el rediseño.** Siguen siendo las tres
+  de arriba (Space Grotesk / Inter / IBM Plex Mono). En los mockups de las
+  rutas B y C se probó una serif editorial (Newsreader) para texto corrido,
+  pero esas rutas no se eligieron — no está en el sitio.
 
 ---
 
-## 4. Schema del array `PRODUCTS` (en `index.html`)
+## 4. Schema del array `PRODUCTS` (en `src/data/products.ts`)
 
-```js
+```ts
 {
   id:      "pN",         // string, correlativo. Ver "próximo id libre" abajo.
   name:    "NOMBRE",      // string
@@ -104,10 +149,15 @@ impresora o capacidad limitada.
                                        // como referencia de tono).
   mpLink:  null,          // placeholder, no se usa activamente todavía
   status:  "listo",       // ver STOCK_STATUS, sección 6
-  imgs:    ["assets/products/slug-1.jpg", "assets/products/slug-2.jpg"]
+  imgs:    ["/assets/products/slug-1.jpg", "/assets/products/slug-2.jpg"],
            // OMITIR este campo (o dejar imgs:[]) = el producto muestra
            // "PRÓXIMAMENTE" en vez de precio. La función hasConfirmedPrice(p)
-           // chequea imgs.length > 0 — es el mecanismo real, no un flag aparte.
+           // (en el mismo archivo) chequea imgs.length > 0 — es el mecanismo
+           // real, no un flag aparte. Ojo con el "/" inicial: los archivos
+           // viven en public/assets/products/, Vite los sirve desde la raíz.
+  video:   "/assets/products/slug.mp4"  // opcional, se suma a imgs sin
+           // reemplazarlo — badge de video en la card + rotación automática
+           // por hover (desktop) + slide final con sonido en el modal.
 }
 ```
 
@@ -156,6 +206,7 @@ Piso mínimo: $3.500
 - **Costo de filamento (actualizado agosto 2026):**
   - PLA común: $30.000/kg
   - Especiales (silk, mate, madera, etc.): $39.000/kg
+  - Hyper PLA: $35.000/kg (categoría propia, entre el común y los especiales)
   - **Los precios ya publicados en el catálogo NO se recalculan
     retroactivamente** con el costo nuevo — aplica solo a piezas nuevas de
     acá en adelante. Repricear algo viejo es decisión explícita de Martín,
@@ -172,7 +223,9 @@ Piso mínimo: $3.500
 
 ## 8. Convención de nombres de archivos de imágenes
 
-`assets/products/{slug-del-producto}-{n}.jpg`, empezando en 1. Ejemplo:
+`public/assets/products/{slug-del-producto}-{n}.jpg`, empezando en 1
+(referenciado en el código como `/assets/products/...`, con `/` inicial —
+Vite sirve todo lo de `public/` desde la raíz). Ejemplo:
 `ketil-1.jpg`, `ketil-2.jpg`, `ketil-3.jpg`. Slug en minúsculas, sin tildes
 ni espacios (guion medio como separador).
 
@@ -204,7 +257,7 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 | p2 | Soporte de celular ajustable | Gadgets | $15.800 | (pasado a PRÓXIMAMENTE) |
 | p3 | Maceta Autorregante | Deco | $20.000 | listo |
 | p4 | Portarretrato personalizado | Regalos | $7.900 | extruyendo |
-| p5 | Lámpara de luna (con luz LED) | Deco | $20.500 | pedido |
+| p5 | Porta líquido difusor de aromas | Deco | $15.000 | pedido |
 | p6 | Rompecabezas de píxeles personalizado | Juguetes | $9.200 | listo |
 | p7 | Gancho organizador de cables x6 | Hogar | $5.000 | listo |
 | p8 | Llavero personalizado con nombre | Regalos | $3.500 | extruyendo |
@@ -220,8 +273,9 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 | p18 | MIXTURE | Juguetes | $12.000 | pedido |
 | p19 | KETIL (lámpara) | Deco | $48.200 | listo |
 | p20 | FUELLE (lámpara) | Deco | $78.000 | pedido |
+| p21 | HUSO (lámpara) | Deco | $49.999 | pedido |
 
-**Próximo id libre: p21**
+**Próximo id libre: p22**
 
 ---
 
@@ -247,3 +301,372 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 - Cuenta de Instagram vieja `@stickos3d` quedó inaccesible — la cuenta
   activa es `@stickos3de` (con "e" al final). Verificar cuál está hardcoded
   antes de asumir.
+- **Un workflow de GitHub Actions recién agregado no corre en el push que lo
+  agrega.** Para el evento `pull_request`, GitHub sí lee el workflow desde la
+  rama del PR (no hace falta que esté en `main` primero, a pesar de lo que
+  parece al principio) — pero necesita un push *posterior* a que el archivo
+  ya exista en la rama para dispararse. El push que agrega `ci.yml` no
+  cuenta; el siguiente sí. `workflow_dispatch` (disparo manual) sí requiere
+  que el archivo esté en la rama default del repo — ahí si da 404 al
+  intentar dispararlo, es señal de que el workflow todavía no llegó a `main`.
+- **Al cambiar Settings → Pages → Source de "Deploy from a branch" a
+  "GitHub Actions"**, el dominio propio (`stickos3d.com.ar`) puede tirar el
+  404 genérico de GitHub ("There isn't a GitHub Pages site here") durante
+  15-20 minutos aunque el campo "Custom domain" en Settings se vea
+  configurado sin errores y el deploy haya corrido en verde — es demora de
+  propagación del lado de GitHub, no un problema de DNS ni de config. La
+  URL default (`usuario.github.io/repo`) sirve para confirmar que el deploy
+  en sí funciona mientras se espera. Pasó una vez, se resolvió solo (con un
+  redeploy manual de por medio, que puede o no haber acelerado algo).
+
+---
+
+## 13. Migración a Vite + React (19/08/2026)
+
+El sitio pasó de un `index.html` single-file (2251 líneas, sin build ni
+dependencias) a Vite + React + TypeScript, en PR #1
+(`claude/ecc-selective-install-rj4oau` → `main`). Motivo: alinear el
+proyecto con el resto del stack de Martín (JAM7, GestionComercialMCR, ambos
+Vite+React+Firebase) y poder testear la lógica de negocio en vez de
+confiar solo en verificación manual.
+
+**Qué NO cambió** (a propósito): diseño, copy, precios, integraciones
+(WhatsApp, Mercado Pago, Meta Pixel, Formspree, EmailJS), todas las
+animaciones (preloader FDM, scroll-reveal, header flotante, sonido del
+taller vía Web Audio API). El CSS se movió a `src/styles/global.css` sin
+tocar una sola regla — mismos selectores que usaba el HTML/JS original.
+
+**Qué sí cambió, estructuralmente:**
+- `PRODUCTS`/`CONFIG`/`QUOTE`/`PRINT_QUEUE`: de `index.html` a
+  `src/data/*.ts` (ver secciones 2 y 4 de este archivo).
+- Lógica de negocio extraída como funciones puras testeables:
+  `src/lib/quote.ts` (`computeQuote`), `src/context/cartReducer.ts`
+  (reglas del carrito). 17 tests unitarios cubren ambas.
+- Carrito, sonido, modal de Instagram: pasaron de variables globales/DOM a
+  React Context (`src/context/`) — mismo comportamiento, sin `window.__x`.
+- Fotos/audio/favicon/CNAME/robots.txt/sitemap.xml: de la raíz del repo a
+  `public/` (Vite los sirve igual, sin reescritura de ruta salvo el `/`
+  inicial en cada referencia — ver sección 8).
+- CI/CD nuevo: `.github/workflows/ci.yml` (lint+test+build en cada PR) y
+  `deploy.yml` (build+publica `dist/` a Pages en cada push a `main`).
+
+**Riesgo real durante la migración, ya resuelto:** el trabajo de migrar
+tardó lo suficiente como para que `main` avanzara 17 commits por separado
+(4 productos nuevos, cambios de precio, la función de video+hover en las
+cards). Se detectó al mergear (conflictos de archivo en `index.html` y en
+`assets/products/`) y se re-portó todo a mano contra el estado más
+reciente de `main` antes de mergear — no se perdió nada, pero es la razón
+por la que conviene avisar antes de arrancar una migración larga si va a
+haber cambios de contenido en paralelo.
+
+**Para agregar productos/tocar precios de acá en adelante:** todo sigue
+igual que antes en términos de reglas de negocio (secciones 0, 4, 7) — lo
+único que cambia es que el array vive en `src/data/products.ts` en vez de
+adentro de `index.html`, y hay que correr `npm run build` (o esperar el CI)
+para ver el resultado, ya no alcanza con abrir el HTML directo en el
+navegador. Ver `README.md` para el flujo de desarrollo completo.
+
+---
+
+## 14. Marketing/SEO — primera tanda (19/08/2026)
+
+Auditoría + mejoras con sombrero de diseño/marketing, priorizadas por
+impacto/esfuerzo. Implementado:
+
+- **Eventos de conversión de Meta Pixel** (ver sección 2) — antes solo
+  `PageView`. Sin esto no se puede optimizar Ads por conversión real.
+- **SEO estructurado dinámico** (`Product` + `LocalBusiness`, ver sección 2)
+  — habilita rich snippets con precio en Google para los 10 productos con
+  foto real cargada.
+- **Botón "Compartir" por WhatsApp en el modal de producto**, con deep-link
+  (`?p=<id>` en la URL abre ese producto directo al cargar). Capitaliza el
+  boca en boca que ya existe por WhatsApp — antes un link compartido caía
+  siempre en la home, ahora cae en el producto puntual.
+- `sitemap.xml` con `lastmod` actualizado.
+
+**Pendiente, necesita contenido real de Martín (no se fabrica):**
+sección de reseñas/testimonios — el sitio no tiene ninguna prueba social
+todavía. Necesita 3-5 reseñas reales (capturas de Instagram/WhatsApp,
+lo que haya) antes de construir esa sección — nunca inventar testimonios,
+es publicidad engañosa.
+
+**Ideas que salieron en la auditoría pero no entraron en esta tanda**
+(no rechazadas por Martín, solo no priorizadas — vale la pena volver a
+proponerlas): Google Analytics 4 (hoy solo hay Meta Pixel, sin visibilidad
+de tráfico orgánico separado del de Ads); newsletter/email capture.
+
+---
+
+## 15. Refresh de UX del modal de producto (19/08/2026)
+
+Segunda ronda de revisión de diseño (después de la tanda de marketing/SEO
+de la sección 14). Martín pidió específicamente "algo para rever en tema
+de diseño" con gorro de marketing/diseño web, y después confirmó hacer un
+refresh 100% de UX/interacción basado en tendencias 2026 **sin tocar la
+identidad de marca** — la estética "tactile/handmade" que ya tiene STICKOS
+3D está validada como tendencia vigente (no hacía falta rediseñar el look,
+solo la interacción).
+
+**Cambios implementados** (`src/components/ProductModal.tsx` +
+`src/styles/global.css`):
+
+1. **Bottom sheet en mobile en vez de modal centrado.** El modal de
+   producto ahora se ancla abajo (`align-items:flex-end`) con animación de
+   entrada (`sheetUp`), siguiendo el patrón que en investigación de UX
+   (NN/g) rinde mejor que el modal centrado tradicional en mobile — se
+   siente como una extensión natural de la pantalla en vez de una
+   interrupción.
+
+2. **"A la cola" siempre visible sin scrollear.** Antes había que
+   scrollear DENTRO del modal para encontrar el botón de compra — nadie lo
+   descubre solo. Ahora la franja de precio + "A la cola" / "Cotizar por
+   WhatsApp" queda fija abajo del sheet, y la descripción/specs scrollean
+   en su propio contenedor interno angosto.
+
+   **Bug real encontrado y corregido en el camino:** el bloque
+   `.product-modal-cta` vivía anidado ADENTRO de `.product-modal-info` en
+   el JSX (no como hermano), mientras el CSS (primero `position:sticky`,
+   después CSS Grid con `grid-template-areas`, después flexbox) siempre
+   asumió que eran hermanos dentro de `.product-modal-content`. Tres
+   enfoques de CSS distintos fallaron con el mismo síntoma exacto (CTA
+   solapado y empujado fuera del viewport) porque el problema nunca fue el
+   CSS — era la estructura del DOM. Se resolvió moviendo
+   `.product-modal-cta` a hermano de `.product-modal-info`, y ahí sí
+   `display:flex;flex-direction:column` con `.product-modal-info{flex:1;
+   min-height:0;overflow-y:auto}` funcionó a la primera. **Aprendizaje:**
+   si varios approaches de CSS distintos fallan con números idénticos,
+   sospechar de la estructura del DOM antes que seguir iterando CSS.
+
+3. **"Compartir" bajó de jerarquía visual.** Antes era un botón de texto
+   con el mismo peso que "A la cola"/"Cotizar por WhatsApp" (competía por
+   atención con las acciones que facturan). Ahora es un ícono circular
+   chico al lado del botón de cerrar (mismo tratamiento visual que
+   `.product-modal-close`) — sigue disponible pero no compite.
+
+4. **Placeholder del textarea del cotizador ya no se corta en mobile.**
+   El placeholder de ejemplo tiene 3 líneas; con el `min-height:80px`
+   genérico de todos los `textarea`, la última línea quedaba cortada.
+   Se agregó `#cfDesc{min-height:108px}` solo para esa caja puntual (el
+   textarea del form de contacto entra bien con el genérico, no se tocó).
+
+**Verificado con Playwright** (mobile 390×844 y desktop 1400×900):
+"A la cola" visible sin scroll en el primer render del modal, sin
+solapamiento entre galería/info/cta, desktop sin cambios de layout
+(sigue siendo grid centrado, no hereda el bottom sheet).
+
+**No se tocó:** paleta, tipografías, wordmark, ninguna copy, fórmula de
+precios, ni el modal en desktop (el bottom sheet es mobile-only, media
+query `max-width:720px`).
+
+---
+
+## 16. Swipe en el modal + preview con foto al compartir (19/08/2026)
+
+Dos pedidos puntuales de Martín después de confirmar el refresh de UX de la
+sección 15.
+
+**1. Swipe táctil en el modal de producto.** Ya existía en las cards del
+catálogo (`ProductCard.tsx` — `onTouchStart`/`onTouchEnd`, umbral de 40px),
+pero faltaba en el modal grande (`ProductModal.tsx`): ahí solo se podía
+navegar con las flechitas `‹›`. Se agregó el mismo criterio (mismo umbral,
+mismo signo de dirección) al `.tile-slider` del modal.
+
+**2. Preview con foto real al compartir un producto por WhatsApp.** El
+`og:image` de `index.html` es fijo (uno solo, genérico, para todo el
+sitio) — como STICKOS 3D es una SPA sin server-side rendering, y WhatsApp
+lee el HTML crudo sin ejecutar JS, compartir cualquier producto (vía
+`?p=<id>`) siempre mostraba la misma imagen genérica del home, nunca la
+foto real del producto.
+
+**Solución:** `scripts/generate-share-pages.mjs`, que corre como parte de
+`npm run build` (después de `vite build`, antes tenía solo `tsc --noEmit
+&& vite build`) y genera una página HTML estática por cada producto con
+precio confirmado: `dist/p/<id>.html`, con `og:title`/`og:description`/
+`og:image` PROPIOS de ese producto (primera foto de `imgs`). Un humano que
+abre el link cae ahí un instante y un `<script>` + `<meta
+http-equiv="refresh">` lo mandan enseguida a `/?p=<id>` (la app real, con
+el modal ya abierto) — los bots de preview (WhatsApp/Facebook/Instagram)
+no ejecutan JS, así que solo leen los meta tags de esa página y arman la
+tarjeta con la foto correcta. Llevan `<meta name="robots" content="noindex">`
+porque son solo para bots de preview — la versión indexable de verdad para
+Google sigue siendo `/?p=<id>` + los datos estructurados de `src/lib/seo.ts`
+(Google sí ejecuta JS); sin el noindex, Google podría indexar estas páginas
+finitas de redirect como contenido duplicado.
+
+`productShareUrl()` (en `src/lib/format.ts`) ahora recibe el producto
+completo (antes solo el `id`) y decide el link según tenga foto confirmada
+o no: con foto → `/p/<id>.html` (la página de preview); sin foto (todavía
+"PRÓXIMAMENTE") → el deep-link de siempre, `/?p=<id>` (no hay nada que
+previsualizar, esa página estática ni se genera para esos productos).
+
+El script bundlea `src/data/products.ts` a un `.mjs` temporal con esbuild
+(ya vive en `node_modules` vía Vite, no se sumó dependencia nueva) porque
+es TypeScript pero sin dependencias en tiempo de ejecución — más simple que
+sumar `tsx`/`ts-node` solo para este script puntual.
+
+**No hizo falta tocar `.github/workflows/deploy.yml`:** ya corre `npm run
+build` como paso único, así que las páginas nuevas se generan y suben a
+Pages sin cambios en el workflow.
+
+**Nota sobre el preview de WhatsApp (sin resolver del todo):** después de
+desplegado, Martín probó compartir un producto y seguía sin aparecer la
+tarjeta de preview, incluso con URLs nunca antes vistas (para descartar
+caché) y con Bot Fight Mode de Cloudflare apagado. Confirmamos con
+metatags.io que los meta tags se leen perfecto desde afuera — el HTML está
+bien. Se corrigieron dos sospechosos reales del lado del código
+(`og:type="product"` sin los campos que ese schema exige → cambiado a
+`"website"`; se sacó el `<meta http-equiv="refresh">` por si WhatsApp lo
+seguía antes de leer los tags) en un PR aparte, pero el problema persistió
+incluso después de ese fix y de un redeploy confirmado. Martín decidió no
+seguir invirtiendo tiempo en esto por ahora ("si figura como ok en el
+deploy ya está") — quedó pendiente de retomar si en algún momento alguien
+prueba compartir desde otro celular (para descartar que sea un ajuste
+puntual de su WhatsApp/dispositivo, no del sitio).
+
+---
+
+## 17. Bottom sheet también en el carrito (19/08/2026)
+
+Mismo día, continuación del refresh de UX. Con el modal de producto ya
+convertido a bottom sheet en mobile (sección 15), quedó una inconsistencia
+real: el carrito (`CartDrawer.tsx`) seguía abriéndose como panel lateral
+que ocupa toda la pantalla — dos overlays con comportamiento distinto para
+el mismo tipo de acción en mobile.
+
+**Arreglado:** en mobile (`max-width:720px`), `.drawer` pasa de anclarse a
+la derecha (`translateX`) a anclarse abajo (`translateY`), con esquinas
+superiores redondeadas — mismo lenguaje visual que el modal. No hizo falta
+tocar el JSX: `CartDrawer.tsx` ya estaba armado en tres franjas hermanas
+(`.drawer-head` fijo / `.drawer-items` scrolleable / `.drawer-foot` fijo),
+la misma estructura que tuvimos que corregir a mano en el modal de
+producto (sección 15) — acá ya estaba bien desde el principio, solo hubo
+que cambiar el eje del panel.
+
+**Segundo fix, mismo commit lógico separado:** el carrito vacío tiraba un
+`alert()` nativo del navegador al tocar "Confirmar cola" — la única
+notificación de todo el sitio que no pasaba por el sistema de Toast propio
+(`ToastContext`/`useToast`, el mismo que muestra "agregado a la cola ✓").
+Ahora usa `notify()` como el resto.
+
+Verificado con Playwright: carrito vacío muestra el toast (sin dialog
+nativo), con items el bottom sheet queda con headfoot fijos y los items
+scrolleando en su propio contenedor sin exceder el viewport, desktop sin
+cambios (sigue siendo panel lateral completo).
+
+---
+
+## 18. Rediseño visual — Ruta A "Taller" (19/08/2026)
+
+Martín pidió repensar el sitio con sombrero de diseñador ("me gusta pero
+siento que es una web más, no una web hermosa y moderna"), sin tocar paleta
+ni logo. Se presentaron **tres rutas** como mockups para que eligiera
+viendo, no describiendo: **A · Taller** (la web como máquina), **B ·
+Galería** (fondo claro, foto enorme) y **C · Editorial** (revista).
+Eligió **Ruta A, en versión "templada"**.
+
+**Aprendizaje de proceso:** la primera entrega fue UNA sola dirección con
+pedido de aprobación. Estuvo mal: cuando el cliente no sabe todavía qué
+quiere, corresponde mostrar rutas contrastantes. "Elegí vos la dirección"
+no es lo mismo que saltearse la comparación.
+
+**Qué define la Ruta A (implementado):**
+- **Esquina recta en todo el sitio** (`--radius:0`). La pieza impresa tiene
+  aristas; el redondeo genérico era lo que hacía leer el sitio como
+  plantilla. Únicas excepciones conservadas a propósito: los dos bottom
+  sheets de mobile (modal de producto y carrito), donde la esquina
+  redondeada superior ES la señal de "panel que sube" (ver secciones 15 y 17).
+- **Header al ras** en vez de píldora flotante redondeada, con reglas
+  verticales entre los links del nav. Arriba, una **barra de estado** con
+  dato real (ubicación, materiales, alcance de envío, taller activo) que
+  vive FUERA del `<header>` sticky a propósito: sumarle 32px al sticky
+  comía viewport en mobile.
+- **Hero a dos columnas separadas por una regla**: a la izquierda el
+  argumento con las specs como **tabla de ficha técnica** (clave/valor) en
+  vez de cuatro bloques sueltos; a la derecha un panel con **el trabajo que
+  está corriendo ahora** + la pieza destacada. Fondo: retícula de plano
+  técnico (`--plot`) en vez del degradado radial.
+- **El hero NO duplica la cola de impresión completa**: muestra solo el
+  trabajo en curso; el listado entero sigue viviendo en la sección "El
+  taller". La pieza destacada y el trabajo en curso salen de `PRODUCTS` y
+  `PRINT_QUEUE`, no hardcodeados — si Martín reordena la grilla o actualiza
+  la cola, el hero acompaña solo.
+- **Cards del catálogo como índice de piezas**: nº de índice derivado del
+  id real (`p17` → `N° 17`, la misma referencia del link para compartir) +
+  línea de ficha con material y gramaje.
+- **Botones mono, en mayúsculas, rectos.**
+
+**"Templado" (no full frío):** se conservó un rastro cálido muy tenue en el
+hero (radial naranja al 7% sobre la retícula) y se mantuvo el aire entre
+secciones. La Ruta A pura leía demasiado industrial para alguien que entra
+a comprar un regalo — ese era el riesgo declarado al presentarla.
+
+**No se tocó ni una línea de copy** — decisión explícita: el copy es de
+Martín (sección 0), así que "templar" se hizo con aire, escala y jerarquía,
+no reescribiendo textos.
+
+**Bugs reales encontrados y corregidos durante la implementación:**
+- El nº de índice sobre la foto **chocaba con el badge de estado** (misma
+  esquina). Se movió al cuerpo de la ficha, junto a la categoría.
+- En mobile el header **se desbordaba**: wordmark + menú + Instagram +
+  sonido + Cola no entran en 390px. Instagram salió de la barra (sigue en
+  el menú desplegable y en el footer).
+- El badge de estado **se volvía ilegible sobre las fotos claras** de las
+  lámparas (texto gris sin fondo propio). Se le agregó fondo con blur.
+
+**Pendiente de Martín:** va a comprar/imprimir un photo booth para
+estandarizar las fotos. Recomendación dada: **fondo gris medio neutro o
+negro mate, NO blanco puro** (el sitio va sobre INK; los fondos blancos
+quedan como rectángulos brillantes que pelean con todo), alto útil de
+70-80cm (la pieza más grande conocida es KETIL, 270mm), y sobre todo
+**repetir siempre el mismo setup** — misma distancia, altura de cámara y
+encuadre. La consistencia de fotografía es el techo real del sitio: ninguna
+decisión de CSS la reemplaza.
+
+---
+
+## 19. Estado al cierre del 19/08/2026 — qué quedó y qué sigue
+
+Día largo: el sitio pasó de un `index.html` estático a Vite+React, y de ahí
+a un rediseño visual completo. Seis PRs, todos mergeados y desplegados.
+
+**Lo que está en producción hoy:**
+
+| # | Qué | Sección |
+|---|---|---|
+| PR #1 | Migración a Vite + React + TypeScript, CI/CD, tests | 13 |
+| PR #2 | Meta Pixel de conversión, SEO estructurado dinámico, compartir por WhatsApp | 14 |
+| PR #3 | Bottom sheet del modal, CTA siempre visible, swipe, preview con foto al compartir | 15 y 16 |
+| PR #4 | Intento de fix del preview de WhatsApp (`og:type`, redirect) | 16 |
+| PR #5 | Bottom sheet del carrito, toast en vez de `alert()` | 17 |
+| PR #6 | Rediseño visual — Ruta A "Taller" (templada) | 18 |
+
+**Abierto, en orden de impacto real:**
+
+1. **Fotografía de producto (Martín).** Es el techo del sitio, no el CSS.
+   Va a comprar/imprimir un photo booth. Specs recomendadas y el porqué,
+   en la sección 18. Cuando lo tenga, queda pendiente pasarle una plantilla
+   de encuadre fija para que las 20 fotos salgan intercambiables.
+2. **Reseñas / prueba social.** El sitio no tiene ninguna. Necesita 3-5
+   reseñas reales de Martín (capturas de Instagram/WhatsApp) antes de
+   construir la sección. **Nunca inventar testimonios** — ver sección 14.
+3. **Catálogo tabular en desktop (Ruta A).** El mockup de la Ruta A tenía
+   el catálogo como índice de piezas en TABLA (columnas: N°, foto chica,
+   pieza, material, peso, estado, precio). Se implementó con cards
+   técnicas en su lugar, porque una tabla no funciona en mobile y la mayor
+   parte del tráfico llega de Instagram. Queda disponible como mejora de
+   desktop (tabla en ancho grande, cards en mobile) si Martín la quiere —
+   es lo más distintivo que quedó sin construir de esa ruta.
+4. **Preview de WhatsApp al compartir.** Sin resolver. Los meta tags se
+   leen bien desde afuera (verificado con metatags.io), Bot Fight Mode de
+   Cloudflare está apagado, y con URLs nunca vistas tampoco aparece.
+   Martín decidió no seguir invirtiendo tiempo. Retomar si alguien prueba
+   compartir desde otro celular — ver sección 16.
+5. **Google Analytics 4** y **captura de emails / newsletter.** Propuestos
+   en la auditoría de marketing, no priorizados. No rechazados: vale
+   volver a proponerlos (sección 14).
+
+**Cómo verificar cambios visuales de acá en adelante:** el flujo que
+funcionó todo el día fue `npm run build` + `vite preview` + Playwright
+midiendo geometría real (`getBoundingClientRect`, desborde horizontal,
+solapamientos) en 1440px y 390/360px, ANTES de commitear. Tres bugs reales
+de la Ruta A aparecieron así y ninguno se veía en la lectura del código.
