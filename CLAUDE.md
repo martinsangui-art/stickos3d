@@ -272,7 +272,7 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 | p17 | ONDA (lámpara) | Deco | $44.999 | pedido |
 | p18 | MIXTURE | Juguetes | $12.000 | pedido |
 | p19 | KETIL (lámpara) | Deco | $48.200 | listo |
-| p20 | FUELLE (lámpara) | Deco | $78.000 | pedido |
+| p20 | FUELLE (lámpara) | Deco | $46.999 | pedido |
 | p21 | HUSO (lámpara) | Deco | $49.999 | pedido |
 
 **Próximo id libre: p22**
