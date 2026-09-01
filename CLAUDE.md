@@ -206,6 +206,7 @@ Piso mínimo: $3.500
 - **Costo de filamento (actualizado agosto 2026):**
   - PLA común: $30.000/kg
   - Especiales (silk, mate, madera, etc.): $39.000/kg
+  - Hyper PLA: $35.000/kg (categoría propia, entre el común y los especiales)
   - **Los precios ya publicados en el catálogo NO se recalculan
     retroactivamente** con el costo nuevo — aplica solo a piezas nuevas de
     acá en adelante. Repricear algo viejo es decisión explícita de Martín,
@@ -272,8 +273,9 @@ asumir que está actualizado; esta tabla puede desactualizarse)
 | p18 | MIXTURE | Juguetes | $12.000 | pedido |
 | p19 | KETIL (lámpara) | Deco | $48.200 | listo |
 | p20 | FUELLE (lámpara) | Deco | $78.000 | pedido |
+| p21 | HUSO (lámpara) | Deco | $49.999 | pedido |
 
-**Próximo id libre: p21**
+**Próximo id libre: p22**
 
 ---
 

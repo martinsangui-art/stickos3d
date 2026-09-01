@@ -11,6 +11,13 @@ import type { Product } from './types';
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 export const PRODUCTS: Product[] = [
+  // p21: laminado real 345 g (128 + 189 de piezas + 28 de purga del cambio de
+  // color) en Hyper PLA a $35.000/kg = $12.075 de filamento, más $15.000 de
+  // cable y foco LED cálido → costo real $27.075. La fórmula (costo × 5,74)
+  // daría $155.400. Se fijó $49.999 como PRECIO DE LANZAMIENTO por decisión de
+  // negocio (margen ~1,85x): excepción consciente y documentada, no error.
+  // No recalcular ni "corregir" hacia la fórmula.
+  { id: 'p21', name: 'HUSO', cat: 'Deco', price: 49999, g: 345, mat: 'PLA · dos colores a elección', desc: 'Pantalla torcida sobre sí misma, con una trama fina que deja pasar la luz sin mostrar la bombita. Luz baja y cálida para una mesa, un estante o el piso al lado del sillón. Llega lista para enchufar, con cable y foco LED cálido. Elegís la combinación de colores de pantalla y base. Precio de lanzamiento por las primeras unidades.', mpLink: null, status: 'pedido', imgs: ['/assets/products/huso-1.jpg', '/assets/products/huso-2.jpg', '/assets/products/huso-3.jpg'] },
   { id: 'p17', name: 'ONDA', cat: 'Deco', price: 44999, g: 185, mat: 'PLA · blanco', desc: 'Lámpara de mesa con pantalla plisada, impresa en 3D. Luz cálida y continua que se filtra a través de la trama radial de la pantalla. Base y cuerpo en dos diámetros escalonados. Medidas y colores personalizables a pedido.', mpLink: null, status: 'pedido', imgs: ['/assets/products/onda-1.jpg', '/assets/products/onda-2.jpg', '/assets/products/onda-3.jpg'] },
   { id: 'p19', name: 'KETIL', cat: 'Deco', price: 48200, g: 365, mat: 'PLA · Base + Cap + Pantalla', desc: 'Pantalla acanalada que envuelve la luz sin dejar una sola costura visible. Base E26/E27 — le entra cualquier bombita que ya tengas. 270mm de alto, 230mm de diámetro. Impresa capa por capa, a tu medida.', mpLink: null, status: 'listo', imgs: ['/assets/products/ketil-1.jpg', '/assets/products/ketil-2.jpg', '/assets/products/ketil-3.jpg'] },
   { id: 'p1', name: 'Organizador de escritorio modular', cat: 'Hogar', price: 29700, g: 225, mat: 'PLA · varios colores', desc: 'Ordená lápices, cargadores y clips en un solo módulo apilable. Se ensambla sin herramientas y se adapta al espacio que tengas en el escritorio.', mpLink: null, status: 'listo' }, // [estimado +25%]
