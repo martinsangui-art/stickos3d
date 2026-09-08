@@ -106,6 +106,7 @@ function productListSchema() {
         name: p.name,
         description: p.desc,
         image: p.imgs!.map((src) => `${SITE_URL}${src.replace(/^\//, '')}`),
+        url: `${SITE_URL}p/${p.id}.html`,
         sku: p.id,
         category: p.cat,
         brand: { '@type': 'Brand', name: 'STICKOS 3D' },
