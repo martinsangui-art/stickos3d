@@ -16,7 +16,7 @@ export function Footer() {
               </span>
             </a>
             <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '32ch' }}>Impresión 3D en Bahía Blanca. Diseño propio, hecho al momento.</p>
-            <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '32ch', marginTop: '8px' }}>Envío a todo el país, según destino · Devoluciones dentro de 10 días por defecto de fabricación.</p>
+            <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '38ch', marginTop: '8px' }}>Envío a todo el país, según destino · Piezas hechas a medida: sin cambio por arrepentimiento. Ante un defecto de fabricación, garantía legal de 6 meses — el envío de cambio lo cubrimos nosotros.</p>
           </div>
           <div>
             <h4>Tienda</h4>

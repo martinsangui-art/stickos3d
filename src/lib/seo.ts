@@ -25,15 +25,16 @@ const HANDLING_DAYS: Record<StockStatusKey, [number, number]> = {
   pedido: [3, 5],
 };
 
-// Política de devoluciones real: 10 días, por defecto de fabricación, sin
-// costo para el cliente. Resuelve el warning de Search Console de política
-// de devolución faltante en las Offers.
+// Política de devoluciones real: piezas hechas a medida están exceptuadas
+// del derecho de arrepentimiento de 10 días (art. 1116 CCCN) — por eso
+// NotPermitted, no un plazo. La garantía legal por defectos de fabricación
+// (art. 11 Ley 24.240, piso de 6 meses, no acortable) es un derecho aparte
+// que no tiene campo propio en schema.org para "solo defectos" — queda en
+// el texto visible del sitio (Footer), igual que Etsy/Amazon Handmade con
+// ítems personalizados. No declarar acá un plazo de devolución genérico.
 const RETURN_POLICY = {
   '@type': 'MerchantReturnPolicy',
-  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-  merchantReturnDays: 10,
-  returnMethod: 'https://schema.org/ReturnByMail',
-  returnFees: 'https://schema.org/FreeReturn',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
   applicableCountry: 'AR',
 };
 
