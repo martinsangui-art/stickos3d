@@ -5,13 +5,58 @@ import type { StockStatusKey } from '../data/types';
 const SITE_URL = 'https://stickos3d.com.ar/';
 
 // schema.org itemAvailability — "pedido" (bajo pedido, 3 a 5 días) es el
-// caso real más frecuente del catálogo y no es ni InStock ni OutOfStock;
-// MadeToOrder es la categoría correcta de schema.org para eso.
+// caso real más frecuente del catálogo y no es ni InStock ni OutOfStock.
+// MadeToOrder es válido en schema.org, pero NO está en la lista de valores
+// que Google acepta para listados de Merchant/Product — Search Console lo
+// marca como "valor de enumeración no válido". BackOrder es el que Google
+// sí reconoce para este caso (disponible, se produce/despacha después).
 const AVAILABILITY: Record<StockStatusKey, string> = {
   listo: 'https://schema.org/InStock',
   extruyendo: 'https://schema.org/InStock',
-  pedido: 'https://schema.org/MadeToOrder',
+  pedido: 'https://schema.org/BackOrder',
 };
+
+// Días de armado antes de despachar, por status — coincide con el badge
+// STOCK_STATUS que ya se muestra en el sitio. Usado en handlingTime del
+// structured data de envío (punto 5 más abajo).
+const HANDLING_DAYS: Record<StockStatusKey, [number, number]> = {
+  listo: [0, 1],
+  extruyendo: [1, 3],
+  pedido: [3, 5],
+};
+
+// Política de devoluciones real: 10 días, por defecto de fabricación, sin
+// costo para el cliente. Resuelve el warning de Search Console de política
+// de devolución faltante en las Offers.
+const RETURN_POLICY = {
+  '@type': 'MerchantReturnPolicy',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+  merchantReturnDays: 10,
+  returnMethod: 'https://schema.org/ReturnByMail',
+  returnFees: 'https://schema.org/FreeReturn',
+  applicableCountry: 'AR',
+};
+
+// Detalle de envío por Offer: tarifa (rango real de correo a todo el país),
+// destino (Argentina) y tiempo total = armado (handlingTime, según status)
+// + tránsito del correo (transitTime, fijo).
+function shippingDetails(status: StockStatusKey) {
+  return {
+    '@type': 'OfferShippingDetails',
+    shippingRate: { '@type': 'MonetaryAmount', currency: 'ARS', minValue: 14000, maxValue: 20000 },
+    shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'AR' },
+    deliveryTime: {
+      '@type': 'ShippingDeliveryTime',
+      handlingTime: {
+        '@type': 'QuantitativeValue',
+        minValue: HANDLING_DAYS[status][0],
+        maxValue: HANDLING_DAYS[status][1],
+        unitCode: 'DAY',
+      },
+      transitTime: { '@type': 'QuantitativeValue', minValue: 7, maxValue: 7, unitCode: 'DAY' },
+    },
+  };
+}
 
 function localBusinessSchema() {
   // priceRange real, calculado sobre los productos con precio confirmado
@@ -62,6 +107,7 @@ function productListSchema() {
         image: p.imgs!.map((src) => `${SITE_URL}${src.replace(/^\//, '')}`),
         sku: p.id,
         category: p.cat,
+        brand: { '@type': 'Brand', name: 'STICKOS 3D' },
         offers: {
           '@type': 'Offer',
           url: SITE_URL,
@@ -69,6 +115,8 @@ function productListSchema() {
           price: p.price,
           availability: AVAILABILITY[p.status],
           itemCondition: 'https://schema.org/NewCondition',
+          hasMerchantReturnPolicy: RETURN_POLICY,
+          shippingDetails: shippingDetails(p.status),
         },
       },
     })),
