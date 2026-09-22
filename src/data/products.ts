@@ -11,6 +11,29 @@ import type { Product } from './types';
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 export const PRODUCTS: Product[] = [
+  // Death Star — excepción consciente a la fórmula (22/9/2026, decisión de Martín).
+  // Costo real: filamento 216 g Hyper PLA × $35.000/kg = $7.560
+  //           + kit eléctrico $10.450 (portalámparas E27 $1.450, cable c/enchufe $5.500, foco LED $3.500)
+  //           = $18.010.
+  // Precio por fórmula: $7.560 × 5,74 = $43.394 + $10.450 × 1,4 = $14.630 → $58.024.
+  // Publicado a $49.999 (≈2,78x sobre costo real). No es error de tipeo.
+  {
+    id: 'p23',
+    name: 'Star Wars Death Star',
+    cat: 'Deco',
+    price: 49999,
+    g: 216,
+    mat: 'Hyper PLA · esfera blanca, base plata',
+    desc: 'Velador esférico de 15 cm de diámetro sobre un trípode de 4 cm. Superficie con muchísimo detalle en relieve, que encendida se marca todavía más. Viene listo para enchufar: portalámparas E27, cable con enchufe y foco LED incluidos. Usar foco LED de hasta 9 W.',
+    mpLink: null,
+    status: 'pedido',
+    imgs: [
+      '/assets/products/death-star-1.jpg',
+      '/assets/products/death-star-2.jpg',
+      '/assets/products/death-star-3.jpg',
+      '/assets/products/death-star-4.jpg',
+    ],
+  },
   // p22: laminado real 280 g en Hyper PLA a $35.000/kg = $9.800 de filamento,
   // mas $10.000 de kit electrico con foco LED blanco calido -> costo real
   // $19.800. La formula (costo x 5,74) daria $113.700. Se fijo $47.999 por
