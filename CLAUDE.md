@@ -157,7 +157,11 @@ impresora o capacidad limitada.
            // viven en public/assets/products/, Vite los sirve desde la raíz.
   video:   "/assets/products/slug.mp4"  // opcional, se suma a imgs sin
            // reemplazarlo — badge de video en la card + rotación automática
-           // por hover (desktop) + slide final con sonido en el modal.
+           // por hover (desktop) + slide final en el modal, mudo con loop y
+           // autoplay (sin controles ni sonido — cambiado 22/9/2026, antes
+           // tenía controls+sonido).
+  videoPoster: "/assets/products/slug-poster.jpg"  // opcional, imagen que
+           // se ve mientras el video carga (atributo poster).
 }
 ```
 
