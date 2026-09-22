@@ -28,10 +28,10 @@ export const PRODUCTS: Product[] = [
     mpLink: null,
     status: 'pedido',
     imgs: [
+      '/assets/products/death-star-4.jpg',
       '/assets/products/death-star-1.jpg',
       '/assets/products/death-star-2.jpg',
       '/assets/products/death-star-3.jpg',
-      '/assets/products/death-star-4.jpg',
     ],
   },
   // p22: laminado real 280 g en Hyper PLA a $35.000/kg = $9.800 de filamento,
