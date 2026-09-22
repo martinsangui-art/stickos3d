@@ -11,6 +11,28 @@ import type { Product } from './types';
    ============================================================ */
 // status: "extruyendo" | "listo" | "pedido" — placeholder, calibrar con el stock real del taller.
 export const PRODUCTS: Product[] = [
+  // Básquet de mesa — precio por fórmula (22/9/2026).
+  // Costo: 52 g Hyper PLA × $35.000/kg = $1.820 (impreso por color en dos
+  // placas, sin purga) → × 5,74 = $10.447 → $10.500.
+  {
+    id: 'p24',
+    name: 'Básquet de mesa',
+    cat: 'Juguetes',
+    price: 10500,
+    g: 52,
+    mat: 'Hyper PLA · negro y naranja',
+    desc: 'Apretás la palanca y la pelotita sale volando al aro. Mide 15 cm de alto, 8 de ancho y 9 de profundidad, entra en cualquier escritorio. Para desafiar a quien tengas al lado.',
+    mpLink: null,
+    status: 'pedido',
+    imgs: [
+      '/assets/products/basquet-de-mesa-1.jpg',
+      '/assets/products/basquet-de-mesa-2.jpg',
+      '/assets/products/basquet-de-mesa-3.jpg',
+      '/assets/products/basquet-de-mesa-4.jpg',
+    ],
+    video: '/assets/products/basquet-de-mesa.mp4',
+    videoPoster: '/assets/products/basquet-de-mesa-video-poster.jpg',
+  },
   // Death Star — excepción consciente a la fórmula (22/9/2026, decisión de Martín).
   // Costo real: filamento 216 g Hyper PLA × $35.000/kg = $7.560
   //           + kit eléctrico $10.450 (portalámparas E27 $1.450, cable c/enchufe $5.500, foco LED $3.500)

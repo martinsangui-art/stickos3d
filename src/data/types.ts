@@ -18,6 +18,8 @@ export interface Product {
   imgs?: string[];
   /** Ruta a un mp4 opcional, se suma a imgs como slide final (no lo reemplaza). */
   video?: string;
+  /** Imagen que se muestra mientras el video carga (atributo poster). */
+  videoPoster?: string;
 }
 
 export interface PrintJob {

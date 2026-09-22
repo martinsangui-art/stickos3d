@@ -123,9 +123,19 @@ export function ProductModal({ product: p, onClose }: Props) {
               {imgs || p.video ? (
                 <>
                   {imgs?.map((src) => <img key={src} className="tile-photo" src={src} alt={p.name} />)}
-                  {/* Video completo (con controles y sonido) — a diferencia del preview
-                      muted del hover en la card, acá se ve entero si el usuario quiere. */}
-                  {p.video && <video ref={videoRef} className="tile-photo" src={p.video} controls playsInline />}
+                  {p.video && (
+                    <video
+                      ref={videoRef}
+                      className="tile-photo"
+                      src={p.video}
+                      poster={p.videoPoster}
+                      muted
+                      loop
+                      autoPlay
+                      playsInline
+                      preload="metadata"
+                    />
+                  )}
                 </>
               ) : (
                 <div
