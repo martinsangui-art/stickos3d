@@ -1,51 +1,64 @@
 import { describe, expect, it } from 'vitest';
-import { computeQuote } from './quote';
+import { buildQuoteMessage, quoteFloor, type QuoteRequest } from './quote';
 
-describe('computeQuote', () => {
-  it('matches the default form selection (M / PLA / complejidad media / qty 1)', () => {
-    // Mismos defaults que el <select> del cotizador: tamaño M, material PLA,
-    // complejidad "Media/no sé" (1.3), cantidad 1. Precios base recalculados
-    // con el costo de filamento actualizado (commit 884eb42 en main).
-    const result = computeQuote({ size: 'M', mat: 'PLA', cx: 1.3, qty: 1 });
-    expect(result.needsContact).toBe(false);
-    expect(result.low).toBe(22900);
-    expect(result.high).toBe(33600);
+describe('quoteFloor', () => {
+  it('returns the floor price for each size', () => {
+    expect(quoteFloor('chico')).toBe(12000);
+    expect(quoteFloor('mediano')).toBe(25000);
+    expect(quoteFloor('grande')).toBe(45000);
   });
 
-  it('scales with quantity (base price × qty, before rounding to the nearest 100)', () => {
-    // No comparamos contra qty=1 × 3: redondear a la centena en cada punto
-    // no siempre da exactamente 3x (ver S actual: 4400×3=13200 pero el
-    // cálculo real redondeado da 13300) — se verifica el valor real contra
-    // la fórmula, no una proporción asumida.
-    const one = computeQuote({ size: 'S', mat: 'PLA', cx: 1, qty: 1 });
-    const three = computeQuote({ size: 'S', mat: 'PLA', cx: 1, qty: 3 });
-    expect(one.low).not.toBeNull();
-    expect(three.low! > one.low!).toBe(true);
-    expect(three.high! > one.high!).toBe(true);
-    // El precio por unidad implícito tiene que quedar cerca de 3x, dentro
-    // del margen que puede meter un redondeo a centena por punto.
-    expect(Math.abs(three.low! - one.low! * 3)).toBeLessThanOrEqual(100);
-    expect(Math.abs(three.high! - one.high! * 3)).toBeLessThanOrEqual(100);
+  it('returns null when the customer is not sure about the size', () => {
+    expect(quoteFloor('no_se')).toBeNull();
+  });
+});
+
+describe('buildQuoteMessage', () => {
+  const base: QuoteRequest = {
+    name: 'Lucía',
+    desc: 'Portalápices tipo pulpo',
+    size: 'mediano',
+    finish: 'mate',
+    qty: 2,
+    delivery: 'retiro',
+    place: '',
+    when: 'sin_apuro',
+    date: '',
+    file: 'no',
+  };
+
+  it('builds the full message with the agreed format', () => {
+    expect(buildQuoteMessage(base)).toBe(
+      'Hola STICKOS 3D, soy Lucía y usé el cotizador de la web.\n\n' +
+        'Pieza: Portalápices tipo pulpo\n' +
+        'Tamaño: Mediano — como una pelota de handball\n' +
+        'Acabado: Mate, sin brillo\n' +
+        'Cantidad: 2\n' +
+        'Entrega: retiro en Bahía Blanca\n' +
+        'Lo necesito: sin apuro\n' +
+        'Archivo: lo busco con ustedes',
+    );
   });
 
-  it('applies the material multiplier (PETG costs more than PLA)', () => {
-    const pla = computeQuote({ size: 'L', mat: 'PLA', cx: 1, qty: 1 });
-    const petg = computeQuote({ size: 'L', mat: 'PETG', cx: 1, qty: 1 });
-    expect(petg.low! > pla.low!).toBe(true);
-    expect(petg.high! > pla.high!).toBe(true);
+  it('uses the typed place for shipping, or a generic line if left empty', () => {
+    expect(buildQuoteMessage({ ...base, delivery: 'envio', place: ' Tandil, 7000 ' }))
+      .toContain('Entrega: envío a Tandil, 7000\n');
+    expect(buildQuoteMessage({ ...base, delivery: 'envio', place: '' }))
+      .toContain('Entrega: envío a domicilio\n');
   });
 
-  it('XL always needs manual contact instead of an instant price', () => {
-    const result = computeQuote({ size: 'XL', mat: 'PLA', cx: 1, qty: 1 });
-    expect(result.needsContact).toBe(true);
-    expect(result.low).toBeNull();
-    expect(result.high).toBeNull();
+  it('uses the typed date when the customer has one', () => {
+    expect(buildQuoteMessage({ ...base, when: 'fecha', date: 'el 15 de octubre' }))
+      .toContain('Lo necesito: el 15 de octubre\n');
+    expect(buildQuoteMessage({ ...base, when: 'dos_semanas' }))
+      .toContain('Lo necesito: dentro de dos semanas\n');
   });
 
-  it('treats a non-positive quantity as 1 (matches the original || 1 fallback)', () => {
-    const zero = computeQuote({ size: 'S', mat: 'PLA', cx: 1, qty: 0 });
-    const one = computeQuote({ size: 'S', mat: 'PLA', cx: 1, qty: 1 });
-    expect(zero.low).toBe(one.low);
-    expect(zero.high).toBe(one.high);
+  it('has no emojis and no price estimate', () => {
+    const msg = buildQuoteMessage({ ...base, file: 'si' });
+    expect(msg).toContain('Archivo: lo tengo');
+    expect(msg).not.toMatch(/\p{Extended_Pictographic}/u);
+    expect(msg).not.toContain('$');
+    expect(msg.toLowerCase()).not.toContain('estimado');
   });
 });
