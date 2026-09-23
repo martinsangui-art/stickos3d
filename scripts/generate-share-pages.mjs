@@ -40,12 +40,13 @@ try {
     { cwd: ROOT, stdio: 'inherit' },
   );
 
-  const { PRODUCTS, hasConfirmedPrice } = await import(bundlePath);
+  const { VISIBLE_PRODUCTS } = await import(bundlePath);
 
   const esc = (s) =>
     String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  const priced = PRODUCTS.filter(hasConfirmedPrice);
+  // Solo productos visibles (con foto): los ocultos no tienen página de share.
+  const priced = VISIBLE_PRODUCTS;
   const outDir = path.join(DIST, 'p');
   mkdirSync(outDir, { recursive: true });
 

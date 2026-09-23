@@ -1,5 +1,5 @@
 import { PRINT_QUEUE } from '../data/config';
-import { hasConfirmedPrice, PRODUCTS } from '../data/products';
+import { VISIBLE_PRODUCTS } from '../data/products';
 import { fmt } from '../lib/format';
 
 /* Hero — Ruta A ("Taller"): el argumento a la izquierda como ficha técnica,
@@ -11,7 +11,7 @@ import { fmt } from '../lib/format';
 export function Hero() {
   // Primera pieza con foto confirmada, respetando el orden real de la
   // grilla (hoy las lámparas van primero).
-  const featured = PRODUCTS.find(hasConfirmedPrice);
+  const featured = VISIBLE_PRODUCTS[0];
   // El trabajo que está corriendo ahora; si no hay ninguno en curso, el
   // primero de la cola.
   const running = PRINT_QUEUE.find((j) => j.progress > 0) ?? PRINT_QUEUE[0];

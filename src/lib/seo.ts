@@ -1,5 +1,5 @@
 import { CONFIG } from '../data/config';
-import { hasConfirmedPrice, PRODUCTS } from '../data/products';
+import { VISIBLE_PRODUCTS } from '../data/products';
 import type { StockStatusKey } from '../data/types';
 
 const SITE_URL = 'https://stickos3d.com.ar/';
@@ -64,7 +64,7 @@ function localBusinessSchema() {
   // (los mismos que muestran precio en vez de "PRÓXIMAMENTE" en el sitio) —
   // así nunca vuelve a quedar desactualizado como pasaba con el valor fijo
   // que había antes en el <head> estático.
-  const pricedProducts = PRODUCTS.filter(hasConfirmedPrice);
+  const pricedProducts = VISIBLE_PRODUCTS;
   const prices = pricedProducts.map((p) => p.price);
   const min = prices.length ? Math.min(...prices) : 0;
   const max = prices.length ? Math.max(...prices) : 0;
@@ -94,7 +94,7 @@ function localBusinessSchema() {
 // "PRÓXIMAMENTE", así el structured data nunca promete un precio que la
 // página no muestra.
 function productListSchema() {
-  const pricedProducts = PRODUCTS.filter(hasConfirmedPrice);
+  const pricedProducts = VISIBLE_PRODUCTS;
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
