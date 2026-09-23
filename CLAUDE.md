@@ -352,7 +352,8 @@ tocar una sola regla — mismos selectores que usaba el HTML/JS original.
 - `PRODUCTS`/`CONFIG`/`QUOTE`/`PRINT_QUEUE`: de `index.html` a
   `src/data/*.ts` (ver secciones 2 y 4 de este archivo).
 - Lógica de negocio extraída como funciones puras testeables:
-  `src/lib/quote.ts` (`computeQuote`), `src/context/cartReducer.ts`
+  `src/lib/quote.ts` (hoy `quoteFloor`/`buildQuoteMessage`, ver sección
+  20), `src/context/cartReducer.ts`
   (reglas del carrito). 17 tests unitarios cubren ambas.
 - Carrito, sonido, modal de Instagram: pasaron de variables globales/DOM a
   React Context (`src/context/`) — mismo comportamiento, sin `window.__x`.
@@ -682,3 +683,27 @@ funcionó todo el día fue `npm run build` + `vite preview` + Playwright
 midiendo geometría real (`getBoundingClientRect`, desborde horizontal,
 solapamientos) en 1440px y 390/360px, ANTES de commitear. Tres bugs reales
 de la Ruta A aparecieron así y ninguno se veía en la lectura del código.
+
+---
+
+## 20. Rediseño del cotizador (23/09/2026)
+
+Motivo: el cotizador preguntaba cosas que el cliente no sabe responder y
+generaba pedidos mal especificados (caso real: eligió "Mediano (5–12 cm)"
+y la pieza era de 15 cm; en complejidad respondió "no sé").
+
+- **Sin centímetros.** Tamaño por referencia cotidiana: Chico (taza),
+  Mediano (pelota de handball), Grande (balde), No estoy seguro.
+- **Fuera:** Complejidad y Material (reemplazado por **Acabado**: mate,
+  brillante, símil seda, me da igual). Nada de jerga técnica en el form.
+- **Nuevos:** Entrega (retiro en Bahía Blanca / envío, con localidad y CP
+  opcional), plazo (sin apuro / dos semanas / tengo fecha, con texto libre)
+  y si tiene el archivo del modelo.
+- **Precio:** ya no hay rango ni multiplicadores. Un piso por tamaño
+  (`QUOTE_FLOOR` en `src/data/config.ts`: $12.000 / $25.000 / $45.000),
+  presentado como "arranca en". "No estoy seguro" no muestra monto. Es
+  decisión de negocio, no sale de la fórmula ×5.74 — no recalcular.
+- **Mensaje de WhatsApp** (`buildQuoteMessage` en `src/lib/quote.ts`, con
+  tests): sin emojis y sin estimado.
+- Todos los campos de opción son botones de radio visibles (`.choice`), no
+  `<select>`: el select cortaba las referencias largas en mobile.
