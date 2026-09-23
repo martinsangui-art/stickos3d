@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { COLORS } from '../data/config';
-import { PRODUCTS } from '../data/products';
+import { VISIBLE_PRODUCTS } from '../data/products';
 import type { Color } from '../data/types';
 import { useReveal } from '../hooks/useReveal';
 import { ProductCard } from './ProductCard';
 import { ProductModal } from './ProductModal';
 
-const CATS = ['Todos', ...Array.from(new Set(PRODUCTS.map((p) => p.cat)))];
+// Solo categorías con al menos un producto visible: un filtro que lleve a
+// una grilla vacía no se muestra.
+const CATS = ['Todos', ...Array.from(new Set(VISIBLE_PRODUCTS.map((p) => p.cat)))];
 
 export function ProductGrid() {
   const headReveal = useReveal<HTMLDivElement>();
   const [activeCat, setActiveCat] = useState('Todos');
   const [selectedColor, setSelectedColor] = useState<Record<string, Color>>(() =>
-    Object.fromEntries(PRODUCTS.map((p) => [p.id, COLORS[0]])),
+    Object.fromEntries(VISIBLE_PRODUCTS.map((p) => [p.id, COLORS[0]])),
   );
   // Deep-link: ?p=<id> en la URL abre el modal de ese producto directo al
   // cargar — lo que hace que el botón "Compartir por WhatsApp" de cada
@@ -22,7 +24,8 @@ export function ProductGrid() {
   const [openProductId, setOpenProductId] = useState<string | null>(() => {
     if (typeof window === 'undefined') return null;
     const id = new URLSearchParams(window.location.search).get('p');
-    return id && PRODUCTS.some((p) => p.id === id) ? id : null;
+    // Un id oculto (sin foto) se trata igual que uno inexistente: grilla sin modal.
+    return id && VISIBLE_PRODUCTS.some((p) => p.id === id) ? id : null;
   });
 
   // Mantiene la URL en sync con el modal abierto, sin recargar la página —
@@ -41,18 +44,14 @@ export function ProductGrid() {
   const isFirstRender = !hasRenderedOnce.current;
   hasRenderedOnce.current = true;
 
-  const list = useMemo(() => {
-    const filtered = activeCat === 'Todos' ? PRODUCTS.slice() : PRODUCTS.filter((p) => p.cat === activeCat);
-    // Con foto real primero — sort() es estable en JS, así que entre
-    // empatados se conserva el orden original de PRODUCTS.
-    return filtered.sort((a, b) => {
-      const aHasPhoto = a.imgs && a.imgs.length ? 1 : 0;
-      const bHasPhoto = b.imgs && b.imgs.length ? 1 : 0;
-      return bHasPhoto - aHasPhoto;
-    });
-  }, [activeCat]);
+  // Todos los visibles tienen foto, así que ya no hace falta el sort que
+  // mandaba los "PRÓXIMAMENTE" al fondo: se respeta el orden de PRODUCTS.
+  const list = useMemo(
+    () => (activeCat === 'Todos' ? VISIBLE_PRODUCTS : VISIBLE_PRODUCTS.filter((p) => p.cat === activeCat)),
+    [activeCat],
+  );
 
-  const openProduct = openProductId ? PRODUCTS.find((p) => p.id === openProductId) ?? null : null;
+  const openProduct = openProductId ? VISIBLE_PRODUCTS.find((p) => p.id === openProductId) ?? null : null;
 
   return (
     <section id="catalogo">

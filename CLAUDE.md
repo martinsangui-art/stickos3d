@@ -165,11 +165,18 @@ impresora o capacidad limitada.
 }
 ```
 
-### Orden en la grilla
-El filtro "Todos" ordena con `sort()` estable: primero los productos con
-`imgs` cargadas, después los que no. Dentro de cada grupo se respeta el
-orden del array. Para que un producto aparezca primero en su grupo hay que
-moverlo físicamente más arriba en el array — no existe campo de prioridad.
+### Visibilidad y orden en la grilla
+**Los productos sin `imgs` NO se muestran en el sitio** (desde 23/09/2026).
+Siguen en `PRODUCTS` como fuente de datos; lo que se pinta o se cuenta sale
+de `VISIBLE_PRODUCTS` (mismo archivo): grilla, filtros, modal/deep-link
+(`?p=<id>` de un oculto cae en la grilla sin modal), hero, SEO y las páginas
+`dist/p/<id>.html`. Los botones de categoría con 0 productos visibles no se
+muestran. `hasConfirmedPrice`/"PRÓXIMAMENTE" quedan como red de seguridad.
+Para publicar un producto: cargarle `imgs`, nada más.
+
+La grilla respeta el orden del array (ya no hay sort por foto: todos los
+visibles tienen). Para que un producto aparezca primero hay que moverlo
+físicamente más arriba en el array — no existe campo de prioridad.
 
 ---
 

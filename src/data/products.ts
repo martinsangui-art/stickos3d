@@ -123,3 +123,9 @@ export const PRODUCTS: Product[] = [
 export function hasConfirmedPrice(p: Product): boolean {
   return Array.isArray(p.imgs) && p.imgs.length > 0;
 }
+
+// Lo que el sitio muestra: solo productos con foto real. PRODUCTS queda
+// intacto como fuente de datos (los sin foto siguen ahí, listos para volver
+// apenas se les cargue imgs). Todo lo que se pinta o se cuenta en el sitio
+// (grilla, filtros, modal/deep-link, hero, SEO, páginas de share) sale de acá.
+export const VISIBLE_PRODUCTS: Product[] = PRODUCTS.filter((p) => (p.imgs?.length ?? 0) > 0);
