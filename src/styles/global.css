@@ -764,6 +764,23 @@ textarea{resize:vertical;min-height:80px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .form-note{font-size:12.5px;color:var(--muted)}
+/* Opciones cortas del cotizador (entrega, plazo, archivo) como botones de
+   radio visibles: el cliente ve todas las opciones sin abrir un select. El
+   input queda transparente encima (no display:none) para que la validación
+   nativa del required siga pudiendo señalarlo. */
+.choice-group{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;min-width:0}
+.choice-group legend{font-size:13px;font-weight:600;color:var(--muted);padding:0;margin-bottom:7px}
+.choice-row{display:flex;flex-wrap:wrap;gap:8px}
+.choice{
+  position:relative;flex-direction:row;gap:0;
+  font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--line);
+  padding:10px 14px;cursor:pointer;transition:border-color .15s,color .15s;
+}
+.choice input{position:absolute;inset:0;opacity:0;margin:0;padding:0;width:100%;height:100%;cursor:pointer}
+.choice:hover{border-color:var(--line-hi);color:var(--text)}
+.choice.on{border-color:var(--accent);color:var(--text)}
+.choice:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 
 .quote-box{
   border:1px dashed var(--line);

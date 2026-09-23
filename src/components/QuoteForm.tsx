@@ -1,59 +1,113 @@
 import { useMemo, useState } from 'react';
 import { useReveal } from '../hooks/useReveal';
-import { computeQuote, type QuoteMaterial, type QuoteSize } from '../lib/quote';
+import { computeQuote } from '../lib/quote';
 import { fmt, wa } from '../lib/format';
 import { trackPixel } from '../lib/pixel';
 
-const SIZE_OPTIONS: [QuoteSize, string][] = [
-  ['S', 'Chico (hasta 5 cm)'],
-  ['M', 'Mediano (5–12 cm)'],
-  ['L', 'Grande (12–20 cm)'],
-  ['XL', 'Muy grande (+20 cm)'],
+type SizeKey = 'chico' | 'mediano' | 'grande' | 'no_se';
+type FinishKey = 'mate' | 'brillante' | 'seda' | 'indistinto';
+type DeliveryKey = 'retiro' | 'envio';
+type WhenKey = 'sin_apuro' | 'dos_semanas' | 'fecha';
+type FileKey = 'si' | 'no';
+
+// Referencias de objetos cotidianos en vez de centímetros: el cliente no
+// sabe medir lo que imagina, y elegir "5–12 cm" terminaba en piezas de 15.
+const SIZE_OPTIONS: [SizeKey, string][] = [
+  ['chico', 'Chico — como una taza'],
+  ['mediano', 'Mediano — como una pelota de handball'],
+  ['grande', 'Grande — como un balde'],
+  ['no_se', 'No estoy seguro, ayudame vos'],
 ];
-const MAT_OPTIONS: [QuoteMaterial, string][] = [
-  ['PLA', 'PLA común (uso general)'],
-  ['PLA_MATE', 'PLA Mate (acabado sin brillo)'],
-  ['PLA_SILK', 'PLA Silk (brillo satinado)'],
-  ['PETG', 'PETG (más resistente)'],
-  ['TPU', 'TPU (flexible)'],
+const FINISH_OPTIONS: [FinishKey, string][] = [
+  ['mate', 'Mate, sin brillo'],
+  ['brillante', 'Brillante'],
+  ['seda', 'Con brillo símil seda'],
+  ['indistinto', 'Me da igual / recomendame'],
 ];
-const CX_OPTIONS: [number, string][] = [
-  [1, 'Simple'],
-  [1.3, 'Media / no sé'],
-  [1.7, 'Alta (mucho detalle)'],
+const DELIVERY_OPTIONS: [DeliveryKey, string][] = [
+  ['retiro', 'Retiro en Bahía Blanca'],
+  ['envio', 'Envío a domicilio'],
 ];
+const WHEN_OPTIONS: [WhenKey, string][] = [
+  ['sin_apuro', 'Sin apuro'],
+  ['dos_semanas', 'Dentro de dos semanas'],
+  ['fecha', 'Tengo fecha'],
+];
+const FILE_OPTIONS: [FileKey, string][] = [
+  ['si', 'Sí, lo tengo'],
+  ['no', 'No, lo busco con ustedes'],
+];
+
+// Transitorio hasta el piso de precio por tamaño: el rango viejo solo
+// entiende S/M/L/XL.
+const LEGACY_SIZE = { chico: 'S', mediano: 'M', grande: 'L', no_se: 'XL' } as const;
+
+function Choice<T extends string>({
+  name,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  options: [T, string][];
+  value: T | '';
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="choice-row">
+      {options.map(([v, label], i) => (
+        <label key={v} className={`choice${value === v ? ' on' : ''}`}>
+          <input
+            type="radio"
+            name={name}
+            value={v}
+            checked={value === v}
+            required={i === 0}
+            onChange={() => onChange(v)}
+          />
+          <span>{label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
 
 export function QuoteForm() {
   const copyReveal = useReveal<HTMLDivElement>();
   const formReveal = useReveal<HTMLFormElement>();
 
-  const [size, setSize] = useState<QuoteSize>('M');
-  const [mat, setMat] = useState<QuoteMaterial>('PLA');
-  const [cx, setCx] = useState(1.3);
+  const [size, setSize] = useState<SizeKey | ''>('');
+  const [finish, setFinish] = useState<FinishKey>('indistinto');
   const [qty, setQty] = useState(1);
+  const [delivery, setDelivery] = useState<DeliveryKey | ''>('');
+  const [place, setPlace] = useState('');
+  const [when, setWhen] = useState<WhenKey | ''>('');
+  const [date, setDate] = useState('');
+  const [hasFile, setHasFile] = useState<FileKey | ''>('');
   const [desc, setDesc] = useState('');
   const [name, setName] = useState('');
 
-  const quote = useMemo(() => computeQuote({ size, mat, cx, qty }), [size, mat, cx, qty]);
+  const quote = useMemo(
+    () => (size ? computeQuote({ size: LEGACY_SIZE[size], mat: 'PLA', cx: 1, qty }) : null),
+    [size, qty],
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (quote.needsContact) {
-      document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    const sizeLabel = SIZE_OPTIONS.find(([v]) => v === size)![1];
-    // La etiqueta, no el value: los materiales nuevos tienen guion bajo
-    // (PLA_SILK) y quedaría feo en el mensaje de WhatsApp.
-    const matLabel = MAT_OPTIONS.find(([v]) => v === mat)![1];
-    const cxLabel = CX_OPTIONS.find(([v]) => v === cx)![1];
+    if (!size || !delivery || !when || !hasFile) return;
+    const label = <T extends string>(opts: [T, string][], v: T) => opts.find(([k]) => k === v)![1];
+    const deliveryText = delivery === 'retiro'
+      ? 'retiro en Bahía Blanca'
+      : place.trim() ? `envío a ${place.trim()}` : 'envío a domicilio';
+    const whenText = when === 'fecha' ? date.trim() : label(WHEN_OPTIONS, when).toLowerCase();
     const msg =
       `¡Hola STICKOS 3D! Soy ${name} y usé el cotizador de la web:\n\n` +
-      `📦 Pieza: ${desc}\n📐 Tamaño: ${sizeLabel}\n🧵 Material: ${matLabel}\n` +
-      `⚙️ Complejidad: ${cxLabel}\n🔢 Cantidad: ${qty}\n\n` +
-      `💰 Estimado web: ${fmt(quote.low!)} – ${fmt(quote.high!)}\n\n` +
+      `📦 Pieza: ${desc}\n📐 Tamaño: ${label(SIZE_OPTIONS, size)}\n🧵 Acabado: ${label(FINISH_OPTIONS, finish)}\n` +
+      `🔢 Cantidad: ${qty}\n🚚 Entrega: ${deliveryText}\n📅 Lo necesito: ${whenText}\n` +
+      `📁 Archivo: ${hasFile === 'si' ? 'lo tengo' : 'lo busco con ustedes'}\n\n` +
+      (quote && !quote.needsContact ? `💰 Estimado web: ${fmt(quote.low!)} – ${fmt(quote.high!)}\n\n` : '') +
       `¿Me confirman el precio final? Si necesitan fotos o el archivo, los mando por acá.`;
-    trackPixel('Lead', { content_category: 'cotizador', value: quote.low, currency: 'ARS' });
+    trackPixel('Lead', { content_category: 'cotizador', value: quote?.low ?? undefined, currency: 'ARS' });
     window.open(wa(msg), '_blank');
   }
 
@@ -82,27 +136,56 @@ export function QuoteForm() {
               onChange={(e) => setDesc(e.target.value)}
             />
           </label>
-          <div className="form-row-3">
+          <div className="form-row">
             <label>
               Tamaño aproximado
-              <select id="cfSize" value={size} onChange={(e) => setSize(e.target.value as QuoteSize)}>
+              <select id="cfSize" required value={size} onChange={(e) => setSize(e.target.value as SizeKey)}>
+                <option value="" disabled>Elegí una referencia</option>
                 {SIZE_OPTIONS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
               </select>
             </label>
             <label>
-              Material
-              <select id="cfMat" value={mat} onChange={(e) => setMat(e.target.value as QuoteMaterial)}>
-                {MAT_OPTIONS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
-              </select>
-            </label>
-            <label>
-              Complejidad
-              <select id="cfCx" value={cx} onChange={(e) => setCx(parseFloat(e.target.value))}>
-                {CX_OPTIONS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+              Acabado
+              <select id="cfFinish" value={finish} onChange={(e) => setFinish(e.target.value as FinishKey)}>
+                {FINISH_OPTIONS.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
               </select>
             </label>
           </div>
           <p className="form-note">¿No sabés si el tamaño que tenés en mente se puede? Contanos las medidas igual — muchas piezas grandes se imprimen en partes y se arman después. Lo evaluamos caso por caso, sin límite fijo.</p>
+          <fieldset className="choice-group">
+            <legend>Entrega</legend>
+            <Choice name="cfDelivery" options={DELIVERY_OPTIONS} value={delivery} onChange={setDelivery} />
+            {delivery === 'envio' && (
+              <input
+                type="text"
+                id="cfPlace"
+                placeholder="Localidad y código postal"
+                aria-label="Localidad y código postal"
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
+              />
+            )}
+          </fieldset>
+          <fieldset className="choice-group">
+            <legend>¿Para cuándo lo necesitás?</legend>
+            <Choice name="cfWhen" options={WHEN_OPTIONS} value={when} onChange={setWhen} />
+            {when === 'fecha' && (
+              <input
+                type="text"
+                id="cfDate"
+                placeholder="¿Para cuándo?"
+                aria-label="Fecha"
+                maxLength={60}
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            )}
+          </fieldset>
+          <fieldset className="choice-group">
+            <legend>¿Tenés el archivo del modelo?</legend>
+            <Choice name="cfFile" options={FILE_OPTIONS} value={hasFile} onChange={setHasFile} />
+          </fieldset>
           <div className="form-row">
             <label>
               Cantidad
@@ -113,19 +196,16 @@ export function QuoteForm() {
               <input type="text" id="cfName" placeholder="Nombre" required value={name} onChange={(e) => setName(e.target.value)} />
             </label>
           </div>
-          <div className="quote-box">
-            <div>
-              <div className="q-label">Estimado en el acto</div>
-              <div className="quote-value" id="quoteValue">
-                {quote.needsContact ? 'Te cotizamos por mail' : `${fmt(quote.low!)} – ${fmt(quote.high!)}`}
+          {quote && (
+            <div className="quote-box">
+              <div>
+                <div className="q-label">Estimado en el acto</div>
+                <div className="quote-value" id="quoteValue">
+                  {quote.needsContact ? 'Te cotizamos por WhatsApp' : `${fmt(quote.low!)} – ${fmt(quote.high!)}`}
+                </div>
               </div>
-              <p className="form-note" id="quoteNote" style={{ marginTop: '6px' }}>
-                {quote.needsContact
-                  ? 'Piezas grandes: preferimos ajustar el precio a mano para darte el mejor número. Escribinos desde el formulario de abajo.'
-                  : 'Precio de referencia, sujeto a modificación sin previo aviso.'}
-              </p>
             </div>
-          </div>
+          )}
           <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>Confirmar cotización por WhatsApp</button>
           <p className="form-note">Se abre WhatsApp con tu pedido y el estimado ya redactados. Si tenés archivo o fotos, los adjuntás ahí.</p>
         </form>
