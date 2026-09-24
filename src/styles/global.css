@@ -139,7 +139,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
    PRELOADER — un cabezal FDM imprime el logo capa por capa.
    El logo se revela en 6 pasos discretos (steps) de abajo hacia
    arriba, el cabezal barre en horizontal a la velocidad de una
-   capa y sube con cada una. Duración total ~1.7s, y solo la
+   capa y sube con cada una. Duración total ~1.5s, y solo la
    primera carga de la sesión (después el JS lo saltea).
    ============================================================ */
 .preloader{
@@ -148,7 +148,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
   display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px;
   transition:opacity .45s ease, visibility .45s ease;
   cursor:pointer; /* se puede saltear con un toque */
-  animation:autohide 0s linear 5s forwards; /* red de seguridad si el JS no llega a ocultarlo */
+  animation:autohide 0s linear 2.7s forwards; /* red de seguridad si el JS no llega a ocultarlo */
 }
 @keyframes autohide{to{opacity:0;visibility:hidden;pointer-events:none}}
 .preloader.done{opacity:0;visibility:hidden;pointer-events:none}
@@ -158,13 +158,13 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
    el alto del logo y siempre queda apoyado sobre la pieza, nunca flotando. */
 .rig .bed{position:relative}
 .rig .wm{font-size:clamp(46px,12vw,100px);color:var(--paper)}
-.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 2.9s steps(6,end) forwards}
+.rig .lay{display:block;clip-path:inset(100% 0 0 0);animation:layerUp 1.2s steps(6,end) forwards}
 @keyframes layerUp{to{clip-path:inset(0 0 0 0)}}
 
 /* El pórtico (riel + cabezal) sube una capa por vez, como el eje Z real */
 .rig .gantry{
   position:absolute;left:0;right:0;top:100%;z-index:2;
-  animation:gantryRise 2.9s steps(6,end) forwards;
+  animation:gantryRise 1.2s steps(6,end) forwards;
 }
 .rig .rail{
   position:absolute;top:0;left:-34px;right:-34px;height:2px;
@@ -176,7 +176,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
   position:absolute;top:0;left:0;width:clamp(21px,3vw,32px);aspect-ratio:19/24;
   /* -100% deja la punta de la boquilla justo sobre la capa que se está imprimiendo */
   transform:translate(-50%,-100%);
-  animation:headSweep .483s linear infinite alternate;
+  animation:headSweep .2s linear infinite alternate;
 }
 @keyframes headSweep{from{left:3%}to{left:97%}}
 @keyframes gantryRise{from{top:100%}to{top:0%}}
@@ -190,7 +190,7 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(26p
 .preloader .pbar{width:min(230px,52vw);height:3px;background:var(--surface-2);border-radius:99px;overflow:hidden}
 /* La barra avanza en los mismos 6 pasos que las capas: cada tramo es una capa
    impresa, así termina exactamente con la última pasada del cabezal. */
-.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 2.9s steps(6,end) forwards}
+.preloader .pbar i{display:block;height:100%;width:0%;background:var(--accent);animation:pfill 1.2s steps(6,end) forwards}
 @keyframes pfill{to{width:100%}}
 
 /* Hover de producto: la pieza se "imprime" de abajo hacia arriba.
