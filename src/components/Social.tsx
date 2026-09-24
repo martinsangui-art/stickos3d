@@ -4,9 +4,8 @@ import { useReveal } from '../hooks/useReveal';
 
 export function Social() {
   const reveal = useReveal<HTMLDivElement>();
-  // Si las fotos todavía no están subidas, la grilla se saca sola en vez de
-  // mostrar dos íconos de imagen rota. Al subir los archivos aparece sin
-  // tocar nada más.
+  // Si alguna foto falta, la grilla se saca sola en vez de mostrar un
+  // ícono de imagen rota.
   const [gridBroken, setGridBroken] = useState(false);
 
   return (
@@ -17,8 +16,8 @@ export function Social() {
         <p className="social-copy">Ahí van saliendo las piezas terminadas, los colores nuevos de filamento y los trabajos a medida que todavía no están en el catálogo.</p>
         {!gridBroken && (
           <div className="social-grid">
-            <img src="/assets/ig-post-1.jpg" alt="Publicación de STICKOS 3D en Instagram" loading="lazy" onError={() => setGridBroken(true)} />
-            <img src="/assets/ig-post-2.jpg" alt="Publicación de STICKOS 3D en Instagram" loading="lazy" onError={() => setGridBroken(true)} />
+            <img src="/assets/products/huso-1.jpg" alt="Lámpara HUSO" loading="lazy" onError={() => setGridBroken(true)} />
+            <img src="/assets/products/kendai-2.jpg" alt="Lámpara KENDAI" loading="lazy" onError={() => setGridBroken(true)} />
           </div>
         )}
         <a className="btn btn-primary" id="socialIg" href={`https://instagram.com/${CONFIG.instagram}`} target="_blank" rel="noopener">
