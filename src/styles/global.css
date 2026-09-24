@@ -276,8 +276,6 @@ header.scrolled{box-shadow:0 12px 28px -18px rgba(0,0,0,.8)}
 .statusbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:32px}
 .statusbar .grp{display:flex;align-items:center;gap:24px;min-width:0}
 .statusbar b{color:var(--soft-grey);font-weight:400}
-.statusbar .live{display:inline-flex;align-items:center;gap:7px;color:var(--layer-teal);white-space:nowrap}
-.statusbar .live i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
 @media(max-width:900px){
   .statusbar .grp span:nth-child(n+3){display:none}
 }
@@ -408,40 +406,17 @@ header .logo .wm{font-size:27px}
   .hero-specs div{grid-template-columns:1fr;gap:5px}
 }
 
-/* ---------- Panel del taller en el hero ----------
-   Lo más difícil de copiar que tiene STICKOS 3D es que muestra su cola de
-   impresión real. Hasta ahora eso vivía al final de la página; acá sube a
-   la primera pantalla como una sola línea de estado (la cola completa
-   sigue estando en la sección "El taller", sin duplicar el listado). */
+/* ---------- Panel del hero: pieza destacada ----------
+   Foto, nombre y precio de la primera pieza visible del catálogo. */
 .rig-panel{border:1px solid var(--line-hi);background:var(--surface)}
-.rig-head{
-  display:flex;align-items:center;justify-content:space-between;gap:14px;
-  padding:14px 18px;border-bottom:1px solid var(--line);
-  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--muted);
-}
-.rig-live{display:inline-flex;align-items:center;gap:7px;color:var(--layer-teal);white-space:nowrap}
-.rig-live i{width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
-.rig-body{padding:18px}
-.rig-job{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px}
-.rig-job .nm{font-family:var(--font-mono);font-size:12.5px;color:var(--text);line-height:1.5}
-.rig-job .pc{font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:var(--accent)}
-.rig-track{height:2px;background:rgba(244,239,228,.09);position:relative;overflow:hidden}
-.rig-track i{position:absolute;inset:0 auto 0 0;background:var(--accent);display:block}
-.rig-photo{position:relative;border-top:1px solid var(--line);aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
+.rig-photo{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
 .rig-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .rig-cap{
   display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
   padding:14px 18px;border-top:1px solid var(--line);
 }
 .rig-cap .nm{font-family:var(--font-display);font-size:16px;font-weight:600;line-height:1.2}
-.rig-cap .mt{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:.05em;margin-top:4px}
 .rig-cap .pr{font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--accent);white-space:nowrap}
-.rig-foot{
-  padding:12px 18px;border-top:1px solid var(--line);
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--muted);
-}
 
 /* ---------- Strip ---------- */
 .strip{
@@ -826,48 +801,6 @@ textarea{resize:vertical;min-height:80px}
 }
 
 /* ---------- Taller en vivo ---------- */
-.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
-.about p{color:var(--muted);font-size:16.5px;margin-bottom:18px}
-.about p b{color:var(--text)}
-.workshop{
-  border:1px solid var(--line);border-radius:var(--radius);
-  background:var(--layers),linear-gradient(160deg,var(--surface),#18140D);
-  padding:26px 28px;font-family:var(--font-mono);
-}
-.workshop-head{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;
-  margin-bottom:20px;
-}
-.live-dot{
-  display:inline-flex;align-items:center;gap:8px;color:var(--ok);
-}
-.live-dot::before{
-  content:"";width:8px;height:8px;border-radius:99px;background:var(--ok);
-  animation:pulse 1.6s ease infinite;
-}
-@keyframes pulse{50%{opacity:.35}}
-.job{margin-bottom:18px}
-.job:last-child{margin-bottom:0}
-.job-name{font-size:13px;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.bar{
-  height:8px;border-radius:99px;background:var(--surface-2);
-  border:1px solid var(--line);overflow:hidden;
-}
-.bar i{
-  display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hi));
-  border-radius:99px;
-  background-size:200% 100%;
-  animation:flow 2.2s linear infinite;
-}
-@keyframes flow{to{background-position:-200% 0}}
-.workshop-foot{
-  margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
-  font-size:11px;color:var(--muted);letter-spacing:.04em;line-height:1.7;
-}
-.workshop-foot b{color:var(--accent);font-weight:400}
-.cursor{animation:blink 1.1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
 
 /* ---------- Footer ---------- */
 footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--surface)}
@@ -997,7 +930,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
 .wa-float svg{width:28px;height:28px;fill:#fff}
 
 @media(max-width:900px){
-  .custom-grid,.about-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
+  .custom-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
   .steps,.trust{grid-template-columns:1fr}
   .nav-links{display:none}
   .menu-btn{display:flex}
@@ -1047,9 +980,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   /* Fuera todo lo interactivo, lo decorativo y lo que no se puede tocar en papel */
   .preloader,header,.strip,.wa-float,.drawer,.overlay,.toast,footer,.ig-backdrop,
   .hero-ctas,.hero-specs,.filters,.swatches,.card-top,.tile,.sweep,
-  .add-btn,.mp-btn,.buy-link,form,.quote-box,.workshop,.pay-row,.social,.contact{display:none!important}
+  .add-btn,.mp-btn,.buy-link,form,.quote-box,.pay-row,.social,.contact{display:none!important}
   /* Catálogo y secciones en una sola columna */
-  .grid,.steps,.trust,.custom-grid,.about-grid{grid-template-columns:1fr!important;gap:12px!important}
+  .grid,.steps,.trust,.custom-grid{grid-template-columns:1fr!important;gap:12px!important}
   .card{border:1px solid #bbb;break-inside:avoid;page-break-inside:avoid}
   .card-body{padding:10px 12px;gap:4px}
   .card-foot{padding-top:6px}

@@ -1,4 +1,4 @@
-import type { Color, PrintJob, StockStatusKey } from './types';
+import type { Color, StockStatusKey } from './types';
 
 /* ============================================================
    CONFIGURACIÓN — editá esto con sus datos reales
@@ -20,16 +20,6 @@ export const COLORS: Color[] = [
   { name: 'Azul', hex: '#3E6FD4' },
   { name: 'Verde', hex: '#5FBF8A' },
   { name: 'Gris', hex: '#8A8F98' },
-];
-
-/* ============================================================
-   COLA DE IMPRESIÓN — "El taller, en vivo"
-   Actualizá esto cuando cambien de trabajo. progress: 0 = en cola.
-   ============================================================ */
-export const PRINT_QUEUE: PrintJob[] = [
-  { name: 'Lámpara de luna — pedido #041', progress: 64 },
-  { name: 'Soportes de auriculares x3', progress: 0 },
-  { name: 'Pieza a medida — soporte de router', progress: 0 },
 ];
 
 /* ============================================================

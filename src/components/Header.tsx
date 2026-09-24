@@ -61,7 +61,6 @@ export function Header({ cartSize, soundOn, onToggleSound, onOpenCart }: Props) 
             <span>Materiales <b>PLA / PETG / TPU</b></span>
             <span>Envíos <b>a todo el país</b></span>
           </div>
-          <span className="live"><i></i>Taller activo</span>
         </div>
       </div>
     <header className={scrolled ? 'scrolled' : ''}>

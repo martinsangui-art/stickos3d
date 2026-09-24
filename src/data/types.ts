@@ -21,8 +21,3 @@ export interface Product {
   /** Imagen que se muestra mientras el video carga (atributo poster). */
   videoPoster?: string;
 }
-
-export interface PrintJob {
-  name: string;
-  progress: number;
-}
