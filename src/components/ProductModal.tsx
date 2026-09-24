@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { COLORS } from '../data/config';
+import { COLORS, COLOR_TBD } from '../data/config';
 import { hasConfirmedPrice } from '../data/products';
 import type { Color, Product } from '../data/types';
 import { fmt, productShareUrl, shareWa, wa } from '../lib/format';
@@ -15,7 +15,7 @@ interface Props {
 /* Modal de detalle de producto — se abre al tocar la foto/tile de una card,
    reusa el mismo slider visual que ProductCard, en tamaño grande.
 
-   modalColor es estado propio del modal (para el botón "Cotizar por
+   modalColor es estado propio del modal (para el botón "Consultar por
    WhatsApp"), separado del selectedColor de las cards/carrito — igual que en
    el original: abrir el modal siempre arranca en "sin color elegido". */
 export function ProductModal({ product: p, onClose }: Props) {
@@ -88,13 +88,13 @@ export function ProductModal({ product: p, onClose }: Props) {
 
   function handleAdd() {
     if (!p) return;
-    addToCart(p.id, p.name, p.price, modalColor ?? COLORS[0]);
+    addToCart(p.id, p.name, p.price, modalColor ?? COLOR_TBD);
     handleClose();
   }
 
   function handleQuoteWa() {
     let msg = `¡Hola STICKOS 3D! Quiero pedir ${p!.name}`;
-    if (modalColor) msg += ` en color ${modalColor.name}`;
+    msg += modalColor ? ` en color ${modalColor.name}` : ', color a coordinar';
     msg += '.';
     window.open(wa(msg), '_blank');
   }

@@ -22,6 +22,11 @@ export const COLORS: Color[] = [
   { name: 'Gris', hex: '#8A8F98' },
 ];
 
+/* Color de un pedido en el que el cliente no eligió ninguno: se agrega igual
+   y el color se arregla por WhatsApp. Antes caía en COLORS[0] (Negro) y el
+   pedido llegaba con un color que nadie eligió. */
+export const COLOR_TBD: Color = { name: 'A coordinar', hex: '#8C8579' };
+
 /* ============================================================
    COTIZADOR — piso de precio por tamaño. Es "desde cuánto arranca" ese
    tipo de pieza, no un cálculo: no multiplica por acabado, complejidad ni
