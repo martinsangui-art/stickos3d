@@ -31,4 +31,19 @@ describe('generateStructuredData', () => {
       expect(listedSkus.has(p.id)).toBe(false);
     }
   });
+
+  it('counts handling and transit time in business days (Monday to Friday)', () => {
+    const offers = (productList.itemListElement[0].item as unknown as {
+      offers: { shippingDetails: { deliveryTime: { businessDays: { '@type': string; dayOfWeek: string[] } } } };
+    }).offers;
+    const { businessDays } = offers.shippingDetails.deliveryTime;
+    expect(businessDays['@type']).toBe('OpeningHoursSpecification');
+    expect(businessDays.dayOfWeek).toEqual([
+      'https://schema.org/Monday',
+      'https://schema.org/Tuesday',
+      'https://schema.org/Wednesday',
+      'https://schema.org/Thursday',
+      'https://schema.org/Friday',
+    ]);
+  });
 });

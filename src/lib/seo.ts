@@ -40,7 +40,9 @@ const RETURN_POLICY = {
 
 // Detalle de envío por Offer: tarifa (rango real de correo a todo el país),
 // destino (Argentina) y tiempo total = armado (handlingTime, según status)
-// + tránsito del correo (transitTime, fijo).
+// + tránsito del correo (transitTime, fijo). businessDays marca que esos
+// días son hábiles (lunes a viernes), igual que dice la web ("unos 7 días
+// hábiles"). Sin eso, schema.org los interpreta como días corridos.
 function shippingDetails(status: StockStatusKey) {
   return {
     '@type': 'OfferShippingDetails',
@@ -55,6 +57,10 @@ function shippingDetails(status: StockStatusKey) {
         unitCode: 'DAY',
       },
       transitTime: { '@type': 'QuantitativeValue', minValue: 7, maxValue: 7, unitCode: 'DAY' },
+      businessDays: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((d) => `https://schema.org/${d}`),
+      },
     },
   };
 }
