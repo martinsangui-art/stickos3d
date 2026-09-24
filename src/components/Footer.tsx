@@ -2,6 +2,9 @@ import { CONFIG } from '../data/config';
 import { mailBody, wa, waWeb } from '../lib/format';
 
 export function Footer() {
+  // Botón de arrepentimiento (Res. 424/2020 de Comercio Interior): acceso
+  // directo, sin registro, para pedir la revocación de una compra a distancia.
+  const withdrawalHref = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Arrepentimiento de compra')}&body=${encodeURIComponent('Nombre:\nProducto:\nFecha de compra:\n')}`;
   const mailtoHref = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Consulta desde la web — STICKOS 3D')}&body=${encodeURIComponent(mailBody)}`;
 
   return (
@@ -16,7 +19,8 @@ export function Footer() {
               </span>
             </a>
             <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '32ch' }}>Impresión 3D en Bahía Blanca. Diseño propio, hecho al momento.</p>
-            <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '38ch', marginTop: '8px' }}>Envío a todo el país, según destino · Piezas hechas a medida: sin cambio por arrepentimiento. Ante un defecto de fabricación, garantía legal de 6 meses — el envío de cambio lo cubrimos nosotros.</p>
+            <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '38ch', marginTop: '8px' }}>Envío a todo el país, según destino · Productos del catálogo: podés arrepentirte dentro de los 10 días corridos de recibido. Las piezas hechas según tus medidas o diseño no admiten arrepentimiento. Ante un defecto de fabricación, garantía legal de 6 meses — el envío de cambio lo cubrimos nosotros.</p>
+            <a href={withdrawalHref} className="foot-withdrawal" id="footWithdrawal">Botón de arrepentimiento</a>
           </div>
           <div>
             <h4>Tienda</h4>
