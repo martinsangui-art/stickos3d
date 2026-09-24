@@ -767,3 +767,26 @@ lo que le habla al maker. Un commit por bloque (A1…A8).
   el copy del h1, volver a medir.
 - **Schema de envío**: `deliveryTime.businessDays` = lunes a viernes.
   Pendiente de verificar con el Rich Results Test.
+
+---
+
+## 23. Control post #15 (24/09/2026)
+
+- **Popup de Instagram = oferta del 5 %.** Único gatillo: scroll pasado el
+  50 %, nunca con carrito o modal de producto abierto, una vez por semana.
+  **No volver a dispararlo desde "Agregar"**: interrumpía la compra. La
+  oferta se repite en el carrito y en el mensaje de WhatsApp ("Mi usuario de
+  Instagram (5 % off):"), así no depende de haber visto el popup.
+- **Arrepentimiento**: los productos del catálogo tienen 10 días corridos;
+  las piezas hechas según medidas o diseño del cliente, no. Footer, link
+  "Botón de arrepentimiento" (Res. 424/2020, mailto) y el
+  `MerchantReturnPolicy` de `seo.ts` (10 días, FreeReturn) dicen lo mismo:
+  si se cambia uno, se cambian los tres.
+- **WhatsApp**: siempre con `openWhatsApp()` (`src/lib/format.ts`), no con
+  `window.open`. En táctil navega en la misma pestaña (los navegadores de
+  Instagram/Facebook bloquean `window.open`). `trackPixel` antes.
+- **Cards sin "N°"**: el id interno no se muestra al cliente.
+- **Panel del Hero en 1:1**: las fotos de portada son verticales; con 4:3 se
+  cortaba la lámpara.
+- **`mat` de todos los productos** (visibles y ocultos) va en lenguaje de
+  comprador. Al publicar un oculto, revisar igual la `desc`.
