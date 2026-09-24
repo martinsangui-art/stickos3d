@@ -20,7 +20,6 @@ const MOBILE_LINKS: [href: string, label: string][] = [
   ['#catalogo', 'Catálogo'],
   ['#pedido', 'Cotizador'],
   ['#comprar', 'Cómo comprar'],
-  ['#nosotros', 'El taller'],
   ['#contacto', 'Contacto'],
   [`https://instagram.com/${CONFIG.instagram}`, 'Instagram'],
 ];

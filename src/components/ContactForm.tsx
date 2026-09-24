@@ -61,7 +61,7 @@ export function ContactForm() {
     <section className="contact" id="contacto">
       <div className="wrap contact-grid">
         <div className={copyReveal.className} ref={copyReveal.ref}>
-          <div className="eyebrow">Capa 05 — Contacto</div>
+          <div className="eyebrow">Capa 04 — Contacto</div>
           <h2 className="sec-title">¿Preferís escribirnos?</h2>
           <p className="contact-copy">WhatsApp es lo más rápido, pero si estás en la compu o preferís dejarlo por escrito, mandanos el mensaje desde acá. Te contestamos al mail que nos dejes.</p>
           <ul className="contact-list">

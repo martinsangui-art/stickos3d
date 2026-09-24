@@ -54,7 +54,7 @@ export function HowToBuy() {
           <RevealDiv className="trust-card">
             <span className="trust-mark">Garantía STICKOS</span>
             <h3>Si llega dañada, la rehacemos</h3>
-            <p>Si llega dañada, la rehacemos sin cargo. Mandanos una foto dentro de las 48 h de recibida.</p>
+            <p>Si llega dañada, la rehacemos sin cargo. Mandanos una foto dentro de las 48 h de recibida. Cada pedido se revisa antes de salir del taller.</p>
           </RevealDiv>
           <RevealDiv className="trust-card">
             <span className="trust-mark">Sin vueltas</span>
