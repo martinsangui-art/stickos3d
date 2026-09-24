@@ -9,22 +9,9 @@ export const CONFIG = {
   email: 'hola@stickos3d.com.ar', // ← mismo destino que el formulario de contacto
 };
 
-/* ============================================================
-   COLORES DE FILAMENTO DISPONIBLES
-   Agregá o sacá según el stock real de rollos que tengan.
-   ============================================================ */
-export const COLORS: Color[] = [
-  { name: 'Negro', hex: '#2A2A2E' },
-  { name: 'Blanco', hex: '#E8E6E0' },
-  { name: 'Naranja', hex: '#FF5A1F' },
-  { name: 'Azul', hex: '#3E6FD4' },
-  { name: 'Verde', hex: '#5FBF8A' },
-  { name: 'Gris', hex: '#8A8F98' },
-];
 
-/* Color de un pedido en el que el cliente no eligió ninguno: se agrega igual
-   y el color se arregla por WhatsApp. Antes caía en COLORS[0] (Negro) y el
-   pedido llegaba con un color que nadie eligió. */
+/* El color no se elige en la web: se coordina por WhatsApp. Esto es lo que
+   muestra el carrito en cada ítem. */
 export const COLOR_TBD: Color = { name: 'A coordinar', hex: '#8C8579' };
 
 /* ============================================================

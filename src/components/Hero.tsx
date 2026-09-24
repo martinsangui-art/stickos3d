@@ -22,13 +22,13 @@ export function Hero() {
               <span className="capa">para tu casa,</span>
               <span className="capa">hechos a pedido.</span>
             </h1>
-            <p>Elegí el color en pantalla, cotizá al instante y recibilo donde estés. Si llega dañada, la rehacemos sin cargo.</p>
+            <p>Elegís el color, confirmás por WhatsApp y lo recibís donde estés. Si llega dañada, la rehacemos sin cargo.</p>
             <div className="hero-ctas">
               <a href="#catalogo" className="btn btn-primary">Ver catálogo</a>
               <a href="#pedido" className="btn btn-ghost">Cotizar una pieza a medida</a>
             </div>
             <div className="hero-specs">
-              <div><strong>Elegís el color</strong>En pantalla, en vivo</div>
+              <div><strong>Elegís el color</strong>Te mostramos las opciones</div>
               <div><strong>Cotización</strong>Al instante, sin esperar respuesta</div>
               <div><strong>Garantía STICKOS</strong>Si llega dañada, la rehacemos</div>
               <div><strong>Entrega</strong>Retiro local + envío a todo el país</div>

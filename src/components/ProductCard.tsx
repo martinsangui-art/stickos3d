@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
-import type { Color } from '../data/types';
 import type { Product } from '../data/types';
-import { COLORS, STOCK_STATUS } from '../data/config';
+import { STOCK_STATUS } from '../data/config';
 import { fmt } from '../lib/format';
 import { hasConfirmedPrice } from '../data/products';
 import { useCart } from '../context/CartContext';
@@ -10,8 +9,6 @@ import { useSoundContext } from '../context/SoundContext';
 
 interface Props {
   product: Product;
-  selectedColor: Color;
-  onColorChange: (color: Color) => void;
   onOpenModal: () => void;
   revealDelayMs: number | null; // null = no aparece con fade-in (re-render por filtro)
 }
@@ -25,7 +22,7 @@ interface Props {
 const TILE_PHOTO_DWELL_MS = 1600;
 const TILE_VIDEO_DWELL_MS = 2500;
 
-export function ProductCard({ product: p, selectedColor, onColorChange, onOpenModal, revealDelayMs }: Props) {
+export function ProductCard({ product: p, onOpenModal, revealDelayMs }: Props) {
   const { addToCart } = useCart();
   const { notify } = useToast();
   const { playBlip } = useSoundContext();
@@ -102,16 +99,16 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
 
   function handleAdd() {
     if (!confirmedPrice) return;
-    addToCart(p.id, p.name, p.price, selectedColor);
+    addToCart(p.id, p.name, p.price);
     playBlip(480);
-    notify(`${p.name} (${selectedColor.name}) agregado ✓`);
+    notify(`${p.name} agregado ✓`);
     setPulse(false);
     // reinicia la animación .pulse en cada click, como el void offsetWidth original
     requestAnimationFrame(() => setPulse(true));
   }
 
   const cardClass = 'card' + (revealDelayMs !== null ? ' reveal' : '');
-  const cardStyle: React.CSSProperties & Record<string, string> = { '--filament': selectedColor.hex };
+  const cardStyle: React.CSSProperties = {};
   if (revealDelayMs !== null) cardStyle.transitionDelay = `${revealDelayMs}ms`;
 
   return (
@@ -157,7 +154,7 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
             )}
           </div>
         ) : (
-          <div className="obj" style={{ '--obj': selectedColor.hex } as React.CSSProperties}>
+          <div className="obj">
             <span>{p.name.charAt(0)}</span>
           </div>
         )}
@@ -176,12 +173,6 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
             chocaba con el badge de estado, que ocupa la misma esquina. */}
         <div className="card-cat"><span className="card-idx">N° {p.id.replace(/^p/, '').padStart(2, '0')}</span>{p.cat}</div>
         <h3>{p.name}</h3>
-        <div className="swatches" role="group" aria-label="Elegir color">
-          {/* COLORS viene por contexto implícito de quien nos pasó selectedColor;
-              el color set completo se resuelve arriba en ProductGrid. */}
-          <ColorSwatches selected={selectedColor} onChange={(c) => { onColorChange(c); playBlip(700); }} />
-          <span className="swatch-label">{selectedColor.name}</span>
-        </div>
         <div className="card-foot">
           {confirmedPrice ? (
             <span className="price">{fmt(p.price)}</span>
@@ -203,22 +194,5 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
         </div>
       </div>
     </article>
-  );
-}
-
-function ColorSwatches({ selected, onChange }: { selected: Color; onChange: (c: Color) => void }) {
-  return (
-    <>
-      {COLORS.map((c) => (
-        <button
-          key={c.name}
-          className={'swatch' + (c.name === selected.name ? ' active' : '')}
-          style={{ background: c.hex }}
-          title={c.name}
-          aria-label={`Color ${c.name}`}
-          onClick={() => onChange(c)}
-        />
-      ))}
-    </>
   );
 }

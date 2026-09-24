@@ -25,7 +25,7 @@ export function HowToBuy() {
           <RevealDiv className="step">
             <div className="step-n">PASO 01</div>
             <h3>Armá tu pedido</h3>
-            <p>Sumá productos al carrito con el color elegido, o cotizá tu pieza a medida. Sin registrarte ni crear cuentas.</p>
+            <p>Sumá productos al carrito, o cotizá tu pieza a medida. Sin registrarte ni crear cuentas.</p>
           </RevealDiv>
           <RevealDiv className="step">
             <div className="step-n">PASO 02</div>
