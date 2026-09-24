@@ -409,7 +409,7 @@ header .logo .wm{font-size:27px}
 /* ---------- Panel del hero: pieza destacada ----------
    Foto, nombre y precio de la primera pieza visible del catálogo. */
 .rig-panel{border:1px solid var(--line-hi);background:var(--surface)}
-.rig-photo{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--ink)}
+.rig-photo{position:relative;aspect-ratio:1/1;overflow:hidden;background:var(--ink)}
 .rig-photo img{width:100%;height:100%;object-fit:cover;display:block}
 .rig-cap{
   display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
