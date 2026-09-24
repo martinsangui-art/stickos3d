@@ -90,7 +90,7 @@ export const PRODUCTS: Product[] = [
   },
   // p5: suma ~$1.000 de LED + pila CR2032 antes del markup. Si lo recalculás
   // solo desde g te va a dar $14.800 y estarías regalando los componentes.
-  { id: 'p5', name: 'Porta líquido difusor de aromas', cat: 'Deco', price: 15000, g: 107, mat: 'Terminación mate', desc: 'Set de dos piezas con arcos apilados: una para varillas de difusor, otra como florero. Se venden por unidad, $15.000 cada una — combinalas o llevate la que necesites.', mpLink: null, status: 'pedido', imgs: ['/assets/products/porta-liquido-1.jpg'] },
+  { id: 'p5', name: 'Porta líquido difusor de aromas', cat: 'Deco', price: 15000, g: 107, mat: 'Precio por unidad · terminación mate', desc: 'Set de dos piezas con arcos apilados: una para varillas de difusor, otra como florero. Se venden por unidad, $15.000 cada una — combinalas o llevate la que necesites.', mpLink: null, status: 'pedido', imgs: ['/assets/products/porta-liquido-1.jpg'] },
   // p13: laminado real, 122 g y $2.800 de material → $22.951/kg, que confirma
   // otra vez el costo de $23.000/kg. El precio sale de la fórmula, sin ajuste.
   { id: 'p13', name: 'Soporte elevador de smartphone con stand para auriculares', cat: 'Regalos', price: 16100, g: 122, mat: 'Una sola pieza', desc: 'Levanta el celular a la altura justa para mirar de reojo mientras trabajás, con un espacio abajo para guardar los auriculares.', mpLink: null, status: 'pedido', imgs: ['/assets/products/soporte-elevador-1.jpg', '/assets/products/soporte-elevador-2.jpg', '/assets/products/soporte-elevador-3.jpg'] },
