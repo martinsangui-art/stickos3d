@@ -18,9 +18,9 @@ export function Hero() {
           <div className="hero-main">
             <div className="hero-idx">[ 01 ] — Piezas a pedido</div>
             <h1>
-              <span className="capa">Ideas hechas</span>
-              <span className="capa">objeto,</span>
-              <span className="capa">capa por capa.</span>
+              <span className="capa">Lámparas y objetos</span>
+              <span className="capa">para tu casa,</span>
+              <span className="capa">hechos a pedido.</span>
             </h1>
             <p>Elegí el color en pantalla, cotizá al instante y recibilo donde estés. Con garantía de reimpresión si algo sale mal.</p>
             <div className="hero-ctas">

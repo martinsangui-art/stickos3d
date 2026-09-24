@@ -39,7 +39,7 @@ export function Footer() {
         </div>
         <div className="foot-base">
           <span>© 2026 STICKOS 3D</span>
-          <span>HECHO CAPA POR CAPA EN BAHÍA BLANCA</span>
+          <span>HECHO A PEDIDO EN BAHÍA BLANCA</span>
         </div>
       </div>
     </footer>

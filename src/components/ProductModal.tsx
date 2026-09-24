@@ -156,7 +156,7 @@ export function ProductModal({ product: p, onClose }: Props) {
           </div>
         </div>
         <div className="product-modal-info">
-          <div className="eyebrow">{p.cat} · {p.mat}</div>
+          <div className="eyebrow">{p.cat}</div>
           <h3>{p.name}</h3>
           <div className="swatches" role="group" aria-label="Elegir color">
             {COLORS.map((c) => (
@@ -181,10 +181,10 @@ export function ProductModal({ product: p, onClose }: Props) {
         {/* Precio + acción principal van HERMANOS de .product-modal-info, no
             adentro — así quedan fuera del contenedor que scrollea
             (.product-modal-info tiene overflow-y:auto en mobile) y la franja
-            de precio+"A la cola" queda fija abajo del todo, sin que un
+            de precio+"Agregar" queda fija abajo del todo, sin que un
             scroll interno se la lleve puesta. Antes vivía anidado adentro de
             .product-modal-info: el CSS (grid-area/flex-shrink) asumía que
-            era hermano, pero en el DOM real era hijo — por eso "A la cola"
+            era hermano, pero en el DOM real era hijo — por eso "Agregar"
             terminaba scrolleado fuera de vista pasara lo que pasara con el
             layout de afuera. */}
         <div className="product-modal-cta">
@@ -193,7 +193,7 @@ export function ProductModal({ product: p, onClose }: Props) {
           </div>
           <div className="product-modal-cta-buttons">
             {confirmedPrice ? (
-              <button type="button" className="btn btn-primary" onClick={handleAdd}>A la cola</button>
+              <button type="button" className="btn btn-primary" onClick={handleAdd}>Agregar</button>
             ) : (
               <button
                 type="button"
@@ -206,7 +206,7 @@ export function ProductModal({ product: p, onClose }: Props) {
                 Consultar
               </button>
             )}
-            <button type="button" className="btn btn-ghost" onClick={handleQuoteWa}>Cotizar por WhatsApp</button>
+            <button type="button" className="btn btn-ghost" onClick={handleQuoteWa}>Consultar por WhatsApp</button>
           </div>
         </div>
       </div>

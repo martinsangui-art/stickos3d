@@ -485,13 +485,6 @@ section{padding:96px 0}
 .card-idx{color:var(--accent)}
 .card-idx::after{content:"";display:inline-block;width:1px;height:9px;margin-left:9px;
   background:var(--soft-grey);opacity:.45;vertical-align:middle}
-/* Línea de ficha: material y gramaje, el dato que en Ruta A vale tanto
-   como la foto. */
-.card-spec{
-  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;
-  color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;
-}
-.card-spec b{color:var(--soft-grey);font-weight:400}
 .card-top{height:3px;background:var(--filament, var(--soft-grey));transition:background .2s}
 .tile{
   aspect-ratio:4/3;position:relative;
@@ -554,7 +547,7 @@ section{padding:96px 0}
 /* Grid con áreas explícitas en vez de solo columnas: la galería ocupa las
    dos filas de su columna, mientras la columna de texto se parte en
    "scroll" (contenido) arriba y "cta" (precio + botones) abajo. Así el
-   precio y "A la cola" quedan en su propia fila fija, nunca superpuestos
+   precio y "Agregar" quedan en su propia fila fija, nunca superpuestos
    por nada — antes con position:sticky el bloque de precio+CTA se
    "pegaba" desde el primer render (cuando el contenido de arriba no
    alcanzaba a llenar la pantalla) y tapaba el precio y el material que
@@ -581,7 +574,7 @@ section{padding:96px 0}
   cursor:pointer;display:flex;align-items:center;justify-content:center;
 }
 /* "Compartir" es una acción de alcance, no de venta — un ícono chico al lado
-   del cierre no compite en peso visual con "A la cola"/"Cotizar", que son
+   del cierre no compite en peso visual con "Agregar"/"Consultar", que son
    las que importan para facturar. Mismo tratamiento (círculo, borde,
    ink-2) que .product-modal-close, para que lean como del mismo sistema. */
 .product-modal-share{
@@ -600,7 +593,7 @@ section{padding:96px 0}
   /* ---- Bottom sheet: el modal de producto se ancla abajo en vez de
      quedar centrado. La galería queda fija arriba, la descripción
      scrollea en su propio contenedor angosto (.product-modal-info), y
-     precio + "A la cola" quedan en una franja fija abajo que ningún
+     precio + "Agregar" quedan en una franja fija abajo que ningún
      scroll puede tapar ni sacar de vista — antes había que scrollear
      DENTRO del modal para encontrar el botón de compra, algo que nadie
      descubre solo. ---- */
@@ -954,7 +947,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   header .logo .wm{font-size:21px}
   .sound-btn{width:38px;height:38px}
   .menu-btn{width:38px;height:38px}
-  /* En 390px el wordmark + menú + Instagram + sonido + Cola no entran y se
+  /* En 390px el wordmark + menú + Instagram + sonido + Pedido no entran y se
      desbordaban del .wrap. Instagram ya está en el menú desplegable y en el
      footer, así que en mobile sale de la barra. */
   .nav-actions > a.sound-btn{display:none}

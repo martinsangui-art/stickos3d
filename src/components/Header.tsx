@@ -58,7 +58,7 @@ export function Header({ cartSize, soundOn, onToggleSound, onOpenCart }: Props) 
         <div className="wrap">
           <div className="grp">
             <span>Bahía Blanca · AR</span>
-            <span>Materiales <b>PLA / PETG / TPU</b></span>
+            <span>Retiro sin cargo · <b>Bahía Blanca</b></span>
             <span>Envíos <b>a todo el país</b></span>
           </div>
         </div>
@@ -137,8 +137,8 @@ export function Header({ cartSize, soundOn, onToggleSound, onOpenCart }: Props) 
               </svg>
             )}
           </button>
-          <button className="cart-btn" id="openCart" aria-label="Abrir cola de impresión" onClick={onOpenCart}>
-            Cola <span className={'cart-count' + (bumpKey > 0 ? ' bump' : '')} id="cartCount" key={bumpKey}>{cartSize}</span>
+          <button className="cart-btn" id="openCart" aria-label="Abrir tu pedido" onClick={onOpenCart}>
+            Pedido <span className={'cart-count' + (bumpKey > 0 ? ' bump' : '')} id="cartCount" key={bumpKey}>{cartSize}</span>
           </button>
         </div>
       </div>

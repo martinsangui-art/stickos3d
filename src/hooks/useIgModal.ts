@@ -4,7 +4,7 @@ const KEY = 'stickos_ig_modal_seen';
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 
 /* Modal "Seguinos en Instagram" — dispara con lo que pase primero: scroll
-   pasado el 50% de la página, o un producto agregado a la cola de impresión
+   pasado el 50% de la página, o un producto agregado al pedido
    (ver triggerFromCart, llamado desde CartContext.addToCart). No vuelve a
    aparecer hasta pasada una semana (localStorage).
 

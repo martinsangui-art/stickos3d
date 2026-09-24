@@ -15,13 +15,13 @@ export function CartDrawer({ open, onClose }: Props) {
 
   function checkout() {
     if (!items.length) {
-      // Mismo sistema de Toast que usa el resto del sitio (ej: "agregado a
-      // la cola ✓") — antes esto disparaba un alert() nativo del navegador,
+      // Mismo sistema de Toast que usa el resto del sitio (ej: "agregado
+      // ✓") — antes esto disparaba un alert() nativo del navegador,
       // la única notificación de todo STICKOS 3D que no pasaba por acá.
-      notify('Tu cola está vacía — sumá algo del catálogo 👇');
+      notify('Tu pedido está vacío — sumá algo del catálogo 👇');
       return;
     }
-    let msg = '¡Hola STICKOS 3D! Quiero mandar esto a la cola de impresión:\n\n';
+    let msg = '¡Hola STICKOS 3D! Quiero pedir esto:\n\n';
     items.forEach(([, i]) => {
       msg += `• ${i.name} — color ${i.color} — x${i.qty} — ${fmt(i.price * i.qty)}\n`;
     });
@@ -38,14 +38,14 @@ export function CartDrawer({ open, onClose }: Props) {
   return (
     <>
       <div className={'overlay' + (open ? ' open' : '')} onClick={onClose}></div>
-      <aside className={'drawer' + (open ? ' open' : '')} aria-label="Cola de impresión">
+      <aside className={'drawer' + (open ? ' open' : '')} aria-label="Tu pedido">
         <div className="drawer-head">
-          <h3>Tu cola de impresión</h3>
-          <button className="drawer-close" onClick={onClose} aria-label="Cerrar cola de impresión">×</button>
+          <h3>Tu pedido</h3>
+          <button className="drawer-close" onClick={onClose} aria-label="Cerrar tu pedido">×</button>
         </div>
         <div className="drawer-items">
           {items.length === 0 ? (
-            <p className="empty-cart">Tu cola está vacía.<br />Sumá algo del catálogo 👇</p>
+            <p className="empty-cart">Tu pedido está vacío.<br />Sumá algo del catálogo 👇</p>
           ) : (
             items.map(([key, i]) => (
               <div className="d-item" key={key}>
@@ -65,7 +65,7 @@ export function CartDrawer({ open, onClose }: Props) {
         </div>
         <div className="drawer-foot">
           <div className="total-row"><span>Total estimado</span><span className="price">{fmt(total)}</span></div>
-          <button className="btn btn-primary" onClick={checkout}>Confirmar cola por WhatsApp</button>
+          <button className="btn btn-primary" onClick={checkout}>Enviar pedido por WhatsApp</button>
           <p className="drawer-note">Te confirmamos stock y plazo, y te pasamos el link de Mercado Pago o los datos de transferencia. Sin vueltas.</p>
         </div>
       </aside>

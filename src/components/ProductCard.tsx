@@ -104,7 +104,7 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
     if (!confirmedPrice) return;
     addToCart(p.id, p.name, p.price, selectedColor);
     playBlip(480);
-    notify(`${p.name} (${selectedColor.name}) en cola ✓`);
+    notify(`${p.name} (${selectedColor.name}) agregado ✓`);
     setPulse(false);
     // reinicia la animación .pulse en cada click, como el void offsetWidth original
     requestAnimationFrame(() => setPulse(true));
@@ -176,10 +176,6 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
             chocaba con el badge de estado, que ocupa la misma esquina. */}
         <div className="card-cat"><span className="card-idx">N° {p.id.replace(/^p/, '').padStart(2, '0')}</span>{p.cat}</div>
         <h3>{p.name}</h3>
-        <div className="card-spec">
-          <span>{p.mat}</span>
-          <span><b>{p.g} g</b></span>
-        </div>
         <div className="swatches" role="group" aria-label="Elegir color">
           {/* COLORS viene por contexto implícito de quien nos pasó selectedColor;
               el color set completo se resuelve arriba en ProductGrid. */}
@@ -198,7 +194,7 @@ export function ProductCard({ product: p, selectedColor, onColorChange, onOpenMo
             )}
             {confirmedPrice ? (
               <button className={'add-btn' + (pulse ? ' pulse' : '')} onAnimationEnd={() => setPulse(false)} onClick={handleAdd}>
-                A la cola
+                Agregar
               </button>
             ) : (
               <a className="add-btn" href="#contacto">Consultar</a>
