@@ -588,6 +588,17 @@ section{padding:96px 0}
 .product-modal-share svg{width:16px;height:16px}
 .product-modal-cta{display:flex;flex-direction:column;gap:12px;grid-area:cta;padding:16px 32px 32px}
 .product-modal-cta-buttons{display:flex;gap:10px;flex-wrap:wrap}
+/* Desktop: mismo criterio que el bottom sheet de mobile — alto fijo, pie
+   (precio + botones) siempre visible y solo la info scrollea. Con
+   overflow:auto en el contenedor y la fila de info en 1fr, una descripción
+   larga o los botones en dos filas empujaban el CTA debajo del borde.
+   Va en min-width para no pisar el bloque mobile de abajo, que usa
+   max-height y aspect-ratio propios. */
+@media(min-width:721px){
+  .product-modal-content{overflow:hidden;height:min(88vh, 640px);grid-template-rows:minmax(0,1fr) auto}
+  .product-modal-info{min-height:0;overflow-y:auto}
+  .product-modal-gallery{aspect-ratio:auto;height:100%;min-height:0}
+}
 @media(max-width:720px){
   .product-modal-gallery{aspect-ratio:1.2}
 
