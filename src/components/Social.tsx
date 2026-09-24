@@ -11,7 +11,7 @@ export function Social() {
   return (
     <section className="social" id="redes">
       <div className={`wrap ${reveal.className}`} ref={reveal.ref}>
-        <div className="eyebrow">Capa 06 — Redes</div>
+        <div className="eyebrow">Capa 05 — Redes</div>
         <h2 className="sec-title">Seguinos en redes</h2>
         <p className="social-copy">Ahí van saliendo las piezas terminadas, los colores nuevos de filamento y los trabajos a medida que todavía no están en el catálogo.</p>
         {!gridBroken && (

@@ -21,9 +21,8 @@ export function Footer() {
           <div>
             <h4>Tienda</h4>
             <a href="#catalogo">Catálogo</a>
-            <a href="#pedido">Cotizador instantáneo</a>
+            <a href="#pedido">Pieza a medida</a>
             <a href="#comprar">Cómo comprar</a>
-            <a href="#nosotros">El taller</a>
           </div>
           <div>
             <h4>Contacto</h4>
