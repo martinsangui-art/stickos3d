@@ -68,7 +68,7 @@ export function CartDrawer({ open, onClose }: Props) {
           <div className="total-row"><span>Total estimado</span><span className="price">{fmt(total)}</span></div>
           <p className="drawer-ig">¿Nos seguís en Instagram? 5 % off: dejá tu usuario en el mensaje.</p>
           <button className="btn btn-primary" onClick={checkout}>Enviar pedido por WhatsApp</button>
-          <p className="drawer-note">Te confirmamos stock y plazo, y te pasamos el link de Mercado Pago o los datos de transferencia. Sin vueltas.</p>
+          <p className="drawer-note">Te confirmamos disponibilidad y plazo, y te pasamos el link de Mercado Pago o los datos de transferencia. Sin vueltas.</p>
         </div>
       </aside>
     </>

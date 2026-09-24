@@ -18,7 +18,7 @@ export function Footer() {
                 <span className="wm-t" aria-hidden="true">STICKOS<em>3D</em></span>
               </span>
             </a>
-            <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '32ch' }}>Impresión 3D en Bahía Blanca. Diseño propio, hecho al momento.</p>
+            <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '32ch' }}>Lámparas y objetos de deco hechos a pedido en Bahía Blanca.</p>
             <p style={{ color: 'var(--muted)', fontSize: '13.5px', maxWidth: '38ch', marginTop: '8px' }}>Envío a todo el país, según destino · Productos del catálogo: podés arrepentirte dentro de los 10 días corridos de recibido. Las piezas hechas según tus medidas o diseño no admiten arrepentimiento. Ante un defecto de fabricación, garantía legal de 6 meses — el envío de cambio lo cubrimos nosotros.</p>
             <a href={withdrawalHref} className="foot-withdrawal" id="footWithdrawal">Botón de arrepentimiento</a>
           </div>
