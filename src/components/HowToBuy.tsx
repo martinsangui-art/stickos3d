@@ -35,7 +35,7 @@ export function HowToBuy() {
           <RevealDiv className="step">
             <div className="step-n">PASO 03</div>
             <h3>Retirás o te lo enviamos</h3>
-            <p>Retiro sin cargo en Bahía Blanca, o envío a todo el país por correo con seguimiento.</p>
+            <p>Retiro sin cargo en Bahía Blanca, o envío a todo el país por correo con seguimiento. El correo tarda unos 7 días hábiles según destino.</p>
           </RevealDiv>
         </div>
         <div className="pay-row">
@@ -59,7 +59,7 @@ export function HowToBuy() {
           <RevealDiv className="trust-card">
             <span className="trust-mark">Sin vueltas</span>
             <h3>Todo por WhatsApp</h3>
-            <p>Cotizás, confirmás y seguís tu pedido por WhatsApp. Entrega en 48 a 72hs.</p>
+            <p>Cotizás, confirmás y seguís tu pedido por WhatsApp. Lo que está listo sale en el día; lo que es a pedido, en 3 a 5 días.</p>
           </RevealDiv>
         </div>
       </div>
