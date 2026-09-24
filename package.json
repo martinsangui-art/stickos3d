@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && node scripts/generate-share-pages.mjs",
+    "build": "tsc --noEmit && vite build && node scripts/generate-share-pages.mjs && node scripts/generate-sitemap.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

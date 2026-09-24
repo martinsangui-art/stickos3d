@@ -83,13 +83,15 @@ impresora o capacidad limitada.
   desincronizaba: el `priceRange` quedó fijo en "$3.500 - $31.500" mucho
   después de que el máximo real subiera a $78.000).
 - **Pagos:** Mercado Pago (link de pago por producto, campo `mpLink`).
-- **Build de tres pasos:** `npm run build` = `tsc --noEmit && vite build &&
-  node scripts/generate-share-pages.mjs`. Ese tercer paso genera una página
-  estática por producto con foto (`dist/p/<id>.html`) con sus propios
-  `og:` tags, para que compartir un producto muestre SU foto y no la
-  genérica del home — ver sección 16. Si se agrega otro paso de build, va
-  ahí; `deploy.yml` corre `npm run build` como paso único y no hay que
-  tocarlo.
+- **Build de cuatro pasos:** `npm run build` = `tsc --noEmit && vite build &&
+  node scripts/generate-share-pages.mjs && node scripts/generate-sitemap.mjs`.
+  El tercer paso genera una página estática por producto con foto
+  (`dist/p/<id>.html`) con sus propios `og:` tags, para que compartir un
+  producto muestre SU foto y no la genérica del home — ver sección 16. El
+  cuarto escribe `dist/sitemap.xml` con la fecha del build como `lastmod`
+  (ya no existe `public/sitemap.xml`: no editarlo a mano). Si se agrega otro
+  paso de build, va ahí; `deploy.yml` corre `npm run build` como paso único
+  y no hay que tocarlo.
 
 ---
 
@@ -707,3 +709,32 @@ y la pieza era de 15 cm; en complejidad respondió "no sé").
   tests): sin emojis y sin estimado.
 - Todos los campos de opción son botones de radio visibles (`.choice`), no
   `<select>`: el select cortaba las referencias largas en mobile.
+
+---
+
+## 21. Auditoría de conversión (24/09/2026)
+
+Objetivo: sacar lo que frena al comprador de deco/regalo (el público real) y
+lo que le habla al maker. Un commit por bloque (A1…A8).
+
+- **Preloader** (`usePreloader.ts`): solo en la primera visita de la sesión
+  (`sessionStorage` `stk_preloader_seen`) y nunca con `?p=`. Dura 1,5 s
+  (antes 3,6 s en todas las cargas).
+- **Metas**: meta description, `og:description` y el `description` del
+  LocalBusiness hablan de lámparas y deco a pedido, no de impresión 3D.
+- **Redes**: las dos imágenes son fotos del catálogo (HUSO, KENDAI). Las
+  `ig-post-*.jpg` firmaban la cuenta vieja `@STICKOS3D` y se borraron.
+- **Cola de impresión: eliminada.** `PRINT_QUEUE` era estática, se mostraba
+  "en vivo" y decía "En la impresora" en singular (regla de marca, sección
+  1). Se sacó del Hero, de la sección del taller y el "Taller activo" del
+  header. **No volver a mostrar estado "en vivo" que no se actualice solo.**
+  Esto reemplaza lo que decía la sección 18 sobre el panel del hero.
+- **Vocabulario de comprador**: nada de PLA/PETG/TPU, gramos ni "capa por
+  capa" en lo que ve el cliente. El carrito es "Tu pedido" (no "cola"), el
+  botón es "Agregar", y el modal dice "Consultar por WhatsApp". El campo
+  `mat` de los productos visibles describe colores/lo que incluye, no el
+  filamento — **al cargar un producto nuevo, `mat` va en ese lenguaje**.
+  Las cards ya no muestran la línea material + gramos (sección 18).
+- **Color sin elegir en el modal** → se agrega como "A coordinar"
+  (`COLOR_TBD` en `config.ts`), no como Negro.
+- **Sitemap** generado en el build (ver sección 2).

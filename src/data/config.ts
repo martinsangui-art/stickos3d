@@ -1,4 +1,4 @@
-import type { Color, PrintJob, StockStatusKey } from './types';
+import type { Color, StockStatusKey } from './types';
 
 /* ============================================================
    CONFIGURACIÓN — editá esto con sus datos reales
@@ -22,15 +22,10 @@ export const COLORS: Color[] = [
   { name: 'Gris', hex: '#8A8F98' },
 ];
 
-/* ============================================================
-   COLA DE IMPRESIÓN — "El taller, en vivo"
-   Actualizá esto cuando cambien de trabajo. progress: 0 = en cola.
-   ============================================================ */
-export const PRINT_QUEUE: PrintJob[] = [
-  { name: 'Lámpara de luna — pedido #041', progress: 64 },
-  { name: 'Soportes de auriculares x3', progress: 0 },
-  { name: 'Pieza a medida — soporte de router', progress: 0 },
-];
+/* Color de un pedido en el que el cliente no eligió ninguno: se agrega igual
+   y el color se arregla por WhatsApp. Antes caía en COLORS[0] (Negro) y el
+   pedido llegaba con un color que nadie eligió. */
+export const COLOR_TBD: Color = { name: 'A coordinar', hex: '#8C8579' };
 
 /* ============================================================
    COTIZADOR — piso de precio por tamaño. Es "desde cuánto arranca" ese

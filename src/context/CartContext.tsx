@@ -22,7 +22,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = (id: string, name: string, price: number, color: Color) => {
     const key = `${id}|${color.name}`;
     dispatch({ type: 'add', key, item: { name, price, color: color.name, colorHex: color.hex } });
-    // Agregar a la cola es uno de los dos gatillos del modal de Instagram
+    // Agregar al pedido es uno de los dos gatillos del modal de Instagram
     // (el otro es scroll pasado el 50%) — ver useIgModal.
     triggerFromCart();
     trackPixel('AddToCart', { content_name: name, content_ids: [id], value: price, currency: 'ARS' });

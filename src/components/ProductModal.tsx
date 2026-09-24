@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { COLORS } from '../data/config';
+import { COLORS, COLOR_TBD } from '../data/config';
 import { hasConfirmedPrice } from '../data/products';
 import type { Color, Product } from '../data/types';
 import { fmt, productShareUrl, shareWa, wa } from '../lib/format';
@@ -15,7 +15,7 @@ interface Props {
 /* Modal de detalle de producto — se abre al tocar la foto/tile de una card,
    reusa el mismo slider visual que ProductCard, en tamaño grande.
 
-   modalColor es estado propio del modal (para el botón "Cotizar por
+   modalColor es estado propio del modal (para el botón "Consultar por
    WhatsApp"), separado del selectedColor de las cards/carrito — igual que en
    el original: abrir el modal siempre arranca en "sin color elegido". */
 export function ProductModal({ product: p, onClose }: Props) {
@@ -88,13 +88,13 @@ export function ProductModal({ product: p, onClose }: Props) {
 
   function handleAdd() {
     if (!p) return;
-    addToCart(p.id, p.name, p.price, modalColor ?? COLORS[0]);
+    addToCart(p.id, p.name, p.price, modalColor ?? COLOR_TBD);
     handleClose();
   }
 
   function handleQuoteWa() {
     let msg = `¡Hola STICKOS 3D! Quiero pedir ${p!.name}`;
-    if (modalColor) msg += ` en color ${modalColor.name}`;
+    msg += modalColor ? ` en color ${modalColor.name}` : ', color a coordinar';
     msg += '.';
     window.open(wa(msg), '_blank');
   }
@@ -156,7 +156,7 @@ export function ProductModal({ product: p, onClose }: Props) {
           </div>
         </div>
         <div className="product-modal-info">
-          <div className="eyebrow">{p.cat} · {p.mat}</div>
+          <div className="eyebrow">{p.cat}</div>
           <h3>{p.name}</h3>
           <div className="swatches" role="group" aria-label="Elegir color">
             {COLORS.map((c) => (
@@ -181,10 +181,10 @@ export function ProductModal({ product: p, onClose }: Props) {
         {/* Precio + acción principal van HERMANOS de .product-modal-info, no
             adentro — así quedan fuera del contenedor que scrollea
             (.product-modal-info tiene overflow-y:auto en mobile) y la franja
-            de precio+"A la cola" queda fija abajo del todo, sin que un
+            de precio+"Agregar" queda fija abajo del todo, sin que un
             scroll interno se la lleve puesta. Antes vivía anidado adentro de
             .product-modal-info: el CSS (grid-area/flex-shrink) asumía que
-            era hermano, pero en el DOM real era hijo — por eso "A la cola"
+            era hermano, pero en el DOM real era hijo — por eso "Agregar"
             terminaba scrolleado fuera de vista pasara lo que pasara con el
             layout de afuera. */}
         <div className="product-modal-cta">
@@ -193,7 +193,7 @@ export function ProductModal({ product: p, onClose }: Props) {
           </div>
           <div className="product-modal-cta-buttons">
             {confirmedPrice ? (
-              <button type="button" className="btn btn-primary" onClick={handleAdd}>A la cola</button>
+              <button type="button" className="btn btn-primary" onClick={handleAdd}>Agregar</button>
             ) : (
               <button
                 type="button"
@@ -206,7 +206,7 @@ export function ProductModal({ product: p, onClose }: Props) {
                 Consultar
               </button>
             )}
-            <button type="button" className="btn btn-ghost" onClick={handleQuoteWa}>Cotizar por WhatsApp</button>
+            <button type="button" className="btn btn-ghost" onClick={handleQuoteWa}>Consultar por WhatsApp</button>
           </div>
         </div>
       </div>
