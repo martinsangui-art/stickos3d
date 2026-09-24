@@ -908,6 +908,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--sur
   transition:opacity .25s ease, transform .45s cubic-bezier(.34,1.56,.64,1);
 }
 .toast.show{opacity:1;transform:translate(-50%,0)}
+/* Con el carrito abierto el toast sube arriba de la pantalla: abajo tapaba
+   el pie del carrito (botón de envío y texto). */
+body:has(.drawer.open) .toast{bottom:auto;top:24px;transform:translate(-50%,-20px)}
+body:has(.drawer.open) .toast.show{transform:translate(-50%,0)}
 
 .wa-float{
   position:fixed;bottom:24px;right:24px;z-index:65;
