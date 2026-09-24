@@ -83,13 +83,15 @@ impresora o capacidad limitada.
   desincronizaba: el `priceRange` quedó fijo en "$3.500 - $31.500" mucho
   después de que el máximo real subiera a $78.000).
 - **Pagos:** Mercado Pago (link de pago por producto, campo `mpLink`).
-- **Build de tres pasos:** `npm run build` = `tsc --noEmit && vite build &&
-  node scripts/generate-share-pages.mjs`. Ese tercer paso genera una página
-  estática por producto con foto (`dist/p/<id>.html`) con sus propios
-  `og:` tags, para que compartir un producto muestre SU foto y no la
-  genérica del home — ver sección 16. Si se agrega otro paso de build, va
-  ahí; `deploy.yml` corre `npm run build` como paso único y no hay que
-  tocarlo.
+- **Build de cuatro pasos:** `npm run build` = `tsc --noEmit && vite build &&
+  node scripts/generate-share-pages.mjs && node scripts/generate-sitemap.mjs`.
+  El tercer paso genera una página estática por producto con foto
+  (`dist/p/<id>.html`) con sus propios `og:` tags, para que compartir un
+  producto muestre SU foto y no la genérica del home — ver sección 16. El
+  cuarto escribe `dist/sitemap.xml` con la fecha del build como `lastmod`
+  (ya no existe `public/sitemap.xml`: no editarlo a mano). Si se agrega otro
+  paso de build, va ahí; `deploy.yml` corre `npm run build` como paso único
+  y no hay que tocarlo.
 
 ---
 
