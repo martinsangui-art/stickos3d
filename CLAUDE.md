@@ -746,3 +746,24 @@ lo que le habla al maker. Un commit por bloque (A1…A8).
   cargo. Mandanos una foto dentro de las 48 h de recibida." Convive con la
   garantía legal de 6 meses del footer, que es obligatoria.
 - **Sitemap** generado en el build (ver sección 2).
+
+---
+
+## 22. Pendientes post #14 (24/09/2026)
+
+- **Orden de la grilla**: abre con las lámparas, HUSO primero (es la
+  destacada del Hero). KENDAI (fotos del diseñador) y Death Star (marca
+  ajena) no van de portada.
+- **Sección "Cómo laburamos" eliminada.** Las capas quedan: 01 Catálogo,
+  02 Pieza a medida, 03 Cómo comprar, 04 Contacto, 05 Redes.
+- **No decir "cotización al instante"**: el cotizador da un piso. Se dice
+  "precio de referencia al instante" o "pieza a medida".
+- **Modal de producto en desktop**: alto fijo `min(88vh, 640px)`, pie fijo
+  con precio y botones, solo la info scrollea (reglas en
+  `@media(min-width:721px)`). Reemplaza lo que decía la sección 15 sobre
+  que el modal de desktop no cambiaba.
+- **h1 del Hero**: `max-width:19ch` y `font-size:clamp(34px,4.8vw,60px)`
+  para que cada `span.capa` quede en una línea de 360 a 1920px. Si cambia
+  el copy del h1, volver a medir.
+- **Schema de envío**: `deliveryTime.businessDays` = lunes a viernes.
+  Pendiente de verificar con el Rich Results Test.
