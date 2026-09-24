@@ -6,6 +6,7 @@ import { hasConfirmedPrice } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useSoundContext } from '../context/SoundContext';
+import { useReveal } from '../hooks/useReveal';
 
 interface Props {
   product: Product;
@@ -28,6 +29,7 @@ export function ProductCard({ product: p, onOpenModal, revealDelayMs }: Props) {
   const { playBlip } = useSoundContext();
   const [idx, setIdx] = useState(0);
   const [pulse, setPulse] = useState(false);
+  const reveal = useReveal<HTMLElement>();
   const touchStartX = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const cycleActiveRef = useRef(false);
@@ -107,12 +109,15 @@ export function ProductCard({ product: p, onOpenModal, revealDelayMs }: Props) {
     requestAnimationFrame(() => setPulse(true));
   }
 
-  const cardClass = 'card' + (revealDelayMs !== null ? ' reveal' : '');
+  // La card se revela sola al entrar en pantalla. Antes solo tenía la clase
+  // .reveal y nadie le agregaba .in: se veía únicamente si algo volvía a
+  // renderizar la grilla (revealDelayMs pasa a null), y a veces nada lo hacía.
+  const cardClass = 'card' + (revealDelayMs !== null ? ` ${reveal.className}` : '');
   const cardStyle: React.CSSProperties = {};
   if (revealDelayMs !== null) cardStyle.transitionDelay = `${revealDelayMs}ms`;
 
   return (
-    <article className={cardClass} data-card={p.id} style={cardStyle}>
+    <article className={cardClass} data-card={p.id} style={cardStyle} ref={reveal.ref}>
       <div className="card-top"></div>
       <div
         className={'tile' + (imgs ? ' has-photo' : '')}
