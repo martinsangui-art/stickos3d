@@ -5,7 +5,7 @@ import {
   DELIVERY_OPTIONS, FILE_OPTIONS, FINISH_OPTIONS, SIZE_OPTIONS, WHEN_OPTIONS,
   type QuoteDelivery, type QuoteFile, type QuoteFinish, type QuoteSize, type QuoteWhen,
 } from '../lib/quote';
-import { fmt, wa } from '../lib/format';
+import { fmt, openWhatsApp, wa } from '../lib/format';
 import { trackPixel } from '../lib/pixel';
 
 function Choice<T extends string>({
@@ -60,7 +60,7 @@ export function QuoteForm() {
     if (!size || !delivery || !when || !hasFile) return;
     const msg = buildQuoteMessage({ name, desc, size, finish, qty, delivery, place, when, date, file: hasFile });
     trackPixel('Lead', { content_category: 'cotizador', ...(floor ? { value: floor, currency: 'ARS' } : {}) });
-    window.open(wa(msg), '_blank');
+    openWhatsApp(wa(msg));
   }
 
   return (

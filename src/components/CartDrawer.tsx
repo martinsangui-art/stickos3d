@@ -1,7 +1,7 @@
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { COLOR_TBD } from '../data/config';
-import { fmt, wa } from '../lib/format';
+import { fmt, openWhatsApp, wa } from '../lib/format';
 import { trackPixel } from '../lib/pixel';
 
 interface Props {
@@ -33,7 +33,7 @@ export function CartDrawer({ open, onClose }: Props) {
       num_items: items.reduce((a, [, i]) => a + i.qty, 0),
       content_ids: items.map(([key]) => key),
     });
-    window.open(wa(msg), '_blank');
+    openWhatsApp(wa(msg));
   }
 
   return (

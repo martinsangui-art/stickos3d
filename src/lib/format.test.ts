@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { productShareUrl, shareWa } from './format';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { openWhatsApp, productShareUrl, shareWa } from './format';
 import { PRODUCTS } from '../data/products';
 
 describe('shareWa', () => {
@@ -24,5 +24,30 @@ describe('productShareUrl', () => {
   it('falls back to the plain ?p=<id> deep link when there is no photo to preview', () => {
     const sinFoto = PRODUCTS.find((p) => p.id === 'p2')!; // sin imgs, PRÓXIMAMENTE
     expect(productShareUrl(sinFoto)).toBe('https://stickos3d.com.ar/?p=p2');
+  });
+});
+
+describe('openWhatsApp', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  function mockPointer(coarse: boolean) {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) => ({ matches: coarse && query === '(pointer: coarse)', media: query }) as MediaQueryList,
+    );
+  }
+
+  it('desktop (mouse): opens a new tab', () => {
+    mockPointer(false);
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    openWhatsApp('https://wa.me/1?text=hola');
+    expect(open).toHaveBeenCalledWith('https://wa.me/1?text=hola', '_blank');
+  });
+
+  it('touch screen: navigates in the same tab instead of window.open (in-app browsers block it)', () => {
+    mockPointer(true);
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    vi.spyOn(console, 'error').mockImplementation(() => {}); // jsdom: "navigation not implemented"
+    openWhatsApp('https://wa.me/1?text=hola');
+    expect(open).not.toHaveBeenCalled();
   });
 });

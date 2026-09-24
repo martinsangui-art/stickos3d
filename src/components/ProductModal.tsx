@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { hasConfirmedPrice } from '../data/products';
 import type { Product } from '../data/types';
-import { fmt, productShareUrl, shareWa, wa } from '../lib/format';
+import { fmt, openWhatsApp, productShareUrl, shareWa, wa } from '../lib/format';
 import { useCart } from '../context/CartContext';
 import { trackCustomPixel } from '../lib/pixel';
 
@@ -85,7 +85,7 @@ export function ProductModal({ product: p, onClose }: Props) {
   }
 
   function handleQuoteWa() {
-    window.open(wa(`¡Hola STICKOS 3D! Quiero pedir ${p!.name}. ¿Qué colores hay?`), '_blank');
+    openWhatsApp(wa(`¡Hola STICKOS 3D! Quiero pedir ${p!.name}. ¿Qué colores hay?`));
   }
 
   function handleShare() {
