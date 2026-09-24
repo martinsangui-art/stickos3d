@@ -25,17 +25,20 @@ const HANDLING_DAYS: Record<StockStatusKey, [number, number]> = {
   pedido: [3, 5],
 };
 
-// Política de devoluciones real: piezas hechas a medida están exceptuadas
-// del derecho de arrepentimiento de 10 días (art. 1116 CCCN) — por eso
-// NotPermitted, no un plazo. La garantía legal por defectos de fabricación
-// (art. 11 Ley 24.240, piso de 6 meses, no acortable) es un derecho aparte
-// que no tiene campo propio en schema.org para "solo defectos" — queda en
-// el texto visible del sitio (Footer), igual que Etsy/Amazon Handmade con
-// ítems personalizados. No declarar acá un plazo de devolución genérico.
+// Política de devoluciones: todo lo que se lista acá es producto del
+// catálogo, y en una venta a distancia tiene derecho de arrepentimiento de 10
+// días corridos (art. 34 Ley 24.240 / art. 1110 CCCN), con la devolución a
+// cargo del vendedor (FreeReturn). Las piezas hechas según medidas o diseño
+// del cliente están exceptuadas (art. 1116 CCCN), pero esas salen del
+// cotizador y no figuran en este schema. Tiene que decir lo mismo que el
+// footer.
 const RETURN_POLICY = {
   '@type': 'MerchantReturnPolicy',
-  returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
   applicableCountry: 'AR',
+  returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+  merchantReturnDays: 10,
+  returnMethod: 'https://schema.org/ReturnByMail',
+  returnFees: 'https://schema.org/FreeReturn',
 };
 
 // Detalle de envío por Offer: tarifa (rango real de correo a todo el país),
