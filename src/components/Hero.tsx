@@ -29,7 +29,7 @@ export function Hero() {
             </div>
             <div className="hero-specs">
               <div><strong>Elegís el color</strong>Te mostramos las opciones</div>
-              <div><strong>Cotización</strong>Al instante, sin esperar respuesta</div>
+              <div><strong>Pieza a medida</strong>Precio de referencia al instante</div>
               <div><strong>Garantía STICKOS</strong>Si llega dañada, la rehacemos</div>
               <div><strong>Entrega</strong>Retiro local + envío a todo el país</div>
             </div>
