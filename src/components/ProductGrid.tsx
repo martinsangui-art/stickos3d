@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { COLORS } from '../data/config';
 import { VISIBLE_PRODUCTS } from '../data/products';
-import type { Color } from '../data/types';
 import { useReveal } from '../hooks/useReveal';
 import { ProductCard } from './ProductCard';
 import { ProductModal } from './ProductModal';
@@ -13,9 +11,6 @@ const CATS = ['Todos', ...Array.from(new Set(VISIBLE_PRODUCTS.map((p) => p.cat))
 export function ProductGrid() {
   const headReveal = useReveal<HTMLDivElement>();
   const [activeCat, setActiveCat] = useState('Todos');
-  const [selectedColor, setSelectedColor] = useState<Record<string, Color>>(() =>
-    Object.fromEntries(VISIBLE_PRODUCTS.map((p) => [p.id, COLORS[0]])),
-  );
   // Deep-link: ?p=<id> en la URL abre el modal de ese producto directo al
   // cargar — lo que hace que el botón "Compartir por WhatsApp" de cada
   // producto (ver ProductCard/ProductModal) lleve a quien lo recibe al
@@ -60,7 +55,7 @@ export function ProductGrid() {
           <div>
             <div className="eyebrow">Capa 01 — Catálogo</div>
             <h2 className="sec-title">Diseños listos para pedir</h2>
-            <p>Tocá un color y mirá cómo queda. Cada pieza se imprime al momento del pedido, en el color que elijas.</p>
+            <p>Cada pieza se hace al momento del pedido, en el color que elijas.</p>
           </div>
         </div>
         <div className="filters" role="tablist" aria-label="Filtrar por categoría">
@@ -80,8 +75,6 @@ export function ProductGrid() {
             <ProductCard
               key={p.id}
               product={p}
-              selectedColor={selectedColor[p.id]}
-              onColorChange={(c) => setSelectedColor((s) => ({ ...s, [p.id]: c }))}
               onOpenModal={() => setOpenProductId(p.id)}
               revealDelayMs={isFirstRender ? (i % 4) * 70 : null}
             />

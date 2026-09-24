@@ -41,7 +41,7 @@ export const PRODUCTS: Product[] = [
   // Publicado a $49.999 (≈2,78x sobre costo real). No es error de tipeo.
   {
     id: 'p23',
-    name: 'Star Wars Death Star',
+    name: 'Death Star',
     cat: 'Deco',
     price: 49999,
     g: 216,

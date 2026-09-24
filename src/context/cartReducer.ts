@@ -1,8 +1,6 @@
 export interface CartItem {
   name: string;
   price: number;
-  color: string;
-  colorHex: string;
   qty: number;
 }
 
@@ -13,7 +11,8 @@ export type CartAction =
   | { type: 'inc'; key: string }
   | { type: 'dec'; key: string };
 
-/* Carrito (en memoria de la sesión) — clave: producto + color.
+/* Carrito (en memoria de la sesión) — clave: id del producto. El color no
+   se elige en la web: se coordina por WhatsApp al confirmar el pedido.
    Extraído del manejador de click delegado del original como reducer puro,
    para poder testear las reglas (sumar cantidad, borrar en 0) sin DOM. */
 export function cartReducer(state: CartState, action: CartAction): CartState {

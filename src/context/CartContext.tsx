@@ -1,6 +1,5 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
 import { cartReducer, cartSize, cartTotal, type CartState } from './cartReducer';
-import type { Color } from '../data/types';
 import { useIgModalContext } from './IgModalContext';
 import { trackPixel } from '../lib/pixel';
 
@@ -8,7 +7,7 @@ interface CartContextValue {
   cart: CartState;
   size: number;
   total: number;
-  addToCart: (id: string, name: string, price: number, color: Color) => string; // returns the key, for the caller's toast
+  addToCart: (id: string, name: string, price: number) => string; // returns the key, for the caller's toast
   inc: (key: string) => void;
   dec: (key: string) => void;
 }
@@ -19,9 +18,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, dispatch] = useReducer(cartReducer, {} as CartState);
   const { triggerFromCart } = useIgModalContext();
 
-  const addToCart = (id: string, name: string, price: number, color: Color) => {
-    const key = `${id}|${color.name}`;
-    dispatch({ type: 'add', key, item: { name, price, color: color.name, colorHex: color.hex } });
+  const addToCart = (id: string, name: string, price: number) => {
+    const key = id;
+    dispatch({ type: 'add', key, item: { name, price } });
     // Agregar al pedido es uno de los dos gatillos del modal de Instagram
     // (el otro es scroll pasado el 50%) — ver useIgModal.
     triggerFromCart();

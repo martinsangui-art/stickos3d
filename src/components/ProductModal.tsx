@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { COLORS, COLOR_TBD } from '../data/config';
 import { hasConfirmedPrice } from '../data/products';
-import type { Color, Product } from '../data/types';
+import type { Product } from '../data/types';
 import { fmt, productShareUrl, shareWa, wa } from '../lib/format';
 import { useCart } from '../context/CartContext';
-import { useSoundContext } from '../context/SoundContext';
 import { trackCustomPixel } from '../lib/pixel';
 
 interface Props {
@@ -14,22 +12,16 @@ interface Props {
 
 /* Modal de detalle de producto — se abre al tocar la foto/tile de una card,
    reusa el mismo slider visual que ProductCard, en tamaño grande.
-
-   modalColor es estado propio del modal (para el botón "Consultar por
-   WhatsApp"), separado del selectedColor de las cards/carrito — igual que en
-   el original: abrir el modal siempre arranca en "sin color elegido". */
+   No hay selector de color: el color se coordina por WhatsApp. */
 export function ProductModal({ product: p, onClose }: Props) {
   const { addToCart } = useCart();
-  const { playBlip } = useSoundContext();
   const [idx, setIdx] = useState(0);
-  const [modalColor, setModalColor] = useState<Color | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const touchStartX = useRef(0);
 
   // Reset al abrir un producto nuevo.
   useEffect(() => {
     setIdx(0);
-    setModalColor(null);
   }, [p?.id]);
 
   useEffect(() => {
@@ -88,15 +80,12 @@ export function ProductModal({ product: p, onClose }: Props) {
 
   function handleAdd() {
     if (!p) return;
-    addToCart(p.id, p.name, p.price, modalColor ?? COLOR_TBD);
+    addToCart(p.id, p.name, p.price);
     handleClose();
   }
 
   function handleQuoteWa() {
-    let msg = `¡Hola STICKOS 3D! Quiero pedir ${p!.name}`;
-    msg += modalColor ? ` en color ${modalColor.name}` : ', color a coordinar';
-    msg += '.';
-    window.open(wa(msg), '_blank');
+    window.open(wa(`¡Hola STICKOS 3D! Quiero pedir ${p!.name}. ¿Qué colores hay?`), '_blank');
   }
 
   function handleShare() {
@@ -158,23 +147,7 @@ export function ProductModal({ product: p, onClose }: Props) {
         <div className="product-modal-info">
           <div className="eyebrow">{p.cat}</div>
           <h3>{p.name}</h3>
-          <div className="swatches" role="group" aria-label="Elegir color">
-            {COLORS.map((c) => (
-              <button
-                key={c.name}
-                type="button"
-                className={'swatch' + (modalColor?.name === c.name ? ' active' : '')}
-                style={{ background: c.hex }}
-                title={c.name}
-                aria-label={`Color ${c.name}`}
-                onClick={() => {
-                  setModalColor(c);
-                  playBlip(700);
-                }}
-              />
-            ))}
-            <span className="swatch-label">{modalColor ? modalColor.name : 'Elegí un color'}</span>
-          </div>
+          <p className="product-modal-note">Elegís los colores al confirmar por WhatsApp. Te mostramos las opciones.</p>
           <p className="product-modal-desc">{p.desc || ''}</p>
           <p className="product-modal-mat">{p.mat}</p>
         </div>

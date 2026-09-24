@@ -735,6 +735,14 @@ lo que le habla al maker. Un commit por bloque (A1…A8).
   `mat` de los productos visibles describe colores/lo que incluye, no el
   filamento — **al cargar un producto nuevo, `mat` va en ese lenguaje**.
   Las cards ya no muestran la línea material + gramos (sección 18).
-- **Color sin elegir en el modal** → se agrega como "A coordinar"
-  (`COLOR_TBD` en `config.ts`), no como Negro.
+- **Sin selector de color** (decisión B3, reemplaza el fix de A7): el color
+  se coordina por WhatsApp. El carrito usa el id del producto como clave y
+  cada ítem muestra "Color: a coordinar" (`COLOR_TBD` en `config.ts`). No
+  volver a agregar swatches mientras las fotos no cambien con el color.
+- **Plazos, una sola versión** (B1): producción según el badge de cada
+  producto (listo: en el día; a pedido: 3 a 5 días); correo, unos 7 días
+  hábiles, dicho una sola vez en "Cómo comprar".
+- **Garantía, una sola versión** (B2): "Si llega dañada, la rehacemos sin
+  cargo. Mandanos una foto dentro de las 48 h de recibida." Convive con la
+  garantía legal de 6 meses del footer, que es obligatoria.
 - **Sitemap** generado en el build (ver sección 2).
