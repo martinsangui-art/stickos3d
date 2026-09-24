@@ -11,14 +11,14 @@ interface Props {
 
 const NAV_LINKS: [href: string, label: string][] = [
   ['#catalogo', 'Catálogo'],
-  ['#pedido', 'Cotizador'],
+  ['#pedido', 'A medida'],
   ['#contacto', 'Contacto'],
   [`https://instagram.com/${CONFIG.instagram}`, 'Instagram'],
 ];
 
 const MOBILE_LINKS: [href: string, label: string][] = [
   ['#catalogo', 'Catálogo'],
-  ['#pedido', 'Cotizador'],
+  ['#pedido', 'A medida'],
   ['#comprar', 'Cómo comprar'],
   ['#contacto', 'Contacto'],
   [`https://instagram.com/${CONFIG.instagram}`, 'Instagram'],

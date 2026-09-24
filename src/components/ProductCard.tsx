@@ -172,11 +172,7 @@ export function ProductCard({ product: p, onOpenModal, revealDelayMs }: Props) {
         <div className="sweep"></div>
       </div>
       <div className="card-body">
-        {/* Nº de índice + categoría en una sola línea. El número sale del id
-            real del producto (p17 -> 17), que es la misma referencia que usa
-            el link para compartir (?p=p17). Va acá y no sobre la foto: ahí
-            chocaba con el badge de estado, que ocupa la misma esquina. */}
-        <div className="card-cat"><span className="card-idx">N° {p.id.replace(/^p/, '').padStart(2, '0')}</span>{p.cat}</div>
+        <div className="card-cat">{p.cat}</div>
         <h3>{p.name}</h3>
         <div className="card-foot">
           {confirmedPrice ? (

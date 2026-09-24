@@ -17,6 +17,18 @@ export const waWeb = (msg: string): string =>
    comparte elige a quién mandárselo. Es el mecanismo real por el que ya
    circulan productos de STICKOS 3D — un botón de compartir con el link y el
    precio precargados es gratis y capitaliza ese boca en boca existente. */
+/* Abrir WhatsApp con un mensaje ya armado. En pantallas táctiles navega en
+   la misma pestaña: los navegadores internos de Instagram y Facebook (de
+   donde llega casi todo el tráfico) pueden bloquear o ignorar window.open, y
+   el pedido se perdía sin aviso. En desktop sigue abriendo una pestaña nueva
+   para no sacar al cliente del sitio. Cualquier trackPixel va ANTES de
+   llamar a esto. */
+export function openWhatsApp(url: string): void {
+  const touch = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+  if (touch) window.location.href = url;
+  else window.open(url, '_blank');
+}
+
 export const shareWa = (msg: string): string => `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
 
 // Link para compartir un producto puntual. Con foto confirmada, apunta a la

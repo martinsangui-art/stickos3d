@@ -13,7 +13,7 @@ export function Social() {
       <div className={`wrap ${reveal.className}`} ref={reveal.ref}>
         <div className="eyebrow">Capa 05 — Redes</div>
         <h2 className="sec-title">Seguinos en redes</h2>
-        <p className="social-copy">Ahí van saliendo las piezas terminadas, los colores nuevos de filamento y los trabajos a medida que todavía no están en el catálogo.</p>
+        <p className="social-copy">Ahí van saliendo las piezas terminadas, los colores nuevos y los trabajos a medida que todavía no están en el catálogo.</p>
         {!gridBroken && (
           <div className="social-grid">
             <img src="/assets/products/huso-1.jpg" alt="Lámpara HUSO" loading="lazy" onError={() => setGridBroken(true)} />

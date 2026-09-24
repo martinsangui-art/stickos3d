@@ -11,7 +11,7 @@ export function Breather() {
         <p>Nada de elegir entre los 3 colores que quedaron en stock. Nos contás la idea y lo imprimimos a tu manera.</p>
         <div className="breather-badges">
           <span className="b-orange">Color</span>
-          <span className="b-teal">Material</span>
+          <span className="b-teal">Tamaño</span>
           <span>Diseño</span>
         </div>
       </div>

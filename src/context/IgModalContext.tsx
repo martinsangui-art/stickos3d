@@ -4,7 +4,6 @@ import { useIgModal } from '../hooks/useIgModal';
 interface IgModalContextValue {
   show: boolean;
   hide: () => void;
-  triggerFromCart: () => void;
 }
 
 const IgModalContext = createContext<IgModalContextValue | null>(null);

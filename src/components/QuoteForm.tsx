@@ -5,7 +5,7 @@ import {
   DELIVERY_OPTIONS, FILE_OPTIONS, FINISH_OPTIONS, SIZE_OPTIONS, WHEN_OPTIONS,
   type QuoteDelivery, type QuoteFile, type QuoteFinish, type QuoteSize, type QuoteWhen,
 } from '../lib/quote';
-import { fmt, wa } from '../lib/format';
+import { fmt, openWhatsApp, wa } from '../lib/format';
 import { trackPixel } from '../lib/pixel';
 
 function Choice<T extends string>({
@@ -60,7 +60,7 @@ export function QuoteForm() {
     if (!size || !delivery || !when || !hasFile) return;
     const msg = buildQuoteMessage({ name, desc, size, finish, qty, delivery, place, when, date, file: hasFile });
     trackPixel('Lead', { content_category: 'cotizador', ...(floor ? { value: floor, currency: 'ARS' } : {}) });
-    window.open(wa(msg), '_blank');
+    openWhatsApp(wa(msg));
   }
 
   return (
@@ -71,7 +71,7 @@ export function QuoteForm() {
           <h2 className="sec-title">¿No está en el catálogo?<br />Cotizalo ahora, acá.</h2>
           <ul>
             <li><span className="li-mark">YA</span><span><b>Precio de referencia al instante.</b> Elegí el tamaño y ves desde cuánto arranca, sin esperar que nadie te responda.</span></li>
-            <li><span className="li-mark">STL</span><span><b>¿Ya tenés el archivo?</b> Mandanos el STL/3MF por WhatsApp y afinamos el precio exacto.</span></li>
+            <li><span className="li-mark">ARCHIVO</span><span><b>¿Ya tenés el archivo?</b> Mandanos el archivo por WhatsApp y afinamos el precio exacto.</span></li>
             <li><span className="li-mark">IDEA</span><span><b>¿Tenés una idea, no un archivo?</b> Contanos qué necesitás y te ayudamos a diseñarlo desde cero, a medida.</span></li>
             <li><span className="li-mark">LOTE</span><span><b>Cantidad.</b> Souvenirs, merchandising y series para eventos o negocios, con descuento por volumen.</span></li>
           </ul>
@@ -150,7 +150,7 @@ export function QuoteForm() {
               </p>
             </div>
           )}
-          <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>Confirmar cotización por WhatsApp</button>
+          <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>Pedir cotización por WhatsApp</button>
           <p className="form-note">Se abre WhatsApp con tu pedido ya redactado. Si tenés archivo o fotos, los adjuntás ahí.</p>
         </form>
       </div>
