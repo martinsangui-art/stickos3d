@@ -1,58 +1,56 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const KEY = 'stickos_ig_modal_seen';
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 
-/* Modal "Seguinos en Instagram" — dispara con lo que pase primero: scroll
-   pasado el 50% de la página, o un producto agregado al pedido
-   (ver triggerFromCart, llamado desde CartContext.addToCart). No vuelve a
-   aparecer hasta pasada una semana (localStorage).
+function readSeen(): string | null {
+  try {
+    return window.localStorage.getItem(KEY);
+  } catch {
+    return null; // storage bloqueado: se trata como primera visita
+  }
+}
 
-   Portado del <script> inline del original: ahí el gatillo del carrito vivía
-   en window.__igCartTrigger porque addToCart y este bloque eran scripts
-   separados sin módulo compartido; acá el mismo rol lo cumple IgModalContext,
-   que expone triggerFromCart() a quien lo necesite (CartContext) sin
-   variables globales. */
+function markSeen() {
+  try {
+    window.localStorage.setItem(KEY, String(Date.now()));
+  } catch {
+    // sin storage no se recuerda; en el peor caso vuelve a aparecer otra visita
+  }
+}
+
+// Carrito o modal de producto abiertos: el cliente está comprando, no se lo
+// interrumpe. Se lee del DOM porque esos estados viven en componentes que no
+// comparten contexto con este hook.
+function isShopping(): boolean {
+  return Boolean(document.querySelector('.drawer.open, .product-modal:not([hidden])'));
+}
+
+/* Modal "Seguinos en Instagram" (5 % off si nos seguís). Único gatillo: scroll
+   pasado el 50 % de la página, y nunca con el carrito o un modal de producto
+   abierto — en ese caso sigue armado y aparece en el próximo scroll con la
+   pantalla libre. Antes también se disparaba al tocar "Agregar", justo en el
+   momento en que el cliente decidía comprar. No vuelve a aparecer hasta pasada
+   una semana (localStorage). */
 export function useIgModal() {
   const [show, setShow] = useState(false);
-  const armedRef = useRef(false);
-  const triggerRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    const last = window.localStorage.getItem(KEY);
-    const now = Date.now();
-    if (!last || now - parseInt(last, 10) > WEEK) {
-      armedRef.current = true;
-    } else {
-      return; // ya se mostró esta semana: no arma scroll listener ni trigger
-    }
-
-    function trigger() {
-      if (!armedRef.current) return;
-      armedRef.current = false;
-      window.removeEventListener('scroll', onScroll);
-      setShow(true);
-      window.localStorage.setItem(KEY, String(Date.now()));
-    }
-    triggerRef.current = trigger;
+    const last = readSeen();
+    if (last && Date.now() - parseInt(last, 10) <= WEEK) return; // ya se mostró esta semana
 
     function onScroll() {
       const doc = document.documentElement;
       const scrollable = doc.scrollHeight - doc.clientHeight;
-      if (scrollable <= 0) return;
-      if (doc.scrollTop / scrollable > 0.5) trigger();
+      if (scrollable <= 0 || doc.scrollTop / scrollable <= 0.5) return;
+      if (isShopping()) return;
+      window.removeEventListener('scroll', onScroll);
+      setShow(true);
+      markSeen();
     }
     window.addEventListener('scroll', onScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      armedRef.current = false;
-    };
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  return {
-    show,
-    hide: () => setShow(false),
-    triggerFromCart: () => triggerRef.current(),
-  };
+  return { show, hide: () => setShow(false) };
 }

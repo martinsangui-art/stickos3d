@@ -26,7 +26,7 @@ export function CartDrawer({ open, onClose }: Props) {
     items.forEach(([, i]) => {
       msg += `• ${i.name} — x${i.qty} — ${fmt(i.price * i.qty)}\n`;
     });
-    msg += `\nTotal estimado: ${fmt(total)}\n\n¿Me confirman disponibilidad, colores y forma de pago?`;
+    msg += `\nTotal estimado: ${fmt(total)}\n\nMi usuario de Instagram (5 % off): \n\n¿Me confirman disponibilidad, colores y forma de pago?`;
     trackPixel('InitiateCheckout', {
       value: total,
       currency: 'ARS',
@@ -66,6 +66,7 @@ export function CartDrawer({ open, onClose }: Props) {
         </div>
         <div className="drawer-foot">
           <div className="total-row"><span>Total estimado</span><span className="price">{fmt(total)}</span></div>
+          <p className="drawer-ig">¿Nos seguís en Instagram? 5 % off: dejá tu usuario en el mensaje.</p>
           <button className="btn btn-primary" onClick={checkout}>Enviar pedido por WhatsApp</button>
           <p className="drawer-note">Te confirmamos stock y plazo, y te pasamos el link de Mercado Pago o los datos de transferencia. Sin vueltas.</p>
         </div>

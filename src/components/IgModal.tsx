@@ -15,8 +15,8 @@ export function IgModal() {
           </svg>
         </div>
         <div className="ig-modal-eyebrow">@stickos3de</div>
-        <h4>Mirá lo último del taller</h4>
-        <p>Fotos de piezas recién salidas de la impresora, colores en vivo, y lo próximo que se viene — antes de que llegue al catálogo.</p>
+        <h4>5 % off si nos seguís</h4>
+        <p>Seguinos en Instagram y pasanos tu usuario cuando confirmes el pedido por WhatsApp. Te descontamos el 5 %.</p>
         <a href="https://instagram.com/stickos3de" target="_blank" rel="noopener" className="ig-modal-follow">Seguir en Instagram</a>
         <button className="ig-modal-dismiss" onClick={hide}>Ahora no</button>
       </div>
