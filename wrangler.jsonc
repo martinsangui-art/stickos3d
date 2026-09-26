@@ -1,0 +1,25 @@
+// Hosting en Cloudflare Workers (static assets): sirve dist/ tal cual sale de
+// `npm run build`, sin código de Worker. El deploy automático es Workers
+// Builds (repo conectado desde el panel de Cloudflare), no GitHub Actions.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Tiene que coincidir con el nombre del Worker en el panel: si no, Workers
+  // Builds falla el deploy.
+  "name": "stickos3d",
+  "compatibility_date": "2026-09-26",
+  "assets": {
+    "directory": "./dist",
+    // "none": /p/<id>.html se sirve tal cual, 200. Con el default
+    // ("auto-trailing-slash") responde 307 → /p/<id>, y las URLs con .html son
+    // las que ya circulan por WhatsApp (ver scripts/generate-share-pages.mjs).
+    "html_handling": "none",
+    // Obligatorio con "none": sin resolución de index, "/" no matchea ningún
+    // archivo y daría 404. El fallback de SPA es lo que sirve index.html en "/"
+    // y en "/?p=<id>". Efecto lateral: una ruta inexistente devuelve la home
+    // con 200 en vez de 404.
+    "not_found_handling": "single-page-application"
+  },
+  // Solo para probar antes de mover el dominio. Los routes del dominio propio
+  // se agregan en el cambio de DNS.
+  "workers_dev": true
+}
