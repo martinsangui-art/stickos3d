@@ -1,10 +1,22 @@
+import { useEffect, useState } from 'react';
 import { wa } from '../lib/format';
 import { trackPixel } from '../lib/pixel';
 
 export function WhatsAppFloat() {
+  // Sobre el catálogo la píldora ancha de desktop tapaba el "Agregar" de la
+  // última card de la fila: ahí se achica a solo ícono, como en mobile.
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const catalog = document.getElementById('catalogo');
+    if (!catalog || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(([entry]) => setCompact(entry.isIntersecting));
+    io.observe(catalog);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <a
-      className="wa-float"
+      className={`wa-float${compact ? ' compact' : ''}`}
       href={wa('¡Hola STICKOS 3D! Quería hacer una consulta.')}
       target="_blank"
       rel="noopener"
