@@ -1,6 +1,7 @@
 import { CONFIG } from '../data/config';
 import { VISIBLE_PRODUCTS } from '../data/products';
 import type { StockStatusKey } from '../data/types';
+import { FAQ } from '../data/faq';
 
 const SITE_URL = 'https://stickos3d.com.ar/';
 
@@ -134,6 +135,18 @@ function productListSchema() {
   };
 }
 
+function faqSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ.map((it) => ({
+      '@type': 'Question',
+      name: it.q,
+      acceptedAnswer: { '@type': 'Answer', text: it.a },
+    })),
+  };
+}
+
 export function generateStructuredData(): object[] {
-  return [localBusinessSchema(), productListSchema()];
+  return [localBusinessSchema(), productListSchema(), faqSchema()];
 }

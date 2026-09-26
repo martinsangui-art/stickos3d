@@ -803,6 +803,30 @@ textarea{resize:vertical;min-height:80px}
 
 /* ---------- Cómo comprar ---------- */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+
+/* ---------- Preguntas frecuentes ---------- */
+.faq{border-top:1px solid var(--line)}
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:64px;align-items:start}
+.faq .sec-head{margin-bottom:0}
+.faq-list{border-top:1px solid var(--line)}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list summary{
+  list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:18px;
+  padding:20px 0;font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text);
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{
+  content:"+";font-family:var(--font-mono);font-size:20px;color:var(--accent);flex-shrink:0;
+  transition:transform .2s;
+}
+.faq-list details[open] summary::after{transform:rotate(45deg)}
+.faq-list summary:hover{color:var(--accent)}
+.faq-list summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.faq-list details p{color:var(--muted);line-height:1.65;padding:0 36px 22px 0;max-width:62ch}
+@media(max-width:900px){
+  .faq-grid{grid-template-columns:1fr;gap:32px}
+  .faq-list summary{font-size:16px;padding:18px 0}
+}
 .step{
   background:var(--surface);border:1px solid var(--line);
   border-radius:var(--radius);padding:28px;

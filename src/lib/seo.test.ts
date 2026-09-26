@@ -46,4 +46,12 @@ describe('generateStructuredData', () => {
       'https://schema.org/Friday',
     ]);
   });
+
+  it('incluye el FAQPage con las mismas preguntas que la sección visible', async () => {
+    const { FAQ } = await import('../data/faq');
+    const faq = generateStructuredData()[2] as { '@type': string; mainEntity: { name: string; acceptedAnswer: { text: string } }[] };
+    expect(faq['@type']).toBe('FAQPage');
+    expect(faq.mainEntity.map((q) => q.name)).toEqual(FAQ.map((it) => it.q));
+    faq.mainEntity.forEach((q) => expect(q.acceptedAnswer.text.length).toBeGreaterThan(20));
+  });
 });

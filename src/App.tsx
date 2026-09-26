@@ -8,6 +8,7 @@ import { Breather } from './components/Breather';
 import { ProductGrid } from './components/ProductGrid';
 import { QuoteForm } from './components/QuoteForm';
 import { HowToBuy } from './components/HowToBuy';
+import { FAQ } from './components/FAQ';
 import { ContactForm } from './components/ContactForm';
 import { Social } from './components/Social';
 import { Footer } from './components/Footer';
@@ -60,6 +61,7 @@ function AppShell() {
       <ProductGrid />
       <QuoteForm />
       <HowToBuy />
+      <FAQ />
       <ContactForm />
       <Social />
       <Footer />
