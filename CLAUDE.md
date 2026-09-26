@@ -830,8 +830,8 @@ Ruta A (sección 18) sigue; se cambió la jerarquía. Un commit por cambio:
   es "Cotizalo ahora, acá." a secas: el "¿No está en el catálogo?" ya lo
   dice el título de esta sección, dos pantallas antes.
   Foco en el textarea solo con mouse (en táctil abriría el teclado).
-  **"La pieza que no se consigue" (repuestos/piezas funcionales) es una
-  línea de negocio nueva que propuso Claude — confirmar con Martín.**
+  **"La pieza que no se consigue" (repuestos/piezas funcionales)**: línea
+  de negocio nueva, propuesta por Claude y confirmada por Martín (26/09).
 - **R3 Mobile ≤560px: catálogo en 2 columnas.** Foto 1:1, sin flechas
   (swipe), badge con `STOCK_STATUS.short`. Home mobile 15.092 → ~12.800px
   (con la FAQ sumada).
