@@ -992,7 +992,15 @@ body:has(.drawer.open) .toast.show{transform:translate(-50%,0)}
   box-shadow:0 6px 24px rgba(0,0,0,.4);transition:transform .18s;
 }
 .wa-float:hover{transform:scale(1.07)}
-.wa-float svg{width:28px;height:28px;fill:#fff}
+.wa-float svg{width:28px;height:28px;fill:#fff;flex-shrink:0}
+/* Desktop: el botón dice qué hace. En mobile queda solo el ícono (el
+   texto taparía la grilla). */
+.wa-label{display:none}
+@media(min-width:901px){
+  .wa-float{width:auto;padding:0 22px 0 16px;gap:10px}
+  .wa-float:hover{transform:translateY(-2px)}
+  .wa-label{display:inline;color:#fff;font-family:var(--font-mono);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+}
 
 @media(max-width:900px){
   .custom-grid,.contact-grid{grid-template-columns:1fr;gap:40px}
