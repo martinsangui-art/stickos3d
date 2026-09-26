@@ -30,9 +30,6 @@ cada push a `main`.
 **"GitHub Actions"**. Antes el sitio se servía directo desde la rama; ahora
 lo sirve el artifact que sube el workflow.
 
-El dominio propio (`CNAME`) sigue funcionando igual — vive en `public/CNAME`
-y Vite lo copia a `dist/` en cada build.
-
 ## Configurar sus datos
 
 Abrí `src/data/config.ts`:
