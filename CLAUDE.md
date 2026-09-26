@@ -790,3 +790,17 @@ lo que le habla al maker. Un commit por bloque (A1…A8).
   cortaba la lámpara.
 - **`mat` de todos los productos** (visibles y ocultos) va en lenguaje de
   comprador. Al publicar un oculto, revisar igual la `desc`.
+
+---
+
+## 24. Detalle de producto en mobile: un solo scroll (26/09/2026)
+
+Bug: la galería quedaba fija arriba y la descripción scrolleaba en un
+contenedor propio de ~255px, cortada contra la foto. Ahora, en mobile
+(`max-width:720px`), `.product-modal-content` es el único contenedor de
+scroll: la galería (tope 55svh) sube con el texto. **Precio y botones siguen
+sticky abajo, dentro del mismo scroll** (decisión de Martín, 26/09: se
+mantiene la regla de la sección 15, "Agregar" siempre visible). Cerrar y
+compartir van en `.product-modal-actions`, sticky arriba en mobile y
+`display:contents` en desktop. Esto reemplaza lo que decía la sección 15
+sobre la galería fija y la info con scroll propio. Desktop, sin cambios.
