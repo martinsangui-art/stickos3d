@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { QUOTE_PREFILL_EVENT } from './Breather';
 import { useReveal } from '../hooks/useReveal';
 import {
   buildQuoteMessage, quoteFloor,
@@ -53,6 +54,28 @@ export function QuoteForm() {
   const [desc, setDesc] = useState('');
   const [name, setName] = useState('');
 
+  const descRef = useRef<HTMLTextAreaElement>(null);
+
+  // Los tiles de "A medida" (Breather) precargan la descripción. Solo si el
+  // cliente todavía no escribió nada: nunca pisar lo que ya tipeó.
+  useEffect(() => {
+    function onPrefill(e: Event) {
+      const text = (e as CustomEvent<{ desc: string }>).detail?.desc ?? '';
+      setDesc((cur) => (cur.trim() ? cur : text));
+      // Foco solo con mouse: en táctil abriría el teclado encima del scroll.
+      // Espera al scroll suave; con preventScroll no lo interrumpe.
+      if (!window.matchMedia('(hover: hover)').matches) return;
+      setTimeout(() => {
+        const el = descRef.current;
+        if (!el) return;
+        el.focus({ preventScroll: true });
+        el.setSelectionRange(el.value.length, el.value.length);
+      }, 650);
+    }
+    window.addEventListener(QUOTE_PREFILL_EVENT, onPrefill);
+    return () => window.removeEventListener(QUOTE_PREFILL_EVENT, onPrefill);
+  }, []);
+
   const floor = size ? quoteFloor(size) : null;
 
   function handleSubmit(e: React.FormEvent) {
@@ -82,6 +105,7 @@ export function QuoteForm() {
             ¿Qué necesitás?
             <textarea
               id="cfDesc"
+              ref={descRef}
               placeholder='Ej: "Quiero un portalápices tipo pulpo, unos 15cm de alto" (cualquier tamaño, lo cotizamos según el caso)'
               required
               value={desc}
