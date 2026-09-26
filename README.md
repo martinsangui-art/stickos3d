@@ -1,6 +1,6 @@
 # STICKOS 3D — Sitio web
 
-Vite + React + TypeScript, deployado a GitHub Pages vía GitHub Actions.
+Vite + React + TypeScript, servido desde Cloudflare Workers.
 
 > Este proyecto era antes un único `index.html` sin build ni dependencias.
 > Se migró a Vite + React para poder testear la lógica de negocio (cotizador,
@@ -22,13 +22,17 @@ npm run lint       # eslint
 
 ## Deploy
 
-`.github/workflows/deploy.yml` builda y publica `dist/` a GitHub Pages en
-cada push a `main`.
+Cloudflare **Workers Builds**, conectado a este repo desde el panel de
+Cloudflare: en cada push a `main` corre `npm run build` y
+`npx wrangler deploy`. Qué carpeta se sirve y cómo se resuelven las rutas
+está en `wrangler.jsonc`.
 
-**Paso manual único, una sola vez:** en el repo de GitHub, ir a
-**Settings → Pages → Source** y cambiar de "Deploy from a branch" a
-**"GitHub Actions"**. Antes el sitio se servía directo desde la rama; ahora
-lo sirve el artifact que sube el workflow.
+Para probar el build con el mismo servidor que producción (redirects, 404,
+`/p/<id>.html`): `npm run build && npx wrangler dev`. `npm run preview`
+(Vite) no replica ese comportamiento.
+
+Deploy manual, si hiciera falta: `npm run build && npx wrangler deploy` (la
+primera vez pide `npx wrangler login`).
 
 ## Configurar sus datos
 
