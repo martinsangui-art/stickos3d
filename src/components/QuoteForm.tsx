@@ -91,7 +91,7 @@ export function QuoteForm() {
       <div className="wrap custom-grid">
         <div className={copyReveal.className} ref={copyReveal.ref}>
           <div className="eyebrow">Capa 02 — Pieza a medida</div>
-          <h2 className="sec-title">¿No está en el catálogo?<br />Cotizalo ahora, acá.</h2>
+          <h2 className="sec-title">Cotizalo ahora, acá.</h2>
           <ul>
             <li><span className="li-mark">YA</span><span><b>Precio de referencia al instante.</b> Elegí el tamaño y ves desde cuánto arranca, sin esperar que nadie te responda.</span></li>
             <li><span className="li-mark">ARCHIVO</span><span><b>¿Ya tenés el archivo?</b> Mandanos el archivo por WhatsApp y afinamos el precio exacto.</span></li>
