@@ -451,10 +451,35 @@ header .logo .wm{font-size:27px}
 .breather h3{font-family:var(--font-display);font-size:clamp(30px,4.2vw,46px);font-weight:700;line-height:1.12;margin-bottom:16px;max-width:640px}
 .breather h3 span.accent{color:var(--signal-orange-on-paper);white-space:nowrap}
 .breather p{color:var(--warm-grey);max-width:480px;font-size:16px;line-height:1.6;margin-bottom:26px}
-.breather-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-.breather-badges span{font-family:var(--font-mono);font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:100px;border:1.5px solid var(--ink);color:var(--ink)}
-.breather-badges span.b-orange{border-color:var(--signal-orange-on-paper);color:var(--signal-orange-on-paper)}
-.breather-badges span.b-teal{border-color:var(--layer-teal-on-paper);color:var(--layer-teal-on-paper)}
+.breather,#customForm{scroll-margin-top:80px}
+/* Tiles de "A medida": botones que precargan el cotizador. Esquina recta
+   (Ruta A); en paper, borde ink fino y el hover lo marca el naranja. */
+.uses{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid rgba(20,18,15,.22);background:rgba(244,239,228,.85);position:relative;z-index:1}
+.use{
+  display:flex;flex-direction:column;gap:10px;text-align:left;
+  padding:24px 22px 22px;background:transparent;color:var(--ink);
+  border:0;border-right:1px solid rgba(20,18,15,.22);
+  cursor:pointer;transition:background .18s;font:inherit;
+}
+.use:last-child{border-right:0}
+.use:hover{background:#fff8ec}
+.use:focus-visible{outline:2px solid var(--signal-orange-on-paper);outline-offset:-2px}
+.use-n{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:var(--signal-orange-on-paper)}
+.use-t{font-family:var(--font-display);font-weight:700;font-size:19px;line-height:1.2}
+.use-d{font-size:14px;line-height:1.5;color:#5f5a51;flex:1}
+.use-cta{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--signal-orange-on-paper);margin-top:6px}
+.use:hover .use-cta{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:900px){
+  .uses{grid-template-columns:1fr 1fr}
+  .use:nth-child(2){border-right:0}
+  .use:nth-child(-n+2){border-bottom:1px solid rgba(20,18,15,.22)}
+}
+@media(max-width:560px){
+  .uses{grid-template-columns:1fr}
+  .use{border-right:0;border-bottom:1px solid rgba(20,18,15,.22);padding:18px 18px 16px;gap:6px}
+  .use:last-child{border-bottom:0}
+  .use-t{font-size:17px}
+}
 
 section{padding:96px 0}
 .sec-head{margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
@@ -472,6 +497,29 @@ section{padding:96px 0}
 
 /* ---------- Grid de productos ---------- */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
+.badge .lb-short{display:none}
+/* Mobile: dos columnas. Con una sola, las 14 piezas eran ~3.000px de scroll
+   antes de llegar al cotizador, que es por donde entran las ventas. Foto
+   cuadrada (las fotos son verticales), sin flechas (queda el swipe) y el
+   botón a lo ancho abajo del precio. */
+@media(max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .grid .tile{aspect-ratio:1/1}
+  .grid .tile-nav{display:none}
+  .grid .tick{display:none}
+  .grid .card-status{top:6px;left:6px}
+  .grid .badge{font-size:9.5px;padding:4px 7px;gap:5px}
+  .grid .badge .lb-long{display:none}
+  .grid .badge .lb-short{display:inline}
+  .grid .card-body{padding:11px 11px 12px;gap:4px}
+  .grid .card-cat{font-size:9.5px;letter-spacing:.14em}
+  .grid .card-body h3{font-size:14px;line-height:1.3}
+  .grid .card-foot{flex-direction:column;align-items:stretch;gap:8px;padding-top:8px}
+  .grid .price{font-size:14.5px}
+  .grid .foot-btns{justify-content:stretch}
+  .grid .add-btn,.grid .mp-btn{width:100%;padding:11px 6px;font-size:13px}
+  .grid .card:hover{transform:none}
+}
 .card{
   background:var(--surface);border:1px solid var(--line);
   overflow:hidden;position:relative;
@@ -755,6 +803,30 @@ textarea{resize:vertical;min-height:80px}
 
 /* ---------- Cómo comprar ---------- */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+
+/* ---------- Preguntas frecuentes ---------- */
+.faq{border-top:1px solid var(--line)}
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:64px;align-items:start}
+.faq .sec-head{margin-bottom:0}
+.faq-list{border-top:1px solid var(--line)}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list summary{
+  list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:18px;
+  padding:20px 0;font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--text);
+}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary::after{
+  content:"+";font-family:var(--font-mono);font-size:20px;color:var(--accent);flex-shrink:0;
+  transition:transform .2s;
+}
+.faq-list details[open] summary::after{transform:rotate(45deg)}
+.faq-list summary:hover{color:var(--accent)}
+.faq-list summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.faq-list details p{color:var(--muted);line-height:1.65;padding:0 36px 22px 0;max-width:62ch}
+@media(max-width:900px){
+  .faq-grid{grid-template-columns:1fr;gap:32px}
+  .faq-list summary{font-size:16px;padding:18px 0}
+}
 .step{
   background:var(--surface);border:1px solid var(--line);
   border-radius:var(--radius);padding:28px;
@@ -920,7 +992,19 @@ body:has(.drawer.open) .toast.show{transform:translate(-50%,0)}
   box-shadow:0 6px 24px rgba(0,0,0,.4);transition:transform .18s;
 }
 .wa-float:hover{transform:scale(1.07)}
-.wa-float svg{width:28px;height:28px;fill:#fff}
+.wa-float svg{width:28px;height:28px;fill:#fff;flex-shrink:0}
+/* Desktop: el botón dice qué hace. En mobile queda solo el ícono (el
+   texto taparía la grilla). */
+.wa-label{display:none}
+@media(min-width:901px){
+  .wa-float{width:auto;padding:0 22px 0 16px;gap:10px}
+  .wa-float:hover{transform:translateY(-2px)}
+  .wa-label{display:inline;color:#fff;font-family:var(--font-mono);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+  /* Sobre el catálogo, solo ícono: la píldora tapaba el "Agregar" de la
+     última card de la fila. */
+  .wa-float.compact{width:56px;padding:0}
+  .wa-float.compact .wa-label{display:none}
+}
 
 @media(max-width:900px){
   .custom-grid,.contact-grid{grid-template-columns:1fr;gap:40px}

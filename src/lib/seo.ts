@@ -1,6 +1,7 @@
 import { CONFIG } from '../data/config';
 import { VISIBLE_PRODUCTS } from '../data/products';
 import type { StockStatusKey } from '../data/types';
+import { FAQ } from '../data/faq';
 
 const SITE_URL = 'https://stickos3d.com.ar/';
 
@@ -85,7 +86,7 @@ function localBusinessSchema() {
     url: SITE_URL,
     image: `${SITE_URL}assets/og-image.png`,
     description:
-      'Lámparas y objetos de deco hechos a pedido en Bahía Blanca, en el color que elijas. Precios a la vista, retiro local y envíos a todo el país.',
+      'Impresiones 3D a pedido en Bahía Blanca: piezas a medida, regalos y lámparas. Precio de referencia al instante, retiro sin cargo y envíos a todo el país.',
     telephone: `+${CONFIG.whatsapp}`,
     address: {
       '@type': 'PostalAddress',
@@ -134,6 +135,18 @@ function productListSchema() {
   };
 }
 
+function faqSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ.map((it) => ({
+      '@type': 'Question',
+      name: it.q,
+      acceptedAnswer: { '@type': 'Answer', text: it.a },
+    })),
+  };
+}
+
 export function generateStructuredData(): object[] {
-  return [localBusinessSchema(), productListSchema()];
+  return [localBusinessSchema(), productListSchema(), faqSchema()];
 }
