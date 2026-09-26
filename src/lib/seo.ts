@@ -86,7 +86,7 @@ function localBusinessSchema() {
     url: SITE_URL,
     image: `${SITE_URL}assets/og-image.png`,
     description:
-      'Lámparas y objetos de deco hechos a pedido en Bahía Blanca, en el color que elijas. Precios a la vista, retiro local y envíos a todo el país.',
+      'Impresiones 3D a pedido en Bahía Blanca: piezas a medida, regalos y lámparas. Precio de referencia al instante, retiro sin cargo y envíos a todo el país.',
     telephone: `+${CONFIG.whatsapp}`,
     address: {
       '@type': 'PostalAddress',

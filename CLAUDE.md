@@ -837,6 +837,14 @@ Ruta A (sección 18) sigue; se cambió la jerarquía. Un commit por cambio:
   como Capa 04; Contacto pasa a 05 y Redes a 06.
 - **R5 WhatsApp flotante**: en desktop (≥901px) dice "Consultanos por
   WhatsApp"; en mobile solo ícono.
+- **R6 Metas**: meta description, `og:description` y el `description` del
+  LocalBusiness (`seo.ts`) arrancan con "Impresiones 3D a pedido en Bahía
+  Blanca". Motivo: en Search Console (export del 26/09/2026, últimos 3
+  meses) el 100 % de las búsquedas son de servicio local ("impresiones 3d
+  bahia blanca", "impresion 3d bahia blanca", "3d bahia blanca"); cero de
+  lámparas o regalos. Revierte a propósito lo de la sección 21 (metas sin
+  "impresión 3D"): no volver a sacarlo. Volver a mirar Search Console a
+  fines de octubre.
 
 **Fuera del código, más impacto que cualquier cambio de arriba** (ver
 charla del 26/09): perfil de Google Business + pedir reseñas después de
