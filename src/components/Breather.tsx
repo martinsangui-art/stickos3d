@@ -38,7 +38,7 @@ const USES: { key: string; title: string; text: string; prefill: string }[] = [
 function prefill(key: string, text: string) {
   window.dispatchEvent(new CustomEvent(QUOTE_PREFILL_EVENT, { detail: { desc: text } }));
   trackPixel('ViewContent', { content_category: 'a-medida', content_name: key });
-  document.getElementById('pedido')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('customForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 export function Breather() {
