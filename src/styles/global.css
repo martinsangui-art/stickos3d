@@ -578,6 +578,7 @@ section{padding:96px 0}
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:color .18s,border-color .18s;
 }
+.product-modal-actions{display:contents}
 .product-modal-share:hover{color:var(--accent);border-color:var(--accent)}
 .product-modal-share svg{width:16px;height:16px}
 .product-modal-cta{display:flex;flex-direction:column;gap:12px;grid-area:cta;padding:16px 32px 32px}
@@ -597,31 +598,30 @@ section{padding:96px 0}
   .product-modal-gallery{aspect-ratio:1.2}
 
   /* ---- Bottom sheet: el modal de producto se ancla abajo en vez de
-     quedar centrado. La galería queda fija arriba, la descripción
-     scrollea en su propio contenedor angosto (.product-modal-info), y
-     precio + "Agregar" quedan en una franja fija abajo que ningún
-     scroll puede tapar ni sacar de vista — antes había que scrollear
-     DENTRO del modal para encontrar el botón de compra, algo que nadie
-     descubre solo. ---- */
+     quedar centrado, y el panel entero es UN solo contenedor de scroll:
+     foto, nombre y descripción suben juntos como una página. Antes la
+     galería quedaba fija arriba y la descripción scrolleaba en su propio
+     contenedor (.product-modal-info) de ~255px entre la foto y el pie: se
+     leía en una franja chica y se cortaba contra el borde de la imagen.
+     Precio + "Agregar" siguen siempre a la vista (sticky abajo, dentro del
+     mismo scroll): sin eso nadie encuentra el botón de compra. Cerrar y
+     compartir, sticky arriba. svh y no vh por las barras del navegador en
+     iOS. ---- */
   .product-modal{align-items:flex-end;padding:0}
-  /* CSS Grid con filas 1fr no se achica de forma confiable cuando el
-     contenedor solo tiene max-height (no height fija) — probado durante
-     el desarrollo de esto mismo: el bloque de precio+CTA terminaba
-     empujado fuera de la pantalla en vez de quedar fijo abajo. Flexbox
-     con flex:1 + min-height:0 en el medio es el patrón estándar para
-     "encabezado fijo + medio scrolleable + pie fijo" y sí respeta
-     max-height de forma consistente — por eso el mobile pasa a flex-column
-     en vez de heredar el grid de desktop. */
   .product-modal-content{
     display:flex;flex-direction:column;
-    width:100%;max-width:none;max-height:92vh;border-radius:20px 20px 0 0;
-    overflow:hidden; /* el scroll pasa a .product-modal-info, no acá */
+    width:100%;max-width:none;max-height:92vh;max-height:92svh;border-radius:20px 20px 0 0;
+    overflow-x:hidden;overflow-y:auto;
+    overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
     animation:sheetUp .38s cubic-bezier(.16,.8,.24,1);
   }
-  .product-modal-gallery{flex-shrink:0}
-  .product-modal-info{flex:1;min-height:0;overflow-y:auto}
+  .product-modal-actions{
+    display:block;position:sticky;top:0;height:0;z-index:6;flex-shrink:0;
+  }
+  .product-modal-gallery{flex-shrink:0;max-height:55vh;max-height:55svh}
+  .product-modal-info{flex-shrink:0}
   .product-modal-cta{
-    flex-shrink:0;
+    position:sticky;bottom:0;z-index:2;flex-shrink:0;
     padding:14px 32px calc(14px + env(safe-area-inset-bottom, 0px));
     background:var(--ink-2);border-top:1px solid var(--line);
   }

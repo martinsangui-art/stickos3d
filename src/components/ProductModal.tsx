@@ -18,6 +18,7 @@ export function ProductModal({ product: p, onClose }: Props) {
   const [idx, setIdx] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   // Reset al abrir un producto nuevo.
   useEffect(() => {
@@ -39,15 +40,18 @@ export function ProductModal({ product: p, onClose }: Props) {
     setIdx((i) => (i + dir + slideCount) % slideCount);
   }
 
-  // Swipe táctil — mismo umbral (40px) y criterio que ya usa ProductCard
-  // para su slider chico; acá faltaba, solo se podía navegar con las flechas.
+  // Swipe táctil — mismo umbral (40px) que ProductCard. Solo cuenta si el
+  // gesto es más horizontal que vertical: en mobile el panel entero scrollea,
+  // y un scroll hacia abajo que se desvía de costado no tiene que cambiar la foto.
   function onTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   }
   function onTouchEnd(e: React.TouchEvent) {
     if (slideCount < 2) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(dx) >= 40) setIdx((i) => (i + (dx < 0 ? 1 : -1) + slideCount) % slideCount);
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy)) setIdx((i) => (i + (dx < 0 ? 1 : -1) + slideCount) % slideCount);
   }
 
   useEffect(() => {
@@ -99,6 +103,10 @@ export function ProductModal({ product: p, onClose }: Props) {
     <div className="product-modal">
       <div className="product-modal-backdrop" onClick={handleClose}></div>
       <div className="product-modal-content">
+        {/* Cerrar y compartir van en una capa propia: en mobile es sticky
+            arriba del panel (que scrollea entero) para que no se vayan con el
+            contenido. En desktop es display:contents y no cambia nada. */}
+        <div className="product-modal-actions">
         <button type="button" className="product-modal-close" onClick={handleClose} aria-label="Cerrar">✕</button>
         <button type="button" className="product-modal-share" onClick={handleShare} aria-label="Compartir este producto por WhatsApp" title="Compartir">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -106,6 +114,7 @@ export function ProductModal({ product: p, onClose }: Props) {
             <path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
           </svg>
         </button>
+        </div>
         <div className="product-modal-gallery">
           <div className="tile-slider" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <div className="tile-slider-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
