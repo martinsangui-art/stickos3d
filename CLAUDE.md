@@ -804,3 +804,43 @@ mantiene la regla de la sección 15, "Agregar" siempre visible). Cerrar y
 compartir van en `.product-modal-actions`, sticky arriba en mobile y
 `display:contents` en desktop. Esto reemplaza lo que decía la sección 15
 sobre la galería fija y la info con scroll propio. Desktop, sin cambios.
+
+---
+
+## 25. Reorientación a "a medida" (26/09/2026)
+
+Dato que lo motivó (Martín): **todas las ventas hasta hoy entraron por
+cotizaciones de piezas a medida** (cotizador → WhatsApp, o consulta por
+Instagram), ninguna por el carrito, y ya llega tráfico desde Google. El
+sitio estaba armado como tienda (catálogo primero) y el camino que vende
+quedaba al ~60 % del scroll en mobile. **No se hizo rediseño visual**: la
+Ruta A (sección 18) sigue; se cambió la jerarquía. Un commit por cambio:
+
+- **R1 Hero**: CTA principal "Cotizar una pieza a medida", secundario "Ver
+  catálogo". h1: "Piezas a medida, / lámparas y regalos / impresos en 3D."
+  — "impresos en 3D" va a propósito aunque la sección 21 sacó la jerga de
+  maker: es lo que la gente escribe en Google. Sigue midiendo una línea por
+  `span.capa` de 360 a 1440px.
+- **R2 Respiro paper → "A medida"**: cuatro casos (regalo con nombre, marca
+  en cantidad, lámpara a medida, pieza que no se consigue). Cada tile
+  dispara `stk:quote-prefill` (`QUOTE_PREFILL_EVENT` en `Breather.tsx`),
+  QuoteForm precarga la descripción **solo si está vacía** y hace scroll.
+  Foco en el textarea solo con mouse (en táctil abriría el teclado).
+  **"La pieza que no se consigue" (repuestos/piezas funcionales) es una
+  línea de negocio nueva que propuso Claude — confirmar con Martín.**
+- **R3 Mobile ≤560px: catálogo en 2 columnas.** Foto 1:1, sin flechas
+  (swipe), badge con `STOCK_STATUS.short`. Home mobile 15.092 → ~12.800px
+  (con la FAQ sumada).
+- **R4 FAQ** (`src/data/faq.ts`, `FAQ.tsx`, `faqSchema()` en `seo.ts`):
+  una sola fuente para la sección y el FAQPage. Solo datos ya publicados;
+  si cambian plazos, pagos, garantía o `QUOTE_FLOOR`, revisar acá. Queda
+  como Capa 04; Contacto pasa a 05 y Redes a 06.
+- **R5 WhatsApp flotante**: en desktop (≥901px) dice "Consultanos por
+  WhatsApp"; en mobile solo ícono.
+
+**Fuera del código, más impacto que cualquier cambio de arriba** (ver
+charla del 26/09): perfil de Google Business + pedir reseñas después de
+cada venta, Search Console para ver las búsquedas reales, fotos de los
+trabajos a medida entregados para convertir la sección R2 en portfolio, y
+**el repo es público**: `PRICING.md`, costos y la fórmula ×5.74 están
+indexados por Google.
