@@ -166,7 +166,8 @@ export function ProductCard({ product: p, onOpenModal, revealDelayMs }: Props) {
         <div className="card-status">
           <span className={`badge ${status.cls}`}>
             <span className="dot"></span>
-            {status.label}
+            <span className="lb-long">{status.label}</span>
+            <span className="lb-short" aria-hidden="true">{status.short}</span>
           </span>
         </div>
         <div className="sweep"></div>

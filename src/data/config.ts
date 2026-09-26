@@ -23,8 +23,10 @@ export const COLOR_TBD: Color = { name: 'A coordinar', hex: '#8C8579' };
 export const QUOTE_FLOOR = { chico: 12000, mediano: 25000, grande: 45000 } as const;
 
 // Vocabulario de estado — reutilizado del badge tipo máquina de la cola de impresión.
-export const STOCK_STATUS: Record<StockStatusKey, { label: string; cls: string }> = {
-  extruyendo: { label: 'Extruyendo ahora', cls: 'b-orange' },
-  listo: { label: 'Listo para retirar', cls: 'b-teal' },
-  pedido: { label: 'Bajo pedido — 3 a 5 días', cls: 'b-grey' },
+// `short` es la versión para la grilla de 2 columnas en mobile, donde la
+// card mide ~170px y la etiqueta larga no entra en una línea.
+export const STOCK_STATUS: Record<StockStatusKey, { label: string; short: string; cls: string }> = {
+  extruyendo: { label: 'Extruyendo ahora', short: 'Imprimiendo', cls: 'b-orange' },
+  listo: { label: 'Listo para retirar', short: 'Listo', cls: 'b-teal' },
+  pedido: { label: 'Bajo pedido — 3 a 5 días', short: '3 a 5 días', cls: 'b-grey' },
 };
