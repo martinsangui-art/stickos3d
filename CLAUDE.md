@@ -824,7 +824,11 @@ Ruta A (sección 18) sigue; se cambió la jerarquía. Un commit por cambio:
 - **R2 Respiro paper → "A medida"**: cuatro casos (regalo con nombre, marca
   en cantidad, lámpara a medida, pieza que no se consigue). Cada tile
   dispara `stk:quote-prefill` (`QUOTE_PREFILL_EVENT` en `Breather.tsx`),
-  QuoteForm precarga la descripción **solo si está vacía** y hace scroll.
+  QuoteForm precarga la descripción **solo si está vacía** y hace scroll
+  a `#customForm` (no a `#pedido`: en mobile la columna de texto va
+  primero y el textarea quedaba debajo del pliegue). El h2 del cotizador
+  es "Cotizalo ahora, acá." a secas: el "¿No está en el catálogo?" ya lo
+  dice el título de esta sección, dos pantallas antes.
   Foco en el textarea solo con mouse (en táctil abriría el teclado).
   **"La pieza que no se consigue" (repuestos/piezas funcionales) es una
   línea de negocio nueva que propuso Claude — confirmar con Martín.**
@@ -836,7 +840,9 @@ Ruta A (sección 18) sigue; se cambió la jerarquía. Un commit por cambio:
   si cambian plazos, pagos, garantía o `QUOTE_FLOOR`, revisar acá. Queda
   como Capa 04; Contacto pasa a 05 y Redes a 06.
 - **R5 WhatsApp flotante**: en desktop (≥901px) dice "Consultanos por
-  WhatsApp"; en mobile solo ícono.
+  WhatsApp"; en mobile solo ícono. Mientras `#catalogo` está en pantalla
+  vuelve a solo ícono también en desktop (clase `compact`): la píldora
+  tapaba el "Agregar" de la última card de la fila.
 - **R6 Metas**: meta description, `og:description` y el `description` del
   LocalBusiness (`seo.ts`) arrancan con "Impresiones 3D a pedido en Bahía
   Blanca". Motivo: en Search Console (export del 26/09/2026, últimos 3
